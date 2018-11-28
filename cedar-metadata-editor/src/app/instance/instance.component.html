@@ -1,0 +1,75 @@
+<div class="template-container scrollable-content">
+  <div class="template-body metadata">
+    <div class="container">
+      <div class="row">
+        <div class="right-body col-sm-10 col-sm-offset-1 c ">
+
+
+
+          <!-- build the form -->
+          <app-form form="form" model="instance" page-index="pageIndex" is-edit-data="isEditData"
+            path="0"></app-form>
+
+          <!-- errors and edit actions -->
+          <div class="edit-actions" ng-hide="$root.isEmpty(form)">
+
+            <!-- validation errors -->
+            <div ng-if="hasKeys(validationErrors)" class="alert alert-danger" role="alert">
+              <p><i class="fa fa-exclamation-triangle"></i><span
+                translate>VALIDATION.groupHeader.validationErrors</span></p>
+              <ul class="list-unstyled">
+                <li ng-repeat="(key, value) in validationErrors">
+                  <p>getValidationHeader(key)</p>
+                  <ul class="list-unstyled" style="margin:5px 5px 5px 20px;">
+                    <li ng-repeat="field in value">field['title']</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div ng-if="canWrite()" class="flex-right">
+              <button type="button" id="button-cancel-metadata" class="btn btn-clear metadata"
+                ng-click="cancelTemplate()" style="outline:none;" translate>GENERIC.Cancel
+              </button>
+              <button type="button" ng-if="isValidationTemplate('validation')" id="button-validation-metadata"
+                ng-disabled="saveButtonDisabled" class="btn btn-clear metadata " style="outline:none;"
+                ng-click="doValidation()" translate>GENERIC.Validate
+              </button>
+              <button type="button" id="button-save-metadata" ng-disabled="saveButtonDisabled"
+                class="btn btn-save metadata" ng-click="saveInstance()" style="outline:none;" translate>GENERIC.Save
+              </button>
+            </div>
+          </div>
+
+          <!-- document preview -->
+          <div id="document-preview">
+            <!--<ngb-accordion id="outputJSON" close-others="true">-->
+              <!--<div ngb-accordion-group is-open="openStatusJSONLD" class="panel-default">-->
+                <!--<ngb-accordion-heading>-->
+                  <!--<i class="cedar-svg-rdf1"></i> JSON-LD <i class="pull-right glyphicon"-->
+                  <!--ng-class="{'glyphicon-chevron-down': openStatusJSONLD, 'glyphicon-chevron-right': !openStatusJSONLD}"></i>-->
+                <!--</ngb-accordion-heading>-->
+                <!--<pre id='form-json-preview'>{{ cleanForm() | json }}</pre>-->
+              <!--</div>-->
+              <!--<div ngb-accordion-group is-open="openStatusRDF" class="panel-default">-->
+                <!--<ngb-accordion-heading>-->
+                  <!--<i class="cedar-svg-rdf"></i> RDF <i class="pull-right glyphicon"-->
+                  <!--ng-class="{'glyphicon-chevron-down': openStatusRDF, 'glyphicon-chevron-right': !openStatusRDF}"></i>-->
+                <!--</ngb-accordion-heading>-->
+                <!--<div ng-if="RDF">-->
+                  <!--<pre id='form-json-preview-rdf'>{{RDF}}</pre>-->
+                <!--</div>-->
+                <!--<div ng-if="!RDF && RDFError">-->
+                  <!--<div class="center warning">-->
+                    <!--{{RDFError}}-->
+                  <!--</div>-->
+                <!--</div>-->
+              <!--</div>-->
+            <!--</ngb-accordion>-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

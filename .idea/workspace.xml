@@ -2,7 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="11ec4402-2531-4864-a813-73cb445aca4f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.module.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/form/form.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/form/form.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/metadata-editor.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/metadata-editor.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cedar-metadata-editor/src/styles.less" beforeDir="false" afterPath="$PROJECT_DIR$/cedar-metadata-editor/src/styles.less" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,58 +33,189 @@
     <session id="1462683020">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.open.time.3" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.closed" value="4" />
+          <entry key="project.open.time.12" value="1" />
+          <entry key="project.open.time.2" value="1" />
+          <entry key="project.open.time.24" value="1" />
+          <entry key="project.open.time.3" value="2" />
+          <entry key="project.opened" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
       <usages-collector id="statistics.spring.boot.run.usages" />
-      <usages-collector id="statistics.js.language.service.starts" />
-      <usages-collector id="statistics.file.types.edit" />
+      <usages-collector id="statistics.js.language.service.starts">
+        <counts>
+          <entry key="Angular2LanguageService" value="4" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="HTML" value="322" />
+          <entry key="Less" value="73" />
+          <entry key="TypeScript" value="2878" />
+        </counts>
+      </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="HTML" value="1" />
-          <entry key="Less" value="1" />
-          <entry key="TypeScript" value="1" />
+          <entry key="Git file" value="2" />
+          <entry key="HTML" value="30" />
+          <entry key="JSON" value="2" />
+          <entry key="JavaScript" value="1" />
+          <entry key="Less" value="7" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="TypeScript" value="62" />
+          <entry key="tsconfig" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.spring.boot.mvc.usages" />
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="html" value="1" />
-          <entry key="less" value="1" />
-          <entry key="ts" value="1" />
+          <entry key="browserslist" value="1" />
+          <entry key="gitignore" value="2" />
+          <entry key="html" value="30" />
+          <entry key="js" value="1" />
+          <entry key="json" value="3" />
+          <entry key="less" value="7" />
+          <entry key="ts" value="62" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="html" value="322" />
+          <entry key="less" value="73" />
+          <entry key="ts" value="2878" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.less">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/template.service.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="43">
+              <caret line="404" column="16" lean-forward="true" selection-start-line="404" selection-start-column="8" selection-end-line="404" selection-end-column="16" />
+              <folding>
+                <element signature="e#165#10884#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="172">
+              <caret line="30" column="68" lean-forward="true" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="68" />
+              <folding>
+                <element signature="e#0#48#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.spec.ts">
+        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/validation.service.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="465">
+              <caret line="271" column="62" lean-forward="true" selection-start-line="271" selection-start-column="62" selection-end-line="271" selection-end-column="62" />
               <folding>
-                <element signature="e#0#55#0" expanded="true" />
+                <element signature="e#158#442#0" />
+                <element signature="e#564#803#0" />
+                <element signature="e#838#6620#0" />
+                <element signature="e#876#1038#0" />
+                <element signature="e#1047#1122#0" />
+                <element signature="e#1174#1233#0" />
+                <element signature="e#1188#1282#0" />
+                <element signature="e#1418#1531#0" />
+                <element signature="e#1589#1708#0" />
+                <element signature="e#1364#1446#0" />
+                <element signature="e#1049#1179#0" />
+                <element signature="e#2022#2176#0" />
+                <element signature="e#1299#1518#0" />
+                <element signature="e#1201#1489#0" />
+                <element signature="e#1940#2617#0" />
+                <element signature="e#1943#2240#0" />
+                <element signature="e#1914#2134#0" />
+                <element signature="e#2276#2740#0" />
+                <element signature="e#3486#5308#0" />
+                <element signature="e#6239#6633#0" />
+                <element signature="e#1183#1220#0" />
+                <element signature="e#1283#1638#0" />
+                <element signature="e#2753#3603#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/ui-util.service.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="15" column="21" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>uib</find>
+      <find>oninit</find>
+      <find>@white</find>
+      <find>@screen-lg</find>
+      <find>less</find>
+      <find>@screen</find>
+      <find>.text-hide</find>
+      <find>@media</find>
+      <find>.clearfix</find>
+      <find>background-image</find>
+      <find>user-menu-dropdown</find>
+      <find>uib-tooltip</find>
+      <find>valid</find>
+      <find>getValidationHeader</find>
+      <find>formatdocument</find>
+      <find>getvalidationheader</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/index.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.module.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.module.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/form/form.component.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/form/form.component.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/form/form.module.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.module.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/styles.less" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.module.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/template.service.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.html" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/ui-util.service.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.ts" />
+        <option value="$PROJECT_DIR$/cedar-metadata-editor/src/app/validation.service.ts" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -82,17 +232,16 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1174" />
-    <option name="y" value="-1416" />
-    <option name="width" value="1641" />
-    <option name="height" value="1350" />
+    <option name="x" value="20" />
+    <option name="y" value="23" />
+    <option name="width" value="1320" />
+    <option name="height" value="835" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -119,23 +268,46 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="app" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="metadata-editor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metadata-editor" type="462c0819:PsiDirectoryNode" />
+              <item name="cedar-metadata-editor" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="footer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="metadata-editor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="metadata-editor" type="462c0819:PsiDirectoryNode" />
+              <item name="cedar-metadata-editor" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="header" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1542518060853" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="settings.typescriptcompiler" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/cedar-metadata-editor/node_modules/typescript/lib" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cedar-metadata-editor/src/app/instance" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -196,28 +368,28 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1542312202310</updated>
-      <workItem from="1542312204258" duration="655000" />
+      <workItem from="1542312204258" duration="7740000" />
+      <workItem from="1542322656540" duration="13759000" />
+      <workItem from="1543252774254" duration="169000" />
+      <workItem from="1543253278266" duration="12000" />
+      <workItem from="1543346241408" duration="18209000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="655000" />
+    <option name="totallyTimeSpent" value="39889000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1174" y="-1416" width="1641" height="1350" extended-state="0" />
+    <frame x="20" y="23" width="1320" height="835" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Image Layers" />
-      <window_info id="Designer" />
-      <window_info id="UI Designer" />
-      <window_info id="Capture Tool" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24953096" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22222222" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Designer" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Capture Tool" order="5" />
+      <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -225,15 +397,20 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette" />
-      <window_info anchor="right" id="Theme Preview" />
-      <window_info anchor="right" id="Capture Analysis" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="Maven Projects" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TypeScript" order="9" visible="true" weight="0.20995963" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Palette&#9;" order="6" />
+      <window_info anchor="right" id="Database" order="7" />
+      <window_info anchor="right" id="Maven Projects" order="8" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -243,17 +420,252 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html">
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/browserslist">
       <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/karma.conf.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-header/cedar-header.module.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/cedar-footer.module.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/footer/footer.component.spec.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/footer/footer.component.html" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/footer/footer.component.less" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/footer/footer.component.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/cedar-footer.component.spec.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/cedar-footer.component.less" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/cedar-footer.component.html" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/cedar-footer/cedar-footer.component.ts" />
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/form/form.module.ts" />
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.spec.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/environments/environment.prod.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/environments/environment.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="23" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app-routing.module.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/form/form.component.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="21" selection-start-column="21" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.component.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/footer/footer.module.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="15" column="19" lean-forward="true" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.module.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="29" column="21" lean-forward="true" selection-start-line="29" selection-start-column="21" selection-end-line="29" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/node_modules/@ng-bootstrap/ng-bootstrap/buttons/checkbox.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="22" lean-forward="true" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="111">
+          <caret line="31" column="42" selection-start-line="31" selection-start-column="42" selection-end-line="31" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/tsconfig.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/angular.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="27" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="27" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.less">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.spec.ts">
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/form/form.component.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/styles.less">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="231" column="19" selection-start-line="231" selection-start-column="1" selection-end-line="231" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.html">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/app.component.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.module.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.component.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/header/header.module.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="19" lean-forward="true" selection-end-line="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/template.service.spec.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <folding>
-            <element signature="e#0#55#0" expanded="true" />
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/ui-util.service.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="21" selection-start-line="15" selection-start-column="21" selection-end-line="15" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/template.service.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="43">
+          <caret line="404" column="16" lean-forward="true" selection-start-line="404" selection-start-column="8" selection-end-line="404" selection-end-column="16" />
+          <folding>
+            <element signature="e#165#10884#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/instance/instance.component.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="30" column="68" lean-forward="true" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cedar-metadata-editor/src/app/validation.service.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="271" column="62" lean-forward="true" selection-start-line="271" selection-start-column="62" selection-end-line="271" selection-end-column="62" />
+          <folding>
+            <element signature="e#158#442#0" />
+            <element signature="e#564#803#0" />
+            <element signature="e#838#6620#0" />
+            <element signature="e#876#1038#0" />
+            <element signature="e#1047#1122#0" />
+            <element signature="e#1174#1233#0" />
+            <element signature="e#1188#1282#0" />
+            <element signature="e#1418#1531#0" />
+            <element signature="e#1589#1708#0" />
+            <element signature="e#1364#1446#0" />
+            <element signature="e#1049#1179#0" />
+            <element signature="e#2022#2176#0" />
+            <element signature="e#1299#1518#0" />
+            <element signature="e#1201#1489#0" />
+            <element signature="e#1940#2617#0" />
+            <element signature="e#1943#2240#0" />
+            <element signature="e#1914#2134#0" />
+            <element signature="e#2276#2740#0" />
+            <element signature="e#3486#5308#0" />
+            <element signature="e#6239#6633#0" />
+            <element signature="e#1183#1220#0" />
+            <element signature="e#1283#1638#0" />
+            <element signature="e#2753#3603#0" />
           </folding>
         </state>
       </provider>
