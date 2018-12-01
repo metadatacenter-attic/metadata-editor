@@ -2,13 +2,11 @@
   <div class="template-body metadata">
     <div class="container">
       <div class="row">
-        <div class="right-body col-sm-10 col-sm-offset-1 c ">
-
-
+        <ngb-panel class="right-body col-sm-10 col-sm-offset-1 c ">
 
           <!-- build the form -->
-          <app-form form="form" model="instance" page-index="pageIndex" is-edit-data="isEditData"
-            path="0"></app-form>
+          <!--<app-form [form]="form"  [model]="instance" [page]="page"></app-form>-->
+          <app-form [questions]="questions"></app-form>
 
           <!-- errors and edit actions -->
           <div class="edit-actions" ng-hide="$root.isEmpty(form)">
@@ -42,34 +40,34 @@
           </div>
 
           <!-- document preview -->
-          <div id="document-preview">
-            <!--<ngb-accordion id="outputJSON" close-others="true">-->
-              <!--<div ngb-accordion-group is-open="openStatusJSONLD" class="panel-default">-->
-                <!--<ngb-accordion-heading>-->
-                  <!--<i class="cedar-svg-rdf1"></i> JSON-LD <i class="pull-right glyphicon"-->
-                  <!--ng-class="{'glyphicon-chevron-down': openStatusJSONLD, 'glyphicon-chevron-right': !openStatusJSONLD}"></i>-->
-                <!--</ngb-accordion-heading>-->
-                <!--<pre id='form-json-preview'>{{ cleanForm() | json }}</pre>-->
-              <!--</div>-->
-              <!--<div ngb-accordion-group is-open="openStatusRDF" class="panel-default">-->
-                <!--<ngb-accordion-heading>-->
-                  <!--<i class="cedar-svg-rdf"></i> RDF <i class="pull-right glyphicon"-->
-                  <!--ng-class="{'glyphicon-chevron-down': openStatusRDF, 'glyphicon-chevron-right': !openStatusRDF}"></i>-->
-                <!--</ngb-accordion-heading>-->
-                <!--<div ng-if="RDF">-->
-                  <!--<pre id='form-json-preview-rdf'>{{RDF}}</pre>-->
-                <!--</div>-->
-                <!--<div ng-if="!RDF && RDFError">-->
-                  <!--<div class="center warning">-->
-                    <!--{{RDFError}}-->
-                  <!--</div>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</ngb-accordion>-->
-          </div>
-        </div>
+          <ngb-panel id="document-preview">
+
+            <ngb-accordion #acc="ngbAccordion">
+              <ngb-panel id="toggle-1" title="JSON-LD">
+                <ng-template ngbPanelContent>
+                  <pre id='form-json-preview'> {{questions | json}}</pre>
+                  <!--<pre id='form-json-preview'>{{ cleanForm(questions) |json}}</pre>-->
+                </ng-template>
+              </ngb-panel>
+              <ngb-panel id="toggle-2" title="RDF">
+                <ng-template ngbPanelContent>
+                  <div ng-if="RDF">
+                    <pre id='form-json-preview-rdf'>{{RDF}}</pre>
+                  </div>
+                  <div ng-if="!RDF && RDFError">
+                    <div class="center warning">
+                      {{RDFError}}
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-panel>
+            </ngb-accordion>
+
+          </ngb-panel>
+        </ngb-panel>
       </div>
     </div>
   </div>
 </div>
+
 

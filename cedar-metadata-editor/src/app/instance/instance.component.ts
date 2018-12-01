@@ -1,104 +1,167 @@
 import {Component, OnInit} from '@angular/core';
-import {TemplateService} from '../template.service';
-import {UiUtilService} from '../ui-util.service';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
+
+import { QuestionService } from './form/question.service';
+import { FormService } from '../form.service';
+import { TemplateService } from '../template.service';
+import { UiUtilService } from '../ui-util.service';
 
 
 @Component({
   selector: 'app-instance',
-  templateUrl: './instance.component.html'
+  templateUrl: './instance.component.html',
+  providers:  [QuestionService]
 })
 
 export class InstanceComponent implements OnInit {
-  title: string;
-  status: string;
-  version: string;
-  name: string;
+  // title: string;
+  // status: string;
+  // version: string;
+  // name: string;
+  // id:string;
+  // templateId:string;
+  // page:number;
+  // instance: object;
+  // validationErrors: any;
+  // validationResponse: Array<object>;
+  // details: any;
+  // form: object;
 
-  instance: object;
-  validationErrors: any;
-  validationResponse: Array<object>;
-  details: any;
-  form: object;
-  const: object;
+  questions: any[];
 
-  constructor(private templateService: TemplateService, private uiUtilService: UiUtilService) {
-    this.form = templateService.getTemplate();
-    this.const = templateService.const;
-    this.status = this.form[this.const["publication"]["STATUS"]];
-    this.version = this.form[this.const["publication"]["VERSION"]];
-    this.name = this.form[this.const["model"]["NAME"]];
-
-    uiUtilService.setTemplate(this.status, this.version, this.name);
+  constructor(service: QuestionService) {
+    this.questions = service.getQuestions();
   }
 
-  ngOnInit() {
-    this.title = 'Metadata Editor';
-    this.instance = {};
-    this.details = {};
-    this.validationErrors = {};
-    this.validationResponse = [
-      {
-        "type": "biosample",
-        "template": "biosample",
-        "action": []
-      },
-      {
-        "type": "airr",
-        "template": "miairr",
-        "action": ["validation", "submission"]
-      },
-      {
-        "type": "lincs",
-        "template": "dsgc dataset template 1.0",
-        "action": ["validation"]
-      }
-    ];
+  ngOnInit() {}
 
 
-    // permissions
-    //
-    //this.saveButtonDisabled = false;
+  // constructor(private templateService: TemplateService,
+  //             private formService: FormService,
+  //             private uiUtilService: UiUtilService,
+  //             private route: ActivatedRoute,
+  //             private router: Router) {
+  //
+  //   this.formService = formService;
+  //   this.uiUtilService = uiUtilService;
+  //
+  //   this.id = this.route.snapshot.paramMap.get('id');
+  //   this.templateId = this.route.snapshot.paramMap.get('templateId');
+  //   this.form = templateService.getTemplate(this.id, this.templateId);
+  //   this.instance = {};
+  //   this.page = 0;
+  //
+  //   this.status = formService.getStatus(this.form);
+  //   this.version = formService.getVersion(this.form);
+  //   this.name = formService.getTitle(this.form);
+  //
+  //   uiUtilService.setTemplate(this.status, this.version, this.name);
+  // }
+  //
+  // ngOnInit() {
+  //
+  //   this.title = 'Metadata Editor';
+  //   this.details = {};
+  //   this.validationErrors = {};
+  //   this.validationResponse = [
+  //     {
+  //       "type": "biosample",
+  //       "template": "biosample",
+  //       "action": []
+  //     },
+  //     {
+  //       "type": "airr",
+  //       "template": "miairr",
+  //       "action": ["validation", "submission"]
+  //     },
+  //     {
+  //       "type": "lincs",
+  //       "template": "dsgc dataset template 1.0",
+  //       "action": ["validation"]
+  //     }
+  //   ];
+  //
+  //
+  //   // permissions
+  //   //
+  //   //this.saveButtonDisabled = false;
+  //
+  //   // routing
+  //   //
+  //   //this.$location = $location;
+  //   //   if (!angular.isUndefined($routeParams.templateId)) {
+  //   //     getTemplate();
+  //   //   }
+  //   //
+  //   //   if (!angular.isUndefined($routeParams.id)) {
+  //   //     getInstance();
+  //   //   }
+  //   //
+  //   //
+  //
+  //
+  //   //   validation
+  //   //
+  //   //   $on('validationError', function (event, args) {
+  //   //     var operation = args[0];
+  //   //     var title = args[1];
+  //   //     var id = args[2];
+  //   //     var error = args[3];
+  //   //     var key = id;
+  //   //
+  //   //     if (operation == 'add') {
+  //   //       $scope.validationErrors[error] = $scope.validationErrors[error] || {};
+  //   //       $scope.validationErrors[error][key] = {};
+  //   //       $scope.validationErrors[error][key].title = title;
+  //   //     }
+  //   //
+  //   //     if (operation == 'remove') {
+  //   //       if ($scope.validationErrors[error] && $scope.validationErrors[error][key]) {
+  //   //         delete $scope.validationErrors[error][key];
+  //   //
+  //   //         if (!$scope.hasKeys($scope.validationErrors[error])) {
+  //   //           delete $scope.validationErrors[error];
+  //   //         }
+  //   //       }
+  //   //     }
+  //   // }
+  // };
 
-    // routing
-    //
-    //this.$location = $location;
-    //   if (!angular.isUndefined($routeParams.templateId)) {
-    //     getTemplate();
-    //   }
-    //
-    //   if (!angular.isUndefined($routeParams.id)) {
-    //     getInstance();
-    //   }
-    //
-    //
+  // create a copy of the form with the _tmp fields stripped out
+  cleanForm = function (model) {
 
-
-    //   validation
-    //
-    //   $on('validationError', function (event, args) {
-    //     var operation = args[0];
-    //     var title = args[1];
-    //     var id = args[2];
-    //     var error = args[3];
-    //     var key = id;
-    //
-    //     if (operation == 'add') {
-    //       $scope.validationErrors[error] = $scope.validationErrors[error] || {};
-    //       $scope.validationErrors[error][key] = {};
-    //       $scope.validationErrors[error][key].title = title;
-    //     }
-    //
-    //     if (operation == 'remove') {
-    //       if ($scope.validationErrors[error] && $scope.validationErrors[error][key]) {
-    //         delete $scope.validationErrors[error][key];
-    //
-    //         if (!$scope.hasKeys($scope.validationErrors[error])) {
-    //           delete $scope.validationErrors[error];
-    //         }
-    //       }
-    //     }
-    // }
+    let copy = Object.assign({}, model);
+    if (copy) {
+      this.formService.stripTmps(copy);
+    }
+    //UIUtilService.toRDF();
+    return copy;
   };
+
+  // toRDF = function () {
+  //   var jsonld = require('jsonld');
+  //   var copiedForm = jQuery.extend(true, {}, $scope.model);
+  //   if (copiedForm) {
+  //     jsonld.toRDF(copiedForm, {format: 'application/nquads'}, function (err, nquads) {
+  //       $scope.metaToRDFError = err;
+  //       $scope.metaToRDF = nquads;
+  //       return nquads;
+  //     });
+  //   }
+  // };
+
+  // getRDF = function () {
+  //   return UIUtilService.getRDF();
+  // };
+  //
+  // getRDFError = function () {
+  //   var result = $translate.instant('SERVER.RDF.SaveFirst');
+  //   if ($scope.metaToRDFError) {
+  //     result = $scope.metaToRDFError.details.cause.message;
+  //   }
+  //   return result;
+  // };
 
   //
   // permissions

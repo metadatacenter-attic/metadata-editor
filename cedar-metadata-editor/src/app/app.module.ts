@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
+
 import { LOCALE_ID,NgModule } from '@angular/core';
 
 
@@ -7,10 +8,12 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
 import { HeaderModule } from './header/header.module';
 import { FooterModule } from './footer/footer.module';
 import { InstanceModule } from './instance/instance.module';
 import { InstanceComponent } from './instance/instance.component';
+
 
 
 const appRoutes: Routes = [
