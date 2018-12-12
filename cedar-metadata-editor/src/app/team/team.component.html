@@ -1,0 +1,17 @@
+<form [formGroup]="teamForm" >
+  Team Name: {{teamForm.controls.name.value}}
+
+  changeLog {{changeLog}}
+
+  <p>Players:</p>
+  <button  color="primary"(click)="addPlayer()">Add Player</button>
+  <ul>
+    <li *ngFor="let player of players?.controls; let i = index">
+      <nba-player [index]="i" [playerForm]="player" (deletePlayer)="deletePlayer($event)"></nba-player>
+    </li>
+  </ul>
+
+  <button  type="submit"  color="accent" (click)="saveTeam()" [disabled]="teamForm.invalid">Submit</button>
+  <pre>Parent Form Status: <span class="status">{{teamForm.status}}</span></pre>
+  <pre>Parent Form Value: <span class="status">{{teamForm.value | json}}</span></pre>
+</form>

@@ -1,64 +1,68 @@
-import {Component, OnInit, Input} from '@angular/core';
+import { Component, Input,OnInit, OnDestroy } from '@angular/core'
+import { FormGroup, FormArray } from '@angular/forms'
+import { Subscription } from 'rxjs'
 
-import { FormGroup }                 from '@angular/forms';
+import { FormService } from './service/form.service'
+import { ElementService } from './element/service/element.service'
 
-import { QuestionBase }              from './question-base';
-import { QuestionControlService }    from './question-control.service';
+import { QuestionService } from './service/question.service'
+import { QuestionControlService } from './service/question-control.service'
 
-import { InstanceComponent } from '../instance.component';
-import { FormService } from '../../form.service';
 
 
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
-  providers: [ QuestionControlService ]
+  providers: [  FormService, ElementService, QuestionService, QuestionControlService ]
 })
 
 export class FormComponent implements OnInit {
-  // @Input() instanceComponent: InstanceComponent;
-  // @Input('form') form: object;
-  // @Input('model') model: object;
-  // @Input('page') page: number;
-
-  @Input() questions: QuestionBase<any>[] = [];
-  form: FormGroup;
-  payLoad = '';
-
-  // title: string;
-  // pages: object;
-  // const: object;
-  // pageIndex: number;
-  //
-  //
-  //
+  templateForm: FormGroup
+  formSub: Subscription
+  formInvalid: boolean = false;
+  //questions: FormArray;
+  templateGroup: FormGroup;
 
 
-  constructor(private qcs: QuestionControlService) {  }
-
-
+  constructor(private fs: FormService, private es: ElementService) {  }
 
   ngOnInit() {
-    // this.title = 'Metadata Editor';
-    //
-    // this.formService.parseForm(this.formService.propertiesOf(this.form), this.model);
-    //
-    // this.pages = this.formService.paginate(this.form);
-    // this.pageIndex = 0;
-    // console.log('pages.order', this.pages['order'])
+    this.formSub = this.fs.templateForm$
+      .subscribe(template => {
+        console.log('next templage',template)
+        this.templateForm = template
+        //this.questions = this.templateForm.get('questions') as FormArray
+        this.templateGroup = this.templateForm.get('templateGroup') as FormGroup
+      })
+  }
 
-    this.form = this.qcs.toFormGroup(this.questions);
+  addQuestion() {
+    this.fs.addQuestion()
+  }
+
+  addElement() {
+    this.fs.addElement(this.templateForm,'project')
+  }
+
+  deleteQuestion(index: number) {
+    this.fs.deleteQuestion(index)
+  }
+
+  deleteElement(index: number) {
+    //this.es.deleteElement(index)
+  }
+
+  saveTeam() {
+    console.log('team saved!')
+    console.log(this.templateForm.value)
+  }
+
+  ngOnDestroy() {
+    console.log('ngOnDestroy');
   }
 
   onSubmit() {
-    this.payLoad = JSON.stringify(this.form.value);
+    console.log('onSubmit',this.templateGroup.value, this.templateGroup.status, this.templateForm.value, this.templateForm.status);
   }
-
-  // getLabel = this.formService.getLabel;
-  // getTitle = this.formService.getTitle;
-  //
-  // pageTitle(index) {
-  //   return this.pages['title'][index];
-  // };
 
 }

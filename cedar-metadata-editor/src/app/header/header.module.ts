@@ -1,5 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  MatCardModule,
+  MatIconModule,
+  MatToolbarModule,
+  MatButtonModule,
+  MatFormFieldModule,
+  MatInputModule
+} from '@angular/material';
 
 import { HeaderComponent } from './header.component';
 
@@ -10,7 +18,8 @@ import { HeaderComponent } from './header.component';
     HeaderComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    MatToolbarModule
   ],
   exports: [
     HeaderComponent

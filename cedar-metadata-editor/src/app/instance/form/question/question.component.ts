@@ -1,22 +1,30 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 
-import {QuestionBase} from '../question-base';
+
+
+
 
 @Component({
   selector: 'app-question',
-  templateUrl: './question.component.html'
+  templateUrl: './question.component.html',
+  providers: [],
+
 })
-export class QuestionComponent {
-  @Input() question: QuestionBase<any>;
-  @Input() form: FormGroup;
+export class QuestionComponent implements OnInit {
+  @Input() questionForm: FormGroup
+  @Input() index: number
+  @Output() deleteQuestion: EventEmitter<number> = new EventEmitter()
 
-  get isValid() {
-    return this.form.controls[this.question.key].valid;
+
+  ngOnInit() {
   }
 
-  addElement(questions) {
-    console.log('addElement with questions',questions);
-
+  delete() {
+    this.deleteQuestion.emit(this.index)
   }
+
+  constructor( ) {
+  }
+
 }

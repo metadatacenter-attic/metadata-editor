@@ -1,34 +1,71 @@
-<div [formGroup]="form">
-
-  <div *ngIf="question.controlType == 'static' ; else notStatic">
-    <div [ngSwitch]="question.type">
-      <div *ngSwitchCase="'section-break'" [id]="question.key">{{question.label}}</div>
-      <div *ngSwitchCase="'image'" [id]="question.key">{{question.label}}</div>
-      <div *ngSwitchCase="'youtube'" [id]="question.key">{{question.label}}</div>
-      <div *ngSwitchCase="'page-break'" [id]="question.key">{{question.label}}</div>
-    </div>
-  </div>
-
-  <ng-template #notStatic>
-
-    <label [attr.for]="question.key">{{question.label}}</label>
-    <button *ngIf="question.controlType == 'element'" [id]="question.key" [type]="question.type" mat-button-raised color="primary"
-      (click)="addElement(question.questions)">open
-    </button>
-
-    <div [ngSwitch]="question.controlType">
-
-      <input *ngSwitchCase="'textbox'" [formControlName]="question.key"
-        [id]="question.key" [type]="question.type">
-
-      <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key">
-        <option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>
-      </select>
 
 
 
-    </div>
-  </ng-template>
+  <!--<label *ngIf="question.controlType != 'static'" [attr.for]="question.key" (click)="toggle()">{{question.label}}</label>-->
+  <!--<div [ngSwitch]="question.controlType" >-->
 
-  <div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>
-</div>
+  <!--<div *ngSwitchCase="'section-break'"  [id]="question.key">{{question.label}}</div>-->
+
+  <!--<div *ngSwitchCase="'image'"  [id]="question.key">{{question.label}}</div>-->
+
+  <!--<div *ngSwitchCase="'youtube'" [id]="question.key">{{question.label}}</div>-->
+
+  <!--<div *ngSwitchCase="'page-break'" [id]="question.key">{{question.label}}</div>-->
+
+  <!--<input *ngSwitchCase="'email'"  [formControlName]="question.key"-->
+  <!--[id]="question.key" [type]="question.type">-->
+
+
+  <!--<input *ngSwitchCase="'textbox'" [formControlName]="question.key"-->
+  <!--[id]="question.key" [type]="question.type">-->
+
+  <!--<select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key">-->
+  <!--<option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>-->
+  <!--</select>-->
+
+  <!--<app-element *ngSwitchCase="'element'"  [elementForm]="parentForm" [key]="question.key"   ></app-element>-->
+
+  <!--</div>-->
+
+  <form [formGroup]="questionForm" >
+    Question Name: {{questionForm.controls.name.value}}
+    <label formArrayName="questions" *ngFor="let question of questions.controls; let i = index">
+      <input  [formControlName]="i">
+      {{question[i].name}}
+    </label>
+  </form>
+
+
+
+  <!--<form [formGroup]="questionForm">-->
+    <!--<table>-->
+      <!--<tr>-->
+        <!--<td>-->
+          <!--<div>-->
+            <!--<input  formControlName="firstName" placeholder="First Name">-->
+          <!--</div>-->
+        <!--</td>-->
+        <!--<td>-->
+          <!--<div>-->
+            <!--<input  formControlName="lastName" placeholder="Last Name">-->
+          <!--</div>-->
+        <!--</td>-->
+        <!--<td>-->
+          <!--<div>-->
+            <!--<input  formControlName="position" placeholder="Position">-->
+          <!--</div>-->
+        <!--</td>-->
+        <!--<td>-->
+          <!--<div>-->
+            <!--<input  formControlName="number" placeholder="Number">-->
+          <!--</div>-->
+        <!--</td>-->
+        <!--<td>-->
+          <!--&lt;!&ndash; emit delete event up w/ index of player &ndash;&gt;-->
+          <!--<button (click)="delete()">Delete</button>-->
+        <!--</td>-->
+      <!--</tr>-->
+    <!--</table>-->
+    <!--<pre>Question Form Status: <span class="status">{{questionForm.status}}</span></pre>-->
+  <!--</form>-->
+

@@ -1,6 +1,19 @@
 <app-header></app-header>
+
+<mat-toolbar>
+  <mat-toolbar-row class="fill-remaining-space">
+    <button mat-button routerLink="">Home</button>
+    <button mat-button routerLink="/nba">Team</button>
+    <button mat-button routerLink="instances/create/:templateId">Instance templateId</button>
+    <button mat-button routerLink="/instances/edit/:id">Instance id</button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
 <router-outlet></router-outlet>
+
 <app-footer></app-footer>
+
+
 
 
 

@@ -1,12 +1,17 @@
-<div class="template-container scrollable-content">
-  <div class="template-body metadata">
+<div class="instance-container ">
+  <div class="instance-body">
     <div class="container">
       <div class="row">
         <ngb-panel class="right-body col-sm-10 col-sm-offset-1 c ">
 
-          <!-- build the form -->
-          <!--<app-form [form]="form"  [model]="instance" [page]="page"></app-form>-->
-          <app-form [questions]="questions"></app-form>
+          <!--<paginator-component></paginator-component>-->
+
+
+          <app-form ></app-form>
+
+          Project {{project}}
+          <pre *ngIf="project">Form: <span class="status">{{project.status}}</span></pre>
+
 
           <!-- errors and edit actions -->
           <div class="edit-actions" ng-hide="$root.isEmpty(form)">

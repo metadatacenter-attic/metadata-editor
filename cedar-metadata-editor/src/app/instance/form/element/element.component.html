@@ -1,0 +1,36 @@
+
+
+
+
+
+  <!--<form  [formGroup]="elementForm"  style="border:1px solid #ddd; width:100%;margin:10px;">-->
+
+
+    <!--<ul>-->
+      <!--<li *ngFor="let question of questions?.controls; let i = index">-->
+        <!--<app-question [index]="i" [questionForm]="question" (getQuestion)="getQuesiton($event)" (deleteQuestion)="deleteQuesiton($event)"></app-question>-->
+      <!--</li>-->
+    <!--</ul>-->
+
+
+    <!--<button  type="submit"  color="accent" (click)="onSubmit()" [disabled]="form.invalid">Submit</button>-->
+    <!--<pre>-->
+      <!--Form: <span class="status">{{elementForm.status}}</span>-->
+      <!--Form: <span class="value">{{elementForm.value | json}}</span>-->
+    <!--</pre>-->
+
+  <!--</form>-->
+
+
+
+
+  <form [formGroup]="elementForm">
+    {{questions}}
+    <ul>
+      <li *ngFor="let question of questions?.controls; let i = index">
+        question {{question}}
+        <app-question  [index]="i" [questionForm]="question" (deleteQuestion)="deleteQuestion($event)"></app-question>
+      </li>
+    </ul>
+    <pre>Player Form Status: <span class="status">{{elementForm.status}}</span></pre>
+  </form>

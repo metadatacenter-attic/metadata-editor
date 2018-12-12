@@ -1,40 +1,34 @@
 import {Component, OnInit} from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
 
-import { QuestionService } from './form/question.service';
-import { FormService } from '../form.service';
-import { TemplateService } from '../template.service';
-import { UiUtilService } from '../ui-util.service';
+import { FormGroup }  from '@angular/forms';
+
 
 
 @Component({
   selector: 'app-instance',
-  templateUrl: './instance.component.html',
-  providers:  [QuestionService]
+  templateUrl: './instance.component.html'
 })
 
 export class InstanceComponent implements OnInit {
-  // title: string;
-  // status: string;
-  // version: string;
-  // name: string;
-  // id:string;
-  // templateId:string;
-  // page:number;
-  // instance: object;
-  // validationErrors: any;
-  // validationResponse: Array<object>;
-  // details: any;
-  // form: object;
 
-  questions: any[];
 
-  constructor(service: QuestionService) {
-    this.questions = service.getQuestions();
+  // questions: any[];
+  formId:string;
+  payLoad: string;
+  nested:boolean;
+  project:FormGroup;
+
+
+  constructor() {
+    // this.formId = 'projectForm';
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.formId = 'projectForm';
+    this.nested = false;
+
+  }
+
 
 
   // constructor(private templateService: TemplateService,
