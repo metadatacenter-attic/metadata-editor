@@ -1,53 +1,42 @@
+<div>
+  <form (ngSubmit)="onSubmit()" [formGroup]="form">
+
+    <div *ngFor="let question of questions" class="form-row">
+      <app-question [question]="question" [form]="form"></app-question>
+    </div>
+
+    <div class="form-row">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">Save</button>
+    </div>
+  </form>
 
 
+  <mat-accordion id="document-preview">
 
-  <!--<form  [formGroup]="form"  style="border:1px solid #ddd; width:100%;margin:10px;">-->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        questions
+      </mat-expansion-panel-header>
+      <pre id='form-json-preview'> {{questions | json}}</pre>
+    </mat-expansion-panel>
 
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        Status
+      </mat-expansion-panel-header>
+      <pre *ngIf="form">Form: <span class="status">{{form.status}}</span></pre>
+    </mat-expansion-panel>
 
-    <!--<ul>-->
-      <!--<li *ngFor="let question of questions?.controls; let i = index">-->
-        <!--<app-question [index]="i" [questionForm]="question" (getQuestion)="getQuesiton($event)" (deleteQuestion)="deleteQuesiton($event)"></app-question>-->
-      <!--</li>-->
-    <!--</ul>-->
-
-
-    <!--<button  type="submit"  color="accent" (click)="onSubmit()" [disabled]="form.invalid">Submit</button>-->
-    <!--<pre>-->
-      <!--Form: <span class="status">{{form.status}}</span>-->
-      <!--Form: <span class="value">{{form.value | json}}</span>-->
-    <!--</pre>-->
-
-  <!--</form>-->
-
-
-
-
-
-    <form [formGroup]="templateForm" >
-      Template Name: {{templateForm.controls.name.value}}
-
-      <p>Elements:</p>
-      <button  color="primary"(click)="addElement(templateForm, 'project')">Add Element</button>
-
-
-      <form [formGroup]="templateGroup" >
-      <div *ngFor="let item of templateGroup.controls | keyvalue; let i = index">
-        <label for="{{item.key}}">{{item.key}}</label>
-        <input  formControlName="{{item.key}}" placeholder="{{item.key}}"  id="{{item.key}}" value="{{item.value.value}}">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        value
+      </mat-expansion-panel-header>
+      <div *ngIf="payload">
+        <pre>Value: <span class="value">{{ payload | json}}</span></pre>
       </div>
-      </form>
+    </mat-expansion-panel>
 
 
-      <!--<ul>-->
-        <!--<li *ngFor="let question of questions?.controls; let i = index">-->
-          <!--<input   value="{{question.value}}">-->
-          <!--&lt;!&ndash;<app-question  [index]="i" [questionForm]="question" (deleteQuestion)="deleteQuestion($event)"></app-question>&ndash;&gt;-->
-        <!--</li>-->
-      <!--</ul>-->
+  </mat-accordion>
 
-      <button  type="submit"  color="accent" (click)="onSubmit()" [disabled]="templateForm.invalid">Submit</button>
-      <pre>Parent Form Status: <span class="status">{{templateForm.status}}</span></pre>
-      <pre>Parent Form Value: <span class="status">{{templateForm.value | json}}</span></pre>
-    </form>
-
-
+</div>

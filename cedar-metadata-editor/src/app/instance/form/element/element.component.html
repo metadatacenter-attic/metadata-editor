@@ -23,14 +23,43 @@
 
 
 
+  <div *ngIf="form; else load">
 
-  <form [formGroup]="elementForm">
-    {{questions}}
-    <ul>
-      <li *ngFor="let question of questions?.controls; let i = index">
-        question {{question}}
-        <app-question  [index]="i" [questionForm]="question" (deleteQuestion)="deleteQuestion($event)"></app-question>
-      </li>
-    </ul>
-    <pre>Player Form Status: <span class="status">{{elementForm.status}}</span></pre>
-  </form>
+
+
+      <!--<form [formGroup]="form" >-->
+        <!--<div *ngFor="let item of form.controls | keyvalue; let i = index">-->
+          <!--<label for="{{item.key}}">{{item.key}}</label>-->
+          <!--<input  formControlName="{{item.key}}" placeholder="{{item.key}}"  id="{{item.key}}" value="{{item.value.value}}">-->
+        <!--</div>-->
+      <!--</form>-->
+
+
+
+      <form [formGroup]="form">
+
+        <div *ngFor="let question of questions" class="form-row">
+          <app-question [question]="question" [form]="form"></app-question>
+        </div>
+
+
+      </form>
+
+
+
+
+
+
+
+  </div>
+  <ng-template #load>
+
+    <button (click)="loadForm(key)"  >
+      Load {{key}}
+    </button>
+
+  </ng-template>
+
+
+
+

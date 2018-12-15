@@ -20,7 +20,9 @@ import {TeamFormService} from './team-form.service';
     ReactiveFormsModule,
     CommonModule,
     NgbModule,
-    TeamRoutingModule
+    TeamRoutingModule,
+    MatButtonModule,
+    MatCheckboxModule
   ],
   exports: [
     TeamComponent

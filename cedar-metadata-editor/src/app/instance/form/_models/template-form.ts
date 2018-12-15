@@ -10,7 +10,10 @@ export class TemplateForm {
   templateGroup:FormGroup;
 
 
+
   constructor(template: Template) {
+
+
     if (template.name) {
       this.name.setValue(template.name)
     } templateGroup:FormGroup;
@@ -20,36 +23,29 @@ export class TemplateForm {
       this.templateGroup =  this.toFormGroup(template.questions)
 
     }
-    console.log('template group', this.templateGroup);
+
+
   }
 
-
-  toFormArray(questions: QuestionBase<any>[] ) {
-    let formArray: FormControl[] = new Array<FormControl>();
-    let group: {};
-
-    questions.forEach(question => {
-      if (question.controlType  == 'textbox' ) {
-        let formControl = question.required ? new FormControl(question.value || '', Validators.required)
-          : new FormControl(question.value || '');
-        formArray.push(formControl);
-      }
-
-    });
-    return new FormArray(formArray);
-  }
 
   toFormGroup(questions: QuestionBase<any>[] ) {
     let group: any = {};
-    console.log('toFormGroup')
+
 
     questions.forEach(question => {
       if (question.controlType  == 'textbox') {
         group[question.label] = question.required ? new FormControl(question.value || '', Validators.required)
           : new FormControl(question.value || '');
+      } else if (question.controlType  == 'element') {
+
+        group[question.key] = new FormControl(question.key);
       }
 
     });
     return new FormGroup(group);
   }
+
+
+
+
 }

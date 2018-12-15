@@ -30,7 +30,7 @@ export class ElementService {
 
     console.log('currentGroup',elementGroup);
 
-    formGroup.addControl('elementGroup',elementGroup as FormControl);
+    formGroup.addControl('elementGroup',elementGroup);
 
     this.elementForm.next(currentElement)
   }

@@ -2,11 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core'
 import { FormGroup, FormArray } from '@angular/forms'
 import { TeamFormService } from './team-form.service'
 import { Subscription } from 'rxjs'
+import {UiService} from "../services/ui/ui.service";
+
+
 
 @Component({
   selector: 'nba-team',
   templateUrl: './team.component.html',
-  styleUrls: ['./team.component.scss']
+  styleUrls: ['./team.component.less']
 })
 export class TeamComponent implements OnInit, OnDestroy {
   teamForm: FormGroup
@@ -15,7 +18,12 @@ export class TeamComponent implements OnInit, OnDestroy {
   players: FormArray;
 
 
-  constructor(private teamFormService: TeamFormService) { }
+  darkMode: boolean;
+
+  private _subscription: Subscription
+
+  constructor(private ui: UiService,private teamFormService: TeamFormService) {
+  }
 
   ngOnInit() {
     this.teamFormSub = this.teamFormService.teamForm$
@@ -24,7 +32,22 @@ export class TeamComponent implements OnInit, OnDestroy {
         this.teamForm = team
         this.players = this.teamForm.get('players') as FormArray
       })
-  }
+
+    this._subscription = this.ui.darkModeState$.subscribe(value => {
+      this.darkMode = value;
+    })}
+
+
+  // constructor(private teamFormService: TeamFormService) { }
+  //
+  // ngOnInit() {
+  //   this.teamFormSub = this.teamFormService.teamForm$
+  //     .subscribe(team => {
+  //       console.log('next teamForm',team)
+  //       this.teamForm = team
+  //       this.players = this.teamForm.get('players') as FormArray
+  //     })
+  // }
 
 
 

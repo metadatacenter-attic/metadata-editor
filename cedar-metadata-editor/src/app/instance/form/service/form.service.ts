@@ -43,8 +43,10 @@ export class FormService {
 
 
   addElement(formGroup:FormGroup, key:string) {
+    console.log('addElement',key);
+
+    this.es.addElement(formGroup,'project');
     const currentTemplate = this.templateForm.getValue()
-    this.es.addElement(formGroup,'project')
     this.templateForm.next(currentTemplate)
   }
 

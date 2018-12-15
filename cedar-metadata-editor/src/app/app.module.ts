@@ -1,5 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ReactiveFormsModule} from '@angular/forms';
 import {
   MatCardModule,
   MatIconModule,
@@ -8,6 +9,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatPaginatorModule,
+  MatExpansionModule
 } from '@angular/material';
 import {FlexLayoutModule} from '@angular/flex-layout';
 
@@ -19,9 +21,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-
-import {HeaderModule} from './header/header.module';
-import {FooterModule} from './footer/footer.module';
+import {UiService} from './services/ui/ui.service';
 
 
 @NgModule({
@@ -33,13 +33,12 @@ import {FooterModule} from './footer/footer.module';
     ReactiveFormsModule,
     AppRoutingModule,
     NgbModule,
-    HeaderModule,
-    FooterModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
-    MatCardModule, MatIconModule, MatToolbarModule, MatButtonModule, MatFormFieldModule, MatInputModule,MatPaginatorModule,
+    MatCardModule, MatIconModule, MatToolbarModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatPaginatorModule, MatExpansionModule,
     FlexLayoutModule
   ],
-  providers: [{provide: LOCALE_ID, useValue: 'en-US'}],
+  providers: [{provide: LOCALE_ID, useValue: 'en-US'}, UiService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

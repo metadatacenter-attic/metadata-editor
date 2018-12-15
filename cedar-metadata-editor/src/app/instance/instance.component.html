@@ -1,78 +1,75 @@
-<div class="instance-container ">
-  <div class="instance-body">
-    <div class="container">
-      <div class="row">
-        <ngb-panel class="right-body col-sm-10 col-sm-offset-1 c ">
-
-          <!--<paginator-component></paginator-component>-->
+<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container"   >
 
 
-          <app-form ></app-form>
-
-          Project {{project}}
-          <pre *ngIf="project">Form: <span class="status">{{project.status}}</span></pre>
+    <!--<paginator-component></paginator-component>-->
 
 
-          <!-- errors and edit actions -->
-          <div class="edit-actions" ng-hide="$root.isEmpty(form)">
+    <app-form [form]="form"  [questions]="questions"></app-form>
 
-            <!-- validation errors -->
-            <div ng-if="hasKeys(validationErrors)" class="alert alert-danger" role="alert">
-              <p><i class="fa fa-exclamation-triangle"></i><span
-                translate>VALIDATION.groupHeader.validationErrors</span></p>
-              <ul class="list-unstyled">
-                <li ng-repeat="(key, value) in validationErrors">
-                  <p>getValidationHeader(key)</p>
-                  <ul class="list-unstyled" style="margin:5px 5px 5px 20px;">
-                    <li ng-repeat="field in value">field['title']</li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
 
-            <div ng-if="canWrite()" class="flex-right">
-              <button type="button" id="button-cancel-metadata" class="btn btn-clear metadata"
-                ng-click="cancelTemplate()" style="outline:none;" translate>GENERIC.Cancel
-              </button>
-              <button type="button" ng-if="isValidationTemplate('validation')" id="button-validation-metadata"
-                ng-disabled="saveButtonDisabled" class="btn btn-clear metadata " style="outline:none;"
-                ng-click="doValidation()" translate>GENERIC.Validate
-              </button>
-              <button type="button" id="button-save-metadata" ng-disabled="saveButtonDisabled"
-                class="btn btn-save metadata" ng-click="saveInstance()" style="outline:none;" translate>GENERIC.Save
-              </button>
-            </div>
-          </div>
+    <!-- errors and edit actions -->
+    <div class="edit-actions" ng-hide="$root.isEmpty(form)">
 
-          <!-- document preview -->
-          <ngb-panel id="document-preview">
+      <!-- validation errors -->
+      <!--<div ng-if="hasKeys(validationErrors)" class="alert alert-danger" role="alert">-->
+        <!--<p><i class="fa fa-exclamation-triangle"></i><span-->
+          <!--translate>VALIDATION.groupHeader.validationErrors</span></p>-->
+        <!--<ul class="list-unstyled">-->
+          <!--<li ng-repeat="(key, value) in validationErrors">-->
+            <!--<p>getValidationHeader(key)</p>-->
+            <!--<ul class="list-unstyled" style="margin:5px 5px 5px 20px;">-->
+              <!--<li ng-repeat="field in value">field['title']</li>-->
+            <!--</ul>-->
+          <!--</li>-->
+        <!--</ul>-->
+      <!--</div>-->
 
-            <ngb-accordion #acc="ngbAccordion">
-              <ngb-panel id="toggle-1" title="JSON-LD">
-                <ng-template ngbPanelContent>
-                  <pre id='form-json-preview'> {{questions | json}}</pre>
-                  <!--<pre id='form-json-preview'>{{ cleanForm(questions) |json}}</pre>-->
-                </ng-template>
-              </ngb-panel>
-              <ngb-panel id="toggle-2" title="RDF">
-                <ng-template ngbPanelContent>
-                  <div ng-if="RDF">
-                    <pre id='form-json-preview-rdf'>{{RDF}}</pre>
-                  </div>
-                  <div ng-if="!RDF && RDFError">
-                    <div class="center warning">
-                      {{RDFError}}
-                    </div>
-                  </div>
-                </ng-template>
-              </ngb-panel>
-            </ngb-accordion>
+      <!--<div>-->
+        <!--<button mat-raised-button color="primary" id="button-cancel-metadata" style="margin:10px;"-->
+          <!--ng-click="cancelTemplate()" >Cancel-->
+        <!--</button>-->
+        <!--<button mat-raised-button color="primary"  id="button-validation-metadata" style="margin:10px;"-->
+          <!--ng-disabled="saveButtonDisabled"-->
+          <!--ng-click="doValidation()" >Validate-->
+        <!--</button>-->
+        <!--<button mat-raised-button color="primary" id="button-save-metadata" ng-disabled="saveButtonDisabled" style="margin:10px;"-->
+           <!--ng-click="saveInstance()"  >Save-->
+        <!--</button>-->
+      <!--</div>-->
+    <!--</div>-->
 
-          </ngb-panel>
-        </ngb-panel>
-      </div>
-    </div>
-  </div>
+
+
+  <!--<mat-accordion id="document-preview">-->
+
+    <!--<mat-expansion-panel >-->
+      <!--<mat-expansion-panel-header>-->
+        <!--questions-->
+      <!--</mat-expansion-panel-header>-->
+      <!--<pre id='form-json-preview'> {{questions | json}}</pre>-->
+    <!--</mat-expansion-panel>-->
+
+    <!--<mat-expansion-panel>-->
+      <!--<mat-expansion-panel-header>-->
+        <!--Status-->
+      <!--</mat-expansion-panel-header>-->
+        <!--<pre *ngIf="form">Form: <span class="status">{{form.status}}</span></pre>-->
+    <!--</mat-expansion-panel>-->
+
+    <!--<mat-expansion-panel>-->
+      <!--<mat-expansion-panel-header>-->
+        <!--value-->
+      <!--</mat-expansion-panel-header>-->
+      <!--<div *ngIf="form">-->
+        <!--<pre >Value: <span class="value">{{JSON.stringify(form.value)}}</span></pre>-->
+      <!--</div>-->
+    <!--</mat-expansion-panel>-->
+
+
+  <!--</mat-accordion>-->
+
+
+
 </div>
 
 

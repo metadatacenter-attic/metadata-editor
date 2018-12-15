@@ -9,7 +9,6 @@ export class ElementForm {
 
 
   name = new FormControl()
-  //questions = new FormArray([])
   elementGroup:FormGroup;
 
   constructor(element: Element) {
@@ -24,21 +23,20 @@ export class ElementForm {
     }
   }
 
-    toFormArray(questions: QuestionBase<any>[] ) {
-      let formArray: FormControl[] = new Array<FormControl>();
-
-      console.log('questions',questions)
-
-      questions.forEach(question => {
-        if (question.controlType  == 'textbox' ) {
-          formArray.push(question.required ? new FormControl(question.value || '', Validators.required)
-            : new FormControl(question.value || ''));
-        }
-
-      });
-      console.log('formArray',formArray)
-      return new FormArray(formArray);
-    }
+    // toFormArray(questions: QuestionBase<any>[] ) {
+    //   let formArray: FormControl[] = new Array<FormControl>();
+    //
+    //
+    //   questions.forEach(question => {
+    //     if (question.controlType  == 'textbox' ) {
+    //       formArray.push(question.required ? new FormControl(question.value || '', Validators.required)
+    //         : new FormControl(question.value || ''));
+    //     }
+    //
+    //   });
+    //   console.log('formArray',formArray)
+    //   return new FormArray(formArray);
+    // }
 
 
   toFormGroup(questions: QuestionBase<any>[] ) {

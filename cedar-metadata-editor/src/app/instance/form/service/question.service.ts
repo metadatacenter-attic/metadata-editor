@@ -136,18 +136,8 @@ export class QuestionService {
         label: 'Email',
         type: 'email',
         order: 4
-      }),
-      new ElementQuestion({
-        name: "another element",
-        type: 'element',
-        id: "mno",
-        key: 'contact',
-        label: 'Contacts',
-        required: true,
-        help: 'Help With Subjects',
-        order: 5,
-        element:null
       })
+
     ],
     "experiment" :[
 
