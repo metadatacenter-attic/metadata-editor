@@ -4,6 +4,9 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
+import {DemoMaterialModule} from '../../material-module';
+
+
 import {
   MatCardModule,
   MatIconModule,
@@ -29,7 +32,7 @@ import {ElementComponent} from './form/element/element.component';
     CommonModule,
     NgbModule,
     InstanceRoutingModule,
-    MatCardModule, MatIconModule, MatToolbarModule, MatButtonModule, MatFormFieldModule, MatInputModule,MatExpansionModule
+    DemoMaterialModule
   ],
   exports: [
     InstanceComponent

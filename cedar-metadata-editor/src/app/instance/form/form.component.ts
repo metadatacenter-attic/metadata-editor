@@ -20,7 +20,7 @@ export class FormComponent implements OnInit {
   @Input() questions: QuestionBase<any>[] = [];
   @Input() form: FormGroup;
   payload: string;
-  
+
   constructor(private qcs: QuestionControlService) {
   }
 

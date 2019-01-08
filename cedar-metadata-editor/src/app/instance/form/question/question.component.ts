@@ -20,8 +20,8 @@ export class QuestionComponent {
     return result;
   } //return this.form.controls[this.question.key].valid; }
 
-  loadForm(key) {
-    console.log('load the form with key', key);
+  loadForm(key, form) {
+    console.log('load the form with key', key, form);
   }
 
 }

@@ -21,41 +21,47 @@ import {FormService} from "../service/form.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {
-  @Input() key: string;
   @Input() parent: FormGroup;
+  @Input() question: QuestionBase<string>;
   darkMode:boolean;
   private _darkModeSub: Subscription;
+  key:string;
 
   form: FormGroup;
   title:string;
-  questions: [QuestionBase<any>];
-  qs:QuestionService;
-  qcs:QuestionControlService;
-  payLoad = '';
+  // questions: [QuestionBase<any>];
+  // qs:QuestionService;
+  // qcs:QuestionControlService;
+  // payLoad = '';
 
 
 
 
   constructor(private ui:UiService, qs: QuestionService, qcs:QuestionControlService) {
-    this.qs = qs;
-    this.qcs = qcs;
+    // this.qs = qs;
+    // this.qcs = qcs;
+
+    let group = {};
+    this.form = new FormGroup(group);
+
   }
 
   ngOnInit() {
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;
     })
+    this.key = this.question ? this.question.key : '';
   }
 
   loadForm() {
-    console.log('loadForm',this.key, this.parent);
-    this.questions = this.qs.getQuestions(this.key);
-
-    this.form = this.qcs.toFormGroup(this.questions);
-
-
-
-    this.parent.setControl(this.key, this.form);
-    console.log('parent',this.parent);
+    console.log('loadForm');
+    // this.questions = this.qs.getQuestions(this.key);
+    //
+    // this.form = this.qcs.toFormGroup(this.questions);
+    //
+    //
+    //
+    // this.parent.setControl(this.key, this.form);
+    // console.log('parent',this.parent);
   }
 }

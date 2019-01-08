@@ -1,31 +1,19 @@
+<div [formGroup]="form">
 
+    <label [attr.for]="question.key">{{question.name}}</label>
+  {{question.type}}
 
-  <!--<form [formGroup]="questionForm" >-->
-    <!--Question Name: {{questionForm.controls.name.value}}-->
-    <!--<label formArrayName="questions" *ngFor="let question of questions.controls; let i = index">-->
-      <!--<input  [formControlName]="i">-->
-      <!--{{question[i].name}}-->
-    <!--</label>-->
-  <!--</form>-->
+    <div [ngSwitch]="question.type">
 
+      <input *ngSwitchCase="'textfield'" [formControlName]="question.key" [id]="question.key" [type]="text" value="{{question.value}}">
 
-  <div [formGroup]="form">
-    <label [attr.for]="question.key">{{question.label}}</label>
-
-    <div [ngSwitch]="question.controlType">
-
-      <input *ngSwitchCase="'textbox'" [formControlName]="question.key"
-        [id]="question.key" [type]="question.type">
-
-      <select [id]="question.key" *ngSwitchCase="'dropdown'" [formControlName]="question.key">
+      <select  *ngSwitchCase="'dropdown'" [id]="question.key" [formControlName]="question.key">
         <option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>
       </select>
 
-      <app-element *ngSwitchCase="'element'"  [parent]="form" [key]="question.key"></app-element>
+      <!--<app-element *ngSwitchCase="'element'"  [formControlName]="question.key" [question]="question"  [parent]="form" ></app-element>-->
 
     </div>
 
     <!--<div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>-->
-  </div>
-
-
+</div>

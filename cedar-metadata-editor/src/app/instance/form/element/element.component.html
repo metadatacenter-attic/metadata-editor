@@ -23,7 +23,7 @@
 
 
 
-  <div *ngIf="form; else load">
+  <!--<div *ngIf="form; else load">-->
 
 
 
@@ -36,29 +36,44 @@
 
 
 
-      <form [formGroup]="form">
+  app-element {{question | json}}
 
-        <div *ngFor="let question of questions" class="form-row">
-          <app-question [question]="question" [form]="form"></app-question>
-        </div>
-
-
-      </form>
+  <form [formGroup]="form" >
 
 
 
+    <label [attr.for]="question.key">{{question.name}}</label>
+
+      <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle
+          [attr.aria-label]="'toggle ' + node.filename">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </button>
+
+        {{node | json}}
+
+        <app-question [question]="node.question" [form]="form"></app-question>
+      </mat-tree-node>
+
+  </form>
 
 
 
 
-  </div>
-  <ng-template #load>
 
-    <button (click)="loadForm(key)"  >
-      Load {{key}}
-    </button>
 
-  </ng-template>
+
+
+  <!--</div>-->
+  <!--<ng-template #load>-->
+
+    <!--<button (click)="loadForm(key)"  >-->
+      <!--Load {{key}}-->
+    <!--</button>-->
+
+  <!--</ng-template>-->
 
 
 

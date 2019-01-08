@@ -1,7 +1,9 @@
 
-import {Component, OnInit} from '@angular/core';
-import {UiService} from './services/ui/ui.service';
-import { Subscription } from 'rxjs'
+import { Component, OnInit } from '@angular/core';
+import { UiService } from './services/ui/ui.service';
+import { Subscription } from 'rxjs';
+import { TreeComponent } from './tree/tree.component';
+
 
 @Component({
   selector: 'app-root',

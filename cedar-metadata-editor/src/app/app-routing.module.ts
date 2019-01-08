@@ -3,6 +3,7 @@ import {Routes, RouterModule} from '@angular/router';
 
 
 const routes: Routes = [{path: 'nba', loadChildren: './team/team.module#TeamModule'},
+  {path: 'tree', loadChildren: './tree/tree.module#TreeModule'},
   {path: 'instances/edit/:id', loadChildren: './instance/instance.module#InstanceModule'},
   {path: 'instances/create/:templateId', loadChildren: './instance/instance.module#InstanceModule'},
   {path: '', redirectTo: '', pathMatch: 'full'},
