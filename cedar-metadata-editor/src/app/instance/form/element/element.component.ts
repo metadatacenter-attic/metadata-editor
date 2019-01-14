@@ -8,9 +8,7 @@ import {QuestionControlService} from '../service/question-control.service'
 import {QuestionBase} from "../question/_models/question-base";
 import {UiService} from "../../../services/ui/ui.service";
 import {FormService} from "../service/form.service";
-
-
-
+import {FileNode} from "../../instance.component";
 
 
 @Component({
@@ -21,47 +19,28 @@ import {FormService} from "../service/form.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {
-  @Input() parent: FormGroup;
-  @Input() question: QuestionBase<string>;
+  @Input() parentForm: FormGroup;
+  @Input() elementForm: FormGroup;
+  @Input() node: FileNode;
+
+
   darkMode:boolean;
   private _darkModeSub: Subscription;
-  key:string;
-
-  form: FormGroup;
-  title:string;
-  // questions: [QuestionBase<any>];
-  // qs:QuestionService;
-  // qcs:QuestionControlService;
-  // payLoad = '';
-
-
-
 
   constructor(private ui:UiService, qs: QuestionService, qcs:QuestionControlService) {
-    // this.qs = qs;
-    // this.qcs = qcs;
 
-    let group = {};
-    this.form = new FormGroup(group);
 
   }
 
   ngOnInit() {
+    this.parentForm.addControl(this.node.filename, this.elementForm);
+
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;
-    })
-    this.key = this.question ? this.question.key : '';
+    });
   }
 
   loadForm() {
     console.log('loadForm');
-    // this.questions = this.qs.getQuestions(this.key);
-    //
-    // this.form = this.qcs.toFormGroup(this.questions);
-    //
-    //
-    //
-    // this.parent.setControl(this.key, this.form);
-    // console.log('parent',this.parent);
   }
 }

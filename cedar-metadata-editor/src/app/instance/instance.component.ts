@@ -1,18 +1,18 @@
 import {Component, Injectable, OnInit} from '@angular/core';
-import { Subscription } from 'rxjs'
-import { FormGroup }  from '@angular/forms';
-// import {MatTreeNestedDataSource} from '@angular/material/tree';
+import {Subscription} from 'rxjs';
+import {FormArray, FormGroup, FormControl} from '@angular/forms';
+import {MatTreeNestedDataSource} from '@angular/material/tree';
+// import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 
-// import {NestedTreeControl} from '@angular/cdk/tree';
+import {NestedTreeControl} from '@angular/cdk/tree';
+// import {FlatTreeControl} from '@angular/cdk/tree';
 
-import {FlatTreeControl} from '@angular/cdk/tree';
-import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {BehaviorSubject, Observable, of as observableOf} from 'rxjs';
 
 
-import { UiService } from "../services/ui/ui.service";
-import { QuestionService } from "./form/service/question.service";
-import { QuestionBase } from "./form/question/_models/question-base";
+import {UiService} from "../services/ui/ui.service";
+import {QuestionService} from "./form/service/question.service";
+import {QuestionBase} from "./form/question/_models/question-base";
 import {ElementQuestion} from "./form/question/_models/question-element";
 import {TextboxQuestion} from "./form/question/_models/question-textbox";
 import {StaticQuestion} from "./form/question/_models/question-static";
@@ -24,46 +24,53 @@ import {DropdownQuestion} from "./form/question/_models/question-dropdown";
  */
 
 
-export class FileNode  {
-
+export class FileNode {
   filename: string;
   type: string;
   children: FileNode[];
-  question:QuestionBase<string>;
-
+  value: string;
+  name: string;
+  options:any;
+  formGroup: FormGroup;
+  elementGroup: FormGroup;
 }
 
 /** Flat node with expandable and level information */
-export class FileFlatNode {
-  constructor(
-    public expandable: boolean, public filename: string, public level: number, public type: any, public question:QuestionBase<string>) {}
-}
+// export class FileNestedNode {
+//   constructor(
+//     public expandable: boolean, public filename: string, public level: number, public type: any, public question:QuestionBase<string>) {}
+// }
 
 /**
  * The file structure tree data in string. The data could be parsed into a Json object
  */
 
 const TREE_DATA = JSON.stringify({
+
   "project": {
-    '@type':'template','@name': 'Project',
-    "namex": {'@type':'textfield', '@name':'namex', key: 'namex',  value: 'first last'},
-    "pies": {'@type':'textfield', '@name':'pies',  key: 'pies',  value: 'pies'},
-    "date": {'@type':'textfield', '@name': 'date', key: 'date',  value: 'date'},
-    "organism": {'@type':'textfield', '@name': 'organism',   key: 'organism',  value: 'my PI'},
-    "context": {'@type':"textfield",  '@name': 'context',  key: 'context', value: 'context'},
-    "classification": {'@type':"textfield", '@name': 'classification',  key: 'classification', value: 'classification'},
+    '@type': 'element', '@name': 'Project',
+    "namex": {'@type': 'textfield', '@name': 'namex', key: 'namex', value: 'first last'},
+    "pies": {'@type': 'dropdown', '@name': 'pies', key: 'pies', value: 'Rhubarb', options: [
+        {key: 'Rhubarb',  value: 'Rhubarb'},
+        {key: 'Cherry',  value: 'Cherry'},
+        {key: 'Key Lime',   value: 'Key Lime'},
+        {key: 'Black Bottom', value: 'Black Bottom'}
+      ],},
+    "date": {'@type': 'textfield', '@name': 'date', key: 'date', value: 'date'},
+    "organism": {'@type': 'textfield', '@name': 'organism', key: 'organism', value: 'my PI'},
+    "context": {'@type': "textfield", '@name': 'context', key: 'context', value: 'context'},
+    "classification": {'@type': "textfield", '@name': 'classification', key: 'classification', value: 'classification'},
 
     "contact": {
-      '@type':"element", '@name': 'Contact',
-      "firstname": {'@type':"textfield", '@name': 'first name', key: 'first name',  value: 'Nancy'},
-      "lasttname": {'@type':"textfield", '@name': 'last name', key: 'last name',  value: 'Pelosi'},
-      "phone": {'@type':"textfield", '@name': 'phone', key: 'phone',  value: '555-555-1212'},
+      '@type': "element", '@name': 'Contact',
+      'firstname': {'@type': "textfield", '@name': 'first name', key: 'first name', value: 'Nancy'},
+      'lasttname': {'@type': "textfield", '@name': 'last name', key: 'last name', value: 'Pelosi'},
+      'phone': {'@type': "textfield", '@name': 'phone', key: 'phone', value: '555-555-1212'},
     },
 
 
   }
 });
-
 
 
 /**
@@ -76,68 +83,55 @@ const TREE_DATA = JSON.stringify({
 @Injectable()
 export class FileDatabase {
   dataChange = new BehaviorSubject<FileNode[]>([]);
+  formGroup: FormGroup;
 
-  get data(): FileNode[] { return this.dataChange.value; }
-
-  constructor() {
-    this.initialize();
+  get data(): FileNode[] {
+    return this.dataChange.value;
   }
 
-  initialize() {
+  constructor() {
+    this.initialize(new FormGroup({}));
+  }
+
+  initialize(formGroup: FormGroup) {
     // Parse the string to json object.
     const dataObject = JSON.parse(TREE_DATA);
 
     // Build the tree nodes from Json object. The result is a list of `FileNode` with nested
     //     file node as children.
-    const data = this.buildFileTree(dataObject, 0);
+
+    const data = this.buildFileTree(dataObject, 0, formGroup);
 
     // Notify the change.
     this.dataChange.next(data);
   }
 
-  /**
-   * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
-   * The return value is the list of `FileNode`.
-   */
-  buildFileTree(obj: {[key: string]: any}, level: number): FileNode[] {
+
+  buildFileTree(obj: { [key: string]: any }, level: number, formGroup: FormGroup): FileNode[] {
     return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
 
       const value = obj[key];
-      const filename = key;
       const node = new FileNode();
-      node.filename = key;
-      node.type = value['@type'];
 
+      if (value != null) {
+        if (typeof value === 'object') {
+          node.filename = key;
+          node.name = value['@name'];
+          node.value = value['value'];
+          node.options = value['options'];
+          node.formGroup = formGroup;
 
-      if (key != '@type'  &&  value && value['@type'] ) {
-        console.log('key, value',key, obj[key])
-
-        if (value['@type'] == 'element' || value['@type'] == 'template') {
-          node.question = new ElementQuestion({
-            name:value['@name'],
-            type:value['@type'],
-            key: value['key'],
-            value: value['value'],
-
-          });
-          node.type = value['@type'];
-          node.children = this.buildFileTree(value, level + 1);
-        } else {
-
-          node.question = new TextboxQuestion({
-            name:value['@name'],
-            type:value['@type'],
-            key: value['key'],
-            value: value['value'],
-
-          });
-
+          if (value['@type'] == 'element' || value['@type'] == 'template') {
+            node.elementGroup = new FormGroup({});
+            node.children = this.buildFileTree(value, level + 1, node.elementGroup);
+          } else {
+            node.type = value['@type'];
+          }
         }
-        accumulator = accumulator.concat(node)
       }
 
-      console.log('accumulator',accumulator);
-      return accumulator;
+      return (key.charAt(0) == '@') ? accumulator : accumulator.concat(node)
+
     }, []);
   }
 }
@@ -151,58 +145,84 @@ export class FileDatabase {
 })
 
 export class InstanceComponent implements OnInit {
-  treeControl: FlatTreeControl<FileFlatNode>;
-  treeFlattener: MatTreeFlattener<FileNode, FileFlatNode>;
-  dataSource: MatTreeFlatDataSource<FileNode, FileFlatNode>;
+  treeControl: NestedTreeControl<FileNode>;
+  dataSource: MatTreeNestedDataSource<FileNode>;
+  database: FileDatabase;
 
-  formId:string;
-  form:FormGroup;
+  formId: string;
+  projectFormName: string;
+  form: FormGroup;
+  payload:any;
 
-  title:string;
+  private _subscription: Subscription;
+  formInvalid: boolean = false;
+
+  title: string;
   questions: [QuestionBase<any>];
-  payload:string;
+
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  constructor(private ui: UiService, qs:QuestionService, database: FileDatabase) {
+  constructor(private ui: UiService, qs: QuestionService, database: FileDatabase) {
 
+    this.projectFormName = 'projectFormName';
     this.questions = qs.getQuestions('projectForm');
-    this.payload = '';
-    let group = {};
-    this.form = new FormGroup(group);
+    // this.payload = {};
+    this.database = database;
+    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.dataSource = new MatTreeNestedDataSource();
 
-
-    this.treeFlattener = new MatTreeFlattener(this.transformer, this._getLevel,
-      this._isExpandable, this._getChildren);
-    this.treeControl = new FlatTreeControl<FileFlatNode>(this._getLevel, this._isExpandable);
-    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
-    database.dataChange.subscribe(data => this.dataSource.data = data);
+    database.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
+    this.form = database.data[0].formGroup;
   }
 
-  transformer = (node: FileNode, level: number) => {
-    return new FileFlatNode(!!node.children, node.filename, level, node.type, node.question);
+  ngAfterViewInit() {
+    //this.payload = this.form.value;
+    this.onChanges();
   }
-
-  private _getLevel = (node: FileFlatNode) => node.level;
-
-  private _isExpandable = (node: FileFlatNode) => node.expandable;
-
-  private _getChildren = (node: FileNode): Observable<FileNode[]> => observableOf(node.children);
-
-  hasChild = (_: number, _nodeData: FileFlatNode) => _nodeData.expandable;
-
 
   ngOnInit() {
     this.title = 'Cedar Metadata Editor';
     this.formId = 'projectForm';
 
-
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
-    this.darkMode = value;
-  })}
+      this.darkMode = value;
+    })
+  }
 
+  onChanges(): void {
+
+    this.form.valueChanges.subscribe(val => {
+      console.log('onChanges')
+      this.payload = val;
+    });
+  }
+
+  // transformer = (node: FileNode, level: number) => {
+  //   return new FileNestedNode(!!node.children, node.filename, level, node.type, node.question);
+  // }
+
+  //private _getLevel = (node: FileNestedNode) => node.level;
+
+  //private _isExpandable = (node: FileNestedNode) => node.expandable;
+
+
+  //hasChild = (_: number, _nodeData: FileNestedNode) => _nodeData.expandable;
+
+  hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
+
+  private _getChildren = (node: FileNode) => node.children;
+
+
+
+
+  onSubmit(value:any, source:string) {
+    console.log('onSubmit', source, value);
+    this.payload = this.form.value;
+  }
 
 
 }

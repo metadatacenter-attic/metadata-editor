@@ -1,21 +1,20 @@
 import { QuestionBase } from './question-base';
+import { FormGroup } from '@angular/forms';
 
 
 export class ElementQuestion extends QuestionBase<string> {
-  controlType = 'element';
-  type: string;
+  formGroup:FormGroup;
 
   constructor(options: {} ) {
     super(options);
-    this.type = options['type'] || '';
-    this.element = null;
-    this.questions = null;
-    this.visible = false;
+
+    let group = {};
+    this.formGroup = new FormGroup(group);
 
   }
 
   get isValid() {
-      return this.element ? this.element.valid : false;
+      return this.formGroup ? this.formGroup.valid : false;
   }
 }
 

@@ -1,19 +1,38 @@
-<div [formGroup]="form">
+<div [formGroup]="node.formGroup" >
 
-    <label [attr.for]="question.key">{{question.name}}</label>
-  {{question.type}}
+  <label [attr.for]="node.filename">{{node.name}}</label>
 
-    <div [ngSwitch]="question.type">
 
-      <input *ngSwitchCase="'textfield'" [formControlName]="question.key" [id]="question.key" [type]="text" value="{{question.value}}">
+  <div [ngSwitch]="node.type">
 
-      <select  *ngSwitchCase="'dropdown'" [id]="question.key" [formControlName]="question.key">
-        <option *ngFor="let opt of question.options" [value]="opt.key">{{opt.value}}</option>
-      </select>
 
-      <!--<app-element *ngSwitchCase="'element'"  [formControlName]="question.key" [question]="question"  [parent]="form" ></app-element>-->
+    <input *ngSwitchCase="'textfield'" [formControlName]="node.filename" type="text" [value]="node.value" required>
 
+    <select *ngSwitchCase="'dropdown'" [formControlName]="node.filename" [value]="node.value">
+      <option *ngFor="let opt of node.options" [value]="opt.key">{{opt.value}}</option>
+    </select>
+
+
+    <!--<app-element *ngSwitchCase="'element'"  [formControlName]="node.filename"   [parent]="form" ></app-element>-->
+
+
+  </div>
+
+  <div *ngIf="node.formGroup.invalid && (node.formGroup.dirty || node.formGroup.touched)" class="alert alert-danger">
+
+    invalid dirty touched {{node.formGroup.errors}}
+
+    <div *ngIf="node.formGroup.errors">
+      Name is required.
     </div>
+    <div *ngIf="node.formGroup.errors">
+      Name must be at least 4 characters long.
+    </div>
+    <div *ngIf="node.formGroup.errors">
+      Name cannot be Bob.
+    </div>
+  </div>
 
-    <!--<div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>-->
+  <!--<div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>-->
 </div>
+
