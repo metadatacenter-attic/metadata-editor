@@ -26,11 +26,19 @@ import {DropdownQuestion} from "./form/question/_models/question-dropdown";
 
 export class FileNode {
   filename: string;
+  helptext: string;
+  required: boolean;
+  hint: string;
+  min:number;
+  max:number;
+  minLength:number;
+  maxLength:number;
+  pattern:string;
   type: string;
   children: FileNode[];
-  value: string;
+  value: any;
   name: string;
-  options:any;
+  options: any;
   formGroup: FormGroup;
   elementGroup: FormGroup;
 }
@@ -49,23 +57,155 @@ const TREE_DATA = JSON.stringify({
 
   "project": {
     '@type': 'element', '@name': 'Project',
-    "namex": {'@type': 'textfield', '@name': 'namex', key: 'namex', value: 'first last'},
-    "pies": {'@type': 'dropdown', '@name': 'pies', key: 'pies', value: 'Rhubarb', options: [
-        {key: 'Rhubarb',  value: 'Rhubarb'},
-        {key: 'Cherry',  value: 'Cherry'},
-        {key: 'Key Lime',   value: 'Key Lime'},
+    "name": {
+      '@type': 'textfield',
+      '@name': 'Name',
+      key: 'name',
+      value: '',
+      helptext: "Name of project",
+      hint: "Enter the name of your project",
+      required: true
+    },
+    "URL": {
+      '@type': 'url',
+      '@name': 'URL',
+      key: 'url',
+      value: '',
+      helptext: "URL of project",
+      hint: "Enter the description of your project",
+      required: true
+    },
+    "description": {
+      '@type': 'paragraph',
+      '@name': 'Description',
+      key: 'description',
+      value: '',
+      helptext: "Description of project",
+      hint: "Enter the description of your project",
+      required: true
+    },
+    "pies": {
+      '@type': 'dropdown',
+      '@name': 'Pies',
+      key: 'pies',
+      value: 'Rhubarb',
+      helptext: "pie filling",
+      required: false,
+      options: [
+        {key: 'Rhubarb', value: 'Rhubarb'},
+        {key: 'Cherry', value: 'Cherry'},
+        {key: 'Key Lime', value: 'Key Lime'},
         {key: 'Black Bottom', value: 'Black Bottom'}
-      ],},
-    "date": {'@type': 'textfield', '@name': 'date', key: 'date', value: 'date'},
-    "organism": {'@type': 'textfield', '@name': 'organism', key: 'organism', value: 'my PI'},
-    "context": {'@type': "textfield", '@name': 'context', key: 'context', value: 'context'},
-    "classification": {'@type': "textfield", '@name': 'classification', key: 'classification', value: 'classification'},
+      ],
+    },
+    "runs": {
+      '@type': 'number',
+      '@name': 'Run count',
+      key: 'runs',
+      value: '',
+      helptext: "The number of experimental runs from 4 to 10",
+      required: true,
+      hint:"e.g. 5",
+      min:4,
+      max:10
+    },
+    "date": {
+      '@type': 'date',
+      '@name': 'Date',
+      key: 'date',
+      value: '',
+      helptext: "start date",
+      required: true,
+      hint:"enter the start date of the project"
+    },
+    "goal": {
+      '@type': 'checkbox', '@name': 'Goal', key: 'goal', value: [true, true, false, false], required: false, options: [
+        {key: 'initial', label: 'initial'},
+        {key: 'in process', label: 'in process'},
+        {key: 'in committee', label: 'in committee'},
+        {key: 'complete', label: 'complete'}
+      ],
+    },
+    "status": {
+      '@type': 'radio',
+      '@name': 'Status',
+      key: 'status',
+      value: 'begin',
+      required: false,
+      helptext: "status of project",
+      hint:"begin",
+      options: [
+        {key: 'begin', label: 'begin', value: 'begin'},
+        {key: 'start', label: 'start', value: 'start'},
+        {key: 'middle', label: 'middle', value: 'middle'},
+        {key: 'finish', label: 'finish', value: 'finish'}
+      ],
+    },
+
+
+    "organism": {
+      '@type': 'textfield',
+      '@name': 'Organism',
+      key: 'organism',
+      value: '',
+      required: false,
+      helptext: "The organism on which your experiment acted",
+      hint:"e.g. human"
+    },
+    "context": {
+      '@type': "textfield",
+      '@name': 'Context',
+      key: 'context',
+      value: '',
+      required: false,
+      helptext: "The context of your project",
+      hint:"e.g. NCI"
+    },
+    "classification": {
+      '@type': "textfield",
+      '@name': 'Classification',
+      key: 'classification',
+      value: '',
+      required: false,
+      helptext: "The classification of your project",
+      hint:"e.g. Cancer"
+    },
 
     "contact": {
       '@type': "element", '@name': 'Contact',
-      'firstname': {'@type': "textfield", '@name': 'first name', key: 'first name', value: 'Nancy'},
-      'lasttname': {'@type': "textfield", '@name': 'last name', key: 'last name', value: 'Pelosi'},
-      'phone': {'@type': "textfield", '@name': 'phone', key: 'phone', value: '555-555-1212'},
+      'firstname': {
+        '@type': "textfield",
+        '@name': 'First name',
+        key: 'first name',
+        value: '',
+        required: false,
+        helptext: "The first name of your contact"
+      },
+      'lasttname': {
+        '@type': "textfield",
+        '@name': 'Last name',
+        key: 'last name',
+        value: '',
+        required: false,
+        helptext: "The last name of your contact"
+      },
+      "email": {
+        '@type': 'email',
+        '@name': 'Email',
+        key: 'email',
+        value: '',
+        helptext: "Email of contact",
+        hint: "Enter the email address for your contact",
+        required: true
+      },
+      'phone': {
+        '@type': "tel",
+        '@name': 'Phone',
+        key: 'phone',
+        value: '',
+        required: false,
+        helptext: "The phon enumber of your contact"
+      },
     },
 
 
@@ -120,6 +260,12 @@ export class FileDatabase {
           node.value = value['value'];
           node.options = value['options'];
           node.formGroup = formGroup;
+          node.helptext = value['helptext'];
+          node.required = value['required'];
+          node.hint = value['hint'];
+          node.min = value['min'];
+          node.max = value['max'];
+
 
           if (value['@type'] == 'element' || value['@type'] == 'template') {
             node.elementGroup = new FormGroup({});
@@ -152,7 +298,7 @@ export class InstanceComponent implements OnInit {
   formId: string;
   projectFormName: string;
   form: FormGroup;
-  payload:any;
+  payload: any;
 
   private _subscription: Subscription;
   formInvalid: boolean = false;
@@ -217,9 +363,7 @@ export class InstanceComponent implements OnInit {
   private _getChildren = (node: FileNode) => node.children;
 
 
-
-
-  onSubmit(value:any, source:string) {
+  onSubmit(value: any, source: string) {
     console.log('onSubmit', source, value);
     this.payload = this.form.value;
   }

@@ -1,34 +1,100 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators, FormControl } from '@angular/forms';
-import {QuestionBase} from './_models/question-base';
-import {ElementQuestion} from './_models/question-element';
-import {TextboxQuestion} from './_models/question-textbox';
-import {UiService} from "../../../services/ui/ui.service";
-import {QuestionService} from "../service/question.service";
-import {QuestionControlService} from "../service/question-control.service";
-import {Player, PlayerForm} from "../../../team/player";
+
 import {FileNode} from "../../instance.component";
 
 
 @Component({
   selector: 'app-question',
-  templateUrl: './question.component.html'
+  templateUrl: './question.component.html',
+  styleUrls: ['./question.component.less'],
 })
 export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
   @Input() parentForm: FormGroup;
   formControl: FormControl;
-  question: QuestionBase<any>;
+  checkboxGroup:FormGroup;
+  radioGroup:FormGroup;
+  _fb: FormBuilder;
 
 
-  constructor() {
+  constructor(fb:FormBuilder) {
+    this._fb = fb;
   }
 
   ngOnInit() {
-    const base = this.node.type;
-    this.question = new TextboxQuestion(this.node);
-    this.formControl = new FormControl(this.node.value);
-    this.parentForm.addControl(this.node.filename, this.formControl);
+    const validators = this.getValidators(this.node);
+
+    if (this.node.type == 'textfield' || this.node.type == 'url' || this.node.type == 'paragraph' || this.node.type == 'email' || this.node.type == 'tel'  || this.node.type == 'number' || this.node.type == 'dropdown' || this.node.type == 'date') {
+      this.formControl = new FormControl(this.node.value, validators);
+      this.parentForm.addControl(this.node.filename, this.formControl);
+    }
+
+    if (this.node.type == 'checkbox') {
+      this.checkboxGroup = this._fb.group({
+        values: this._fb.array(this.node.value)
+      });
+      this.parentForm.addControl(this.node.filename, this.checkboxGroup);
+    }
+    if (this.node.type == 'radio') {
+      this.radioGroup = this._fb.group({
+        value: this.node.value
+      });
+      this.parentForm.addControl(this.node.filename, this.radioGroup);
+    }
+  }
+
+  getValidators(node:FileNode) {
+    let validators = [];
+    if (this.node.required) {
+      validators.push(Validators.required);
+    }
+    if (this.node.type == 'email') {
+      validators.push(Validators.email);
+    }
+    if (this.node.min !== null) {
+      validators.push(Validators.min(this.node.min));
+    }
+    if (this.node.max !== null) {
+      validators.push(Validators.max(this.node.max));
+    }
+    if (this.node.minLength !== null) {
+      validators.push(Validators.minLength(this.node.minLength));
+    }
+    if (this.node.maxLength !== null) {
+      validators.push(Validators.maxLength(this.node.maxLength));
+    }
+    if (this.node.pattern !== null) {
+      validators.push(Validators.pattern(this.node.pattern));
+    }
+    if (this.node.type == 'url') {
+      validators.push(this.validateUrl);
+    }
+    return validators;
+  }
+
+  validateUrl(control: FormControl) {
+    let result = null;
+    if (!control.value.startsWith('http')) {
+      result = {'url':true};
+    }
+    return result;
+  }
+
+  dateFilter = (d: Date): boolean => {
+    const day = d.getDay();
+    // Prevent Saturday and Sunday from being selected.
+    return day !== 0 && day !== 6;
+  }
+
+  toggle(i:number) {
+    if (this.node.type == 'checkbox') {
+      this.node.value[i] = !this.node.value[i];
+    }
+    if (this.node.type == 'radio') {
+      this.node.value = this.node.options[i].value;
+      this.radioGroup.setValue({value:this.node.value});
+    }
   }
 
   get isValid() {
@@ -38,7 +104,7 @@ export class QuestionComponent implements OnInit {
       result = this.parentForm.controls[this.node.filename].valid;
     }
     return result;
-  } //return this.form.controls[this.question.key].valid; }
+  }
 
   loadForm(key, form) {
     console.log('load the form with key', key, form);

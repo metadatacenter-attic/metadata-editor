@@ -3,9 +3,6 @@ import {FormGroup, FormArray} from '@angular/forms';
 import {Subscription} from "rxjs";
 
 import {ElementService} from './service/element.service'
-import {QuestionService} from '../service/question.service'
-import {QuestionControlService} from '../service/question-control.service'
-import {QuestionBase} from "../question/_models/question-base";
 import {UiService} from "../../../services/ui/ui.service";
 import {FormService} from "../service/form.service";
 import {FileNode} from "../../instance.component";
@@ -15,7 +12,7 @@ import {FileNode} from "../../instance.component";
   selector: 'app-element',
   templateUrl: './element.component.html',
   styleUrls: ['./element.component.less'],
-  providers: [ FormService, ElementService, QuestionService, QuestionControlService],
+  providers: [ FormService, ElementService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {
@@ -27,9 +24,7 @@ export class ElementComponent {
   darkMode:boolean;
   private _darkModeSub: Subscription;
 
-  constructor(private ui:UiService, qs: QuestionService, qcs:QuestionControlService) {
-
-
+  constructor(private ui:UiService) {
   }
 
   ngOnInit() {
