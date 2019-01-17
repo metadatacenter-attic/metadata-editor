@@ -12,9 +12,9 @@ import {FileNode} from "../../instance.component";
 export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
   @Input() parentForm: FormGroup;
-  formControl: FormControl;
-  checkboxGroup:FormGroup;
-  radioGroup:FormGroup;
+  formControl: FormControl[];
+  checkboxGroup:FormGroup[];
+  radioGroup:FormGroup[];
   _fb: FormBuilder;
 
 
@@ -23,26 +23,55 @@ export class QuestionComponent implements OnInit {
   }
 
   ngOnInit() {
+
     const validators = this.getValidators(this.node);
 
-    if (this.node.type == 'textfield' || this.node.type == 'url' || this.node.type == 'paragraph' || this.node.type == 'email' || this.node.type == 'tel'  || this.node.type == 'number' || this.node.type == 'dropdown' || this.node.type == 'date') {
-      this.formControl = new FormControl(this.node.value, validators);
-      this.parentForm.addControl(this.node.filename, this.formControl);
+    if (this.node.type == 'textfield' || this.node.type == 'paragraph' ||  this.node.type == 'dropdown' ) {
+      this.formControl = [];
+      this.node.value.values.forEach((item, index) => {
+        let control = new FormControl(item, validators);
+        this.formControl.push(control);
+        this.parentForm.addControl(this.node.filename +  index, control);
+      });
+    }
+
+    if (this.node.type == 'date') {
+      this.formControl = [];
+      this.node.value.values.forEach((item, index) => {
+        let date = new Date(item);
+        console.log('date',date.toDateString(), item)
+        let control = new FormControl(date, validators);
+        this.formControl.push(control);
+        this.parentForm.addControl(this.node.filename +  index, control);
+      });
     }
 
     if (this.node.type == 'checkbox') {
-      this.checkboxGroup = this._fb.group({
-        values: this._fb.array(this.node.value)
+      this.checkboxGroup = [];
+      this.node.value.values.forEach((value, i) => {
+        let arr = [];
+        this.node.options.forEach ((opt,  j) => {
+          let control =  new FormControl(value[j]);
+          arr.push(control);
+        });
+        let group = this._fb.group({
+          values: this._fb.array(arr)});
+        this.checkboxGroup.push(group);
+        this.parentForm.addControl(this.node.filename + i, group);
       });
-      this.parentForm.addControl(this.node.filename, this.checkboxGroup);
     }
+
     if (this.node.type == 'radio') {
-      this.radioGroup = this._fb.group({
-        value: this.node.value
+      this.radioGroup = [];
+      this.node.value.values.forEach((item, index) => {
+        let group = this._fb.group({
+          value: this.node.value.values[index]});
+        this.radioGroup.push(group);
+        this.parentForm.addControl(this.node.filename + index, group);
       });
-      this.parentForm.addControl(this.node.filename, this.radioGroup);
     }
   }
+
 
   getValidators(node:FileNode) {
     let validators = [];
@@ -68,7 +97,7 @@ export class QuestionComponent implements OnInit {
       validators.push(Validators.pattern(this.node.pattern));
     }
     if (this.node.type == 'url') {
-      validators.push(this.validateUrl);
+      //validators.push(this.validateUrl);
     }
     return validators;
   }
@@ -87,15 +116,25 @@ export class QuestionComponent implements OnInit {
     return day !== 0 && day !== 6;
   }
 
-  toggle(i:number) {
+  toggle(i:number, j:number) {
     if (this.node.type == 'checkbox') {
-      this.node.value[i] = !this.node.value[i];
+      let arr = this.node.value.values[i];
+      let value = this.node.options[j].key;
+      if (arr.includes(value)) {
+        arr.splice(arr.indexOf(value),1);
+      } else {
+        arr.push(value);
+      }
     }
     if (this.node.type == 'radio') {
-      this.node.value = this.node.options[i].value;
-      this.radioGroup.setValue({value:this.node.value});
+      let arr = this.node.value.values[i];
+      let value = this.node.options[j].key;
+      arr = value;
+      this.radioGroup[i].setValue({value:arr});
     }
   }
+
+
 
   get isValid() {
     let result = false;

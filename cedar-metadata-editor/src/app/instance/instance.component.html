@@ -1,56 +1,63 @@
-<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree" >
+<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree">
+
+  <mat-tab-group>
+    <mat-tab label="Form">
+
+      <!--<paginator-component></paginator-component>-->
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit(form.value, 'saveButton')">
+
+        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
 
-    <!--<paginator-component></paginator-component>-->
-
-  <form [formGroup]="form"  (ngSubmit)="onSubmit(form.value, 'saveButton')">
-
-  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
 
 
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+            <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
+              <button mat-icon-button disabled></button>
+              <app-question [node]="node" [parentForm]="node.formGroup" style="width:100%"></app-question>
+            </li>
+          </mat-tree-node>
+
+          <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+
+            <li>
+              <div class="mat-tree-node">
+                <button mat-icon-button matTreeNodeToggle
+                  [attr.aria-label]="'toggle ' + node.filename">
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                  </mat-icon>
+                </button>
+                {{node.name}}
+              </div>
 
 
-      <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
-        <button mat-icon-button disabled></button>
-        <app-question [node]="node" [parentForm]="node.formGroup" style="width:100%"></app-question>
-      </li>
-    </mat-tree-node>
+              <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)">
+                <app-element [node]="node" [parentForm]="node.formGroup"
+                  [elementForm]="node.elementGroup"></app-element>
+                <ng-container matTreeNodeOutlet></ng-container>
+              </ul>
 
-    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+            </li>
+          </mat-nested-tree-node>
+        </mat-tree>
 
-      <li>
-        <div class="mat-tree-node">
-          <button mat-icon-button matTreeNodeToggle
-            [attr.aria-label]="'toggle ' + node.filename">
-            <mat-icon class="mat-icon-rtl-mirror">
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
+        <div class="form-row">
+          <button mat-raised-button color="primary" [disabled]="!form.valid"
+            (click)="onSubmit(form.value, 'saveButton')">Save
           </button>
-          {{node.name}}
         </div>
+      </form>
 
+    </mat-tab>
+    <mat-tab label="Value">
+      <div *ngIf="payload">
+        <pre>value: <span class="value">{{ payload | json}}</span></pre>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 
-        <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)"   >
-          <app-element [node]="node" [parentForm]="node.formGroup" [elementForm]="node.elementGroup"></app-element>
-          <ng-container matTreeNodeOutlet></ng-container>
-        </ul>
-
-      </li>
-    </mat-nested-tree-node>
-  </mat-tree>
-
-  <div class="form-row">
-    <button mat-raised-button color="primary"   [disabled]="!form.valid" (click)="onSubmit(form.value, 'saveButton')">Save</button>
-  </div>
-
-
-</form>
-
-
-  <div *ngIf="payload">
-    <pre>value: <span class="value">{{ payload | json}}</span></pre>
-  </div>
 
 </div>
 

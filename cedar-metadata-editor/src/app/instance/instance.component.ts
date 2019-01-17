@@ -23,24 +23,31 @@ import {DropdownQuestion} from "./form/question/_models/question-dropdown";
  * Each node has a filename, and a type or a list of children.
  */
 
+export class ValueArray {
+  min: number;
+  max: number;
+  values: any[];
+}
 
 export class FileNode {
   filename: string;
   helptext: string;
   required: boolean;
   hint: string;
-  min:number;
-  max:number;
-  minLength:number;
-  maxLength:number;
-  pattern:string;
+  min: number;
+  max: number;
+  minLength: number;
+  maxLength: number;
+  pattern: string;
   type: string;
-  children: FileNode[];
-  value: any;
+  subtype:string;
   name: string;
   options: any;
+  value: ValueArray;
   formGroup: FormGroup;
   elementGroup: FormGroup;
+  children: FileNode[];
+
 }
 
 /** Flat node with expandable and level information */
@@ -61,25 +68,39 @@ const TREE_DATA = JSON.stringify({
       '@type': 'textfield',
       '@name': 'Name',
       key: 'name',
-      value: '',
+      subtype:'text',
+      value:{
+        min:1,
+        max:2,
+        values:['one','two'],
+      },
       helptext: "Name of project",
       hint: "Enter the name of your project",
-      required: true
+      required: false
     },
     "URL": {
-      '@type': 'url',
+      '@type': 'textfield',
       '@name': 'URL',
       key: 'url',
-      value: '',
+      subtype:'url',
+      value:{
+        min:1,
+        max:1,
+        values:['',''],
+      },
       helptext: "URL of project",
-      hint: "Enter the description of your project",
+      hint: "Enter the URL of your project",
       required: true
     },
     "description": {
       '@type': 'paragraph',
       '@name': 'Description',
       key: 'description',
-      value: '',
+      value:{
+        min:1,
+        max:2,
+        values:['',''],
+      },
       helptext: "Description of project",
       hint: "Enter the description of your project",
       required: true
@@ -88,7 +109,11 @@ const TREE_DATA = JSON.stringify({
       '@type': 'dropdown',
       '@name': 'Pies',
       key: 'pies',
-      value: 'Rhubarb',
+      value:{
+        min:1,
+        max:2,
+        values:['Rhubarb','Black Bottom'],
+      },
       helptext: "pie filling",
       required: false,
       options: [
@@ -99,27 +124,47 @@ const TREE_DATA = JSON.stringify({
       ],
     },
     "runs": {
-      '@type': 'number',
+      '@type': 'textfield',
       '@name': 'Run count',
+      subtype:'number',
       key: 'runs',
-      value: '',
+      value:{
+        min:1,
+        max:2,
+        values:['',''],
+      },
       helptext: "The number of experimental runs from 4 to 10",
       required: true,
-      hint:"e.g. 5",
-      min:4,
-      max:10
+      hint: "e.g. 5",
+      min: 4,
+      max: 10
     },
     "date": {
       '@type': 'date',
       '@name': 'Date',
       key: 'date',
-      value: '',
+      subtype:'date',
+      value:{
+        min:1,
+        max:2,
+        values:['5/22/87','8/17/85'],
+      },
       helptext: "start date",
-      required: true,
-      hint:"enter the start date of the project"
+      required: false,
+      hint: "Enter the start date of the project"
     },
     "goal": {
-      '@type': 'checkbox', '@name': 'Goal', key: 'goal', value: [true, true, false, false], required: false, options: [
+      '@type': 'checkbox',
+      '@name': 'Goal',
+      key: 'goal',
+      subtype:'checkbox',
+      value:{
+        min:1,
+        max:2,
+        values:[[true,false,true,false],[false,false,true,true]],
+      },
+      required: false,
+      options: [
         {key: 'initial', label: 'initial'},
         {key: 'in process', label: 'in process'},
         {key: 'in committee', label: 'in committee'},
@@ -129,11 +174,16 @@ const TREE_DATA = JSON.stringify({
     "status": {
       '@type': 'radio',
       '@name': 'Status',
+      subtype:'radio',
       key: 'status',
-      value: 'begin',
+      value:{
+        min:1,
+        max:2,
+        values:['begin','finish'],
+      },
       required: false,
       helptext: "status of project",
-      hint:"begin",
+      hint: "begin",
       options: [
         {key: 'begin', label: 'begin', value: 'begin'},
         {key: 'start', label: 'start', value: 'start'},
@@ -141,74 +191,137 @@ const TREE_DATA = JSON.stringify({
         {key: 'finish', label: 'finish', value: 'finish'}
       ],
     },
-
-
     "organism": {
       '@type': 'textfield',
       '@name': 'Organism',
+      subtype:'text',
       key: 'organism',
-      value: '',
+      value:{
+        min:1,
+        max:1,
+        values:[''],
+      },
       required: false,
       helptext: "The organism on which your experiment acted",
-      hint:"e.g. human"
+      hint: "e.g. human"
     },
-    "context": {
-      '@type': "textfield",
-      '@name': 'Context',
-      key: 'context',
-      value: '',
-      required: false,
-      helptext: "The context of your project",
-      hint:"e.g. NCI"
-    },
-    "classification": {
-      '@type': "textfield",
-      '@name': 'Classification',
-      key: 'classification',
-      value: '',
-      required: false,
-      helptext: "The classification of your project",
-      hint:"e.g. Cancer"
-    },
-
     "contact": {
       '@type': "element", '@name': 'Contact',
       'firstname': {
         '@type': "textfield",
         '@name': 'First name',
+        subtype:'text',
         key: 'first name',
-        value: '',
+        value:{
+          min:1,
+          max:1,
+          values:[''],
+        },
         required: false,
         helptext: "The first name of your contact"
       },
       'lasttname': {
         '@type': "textfield",
         '@name': 'Last name',
+        subtype:'text',
         key: 'last name',
-        value: '',
+        value:{
+          min:1,
+          max:1,
+          values:[''],
+        },
         required: false,
         helptext: "The last name of your contact"
       },
       "email": {
-        '@type': 'email',
+        '@type': "textfield",
         '@name': 'Email',
+        subtype:'email',
         key: 'email',
-        value: '',
+        value:{
+          min:1,
+          max:2,
+          values:['',''],
+        },
         helptext: "Email of contact",
         hint: "Enter the email address for your contact",
         required: true
       },
       'phone': {
-        '@type': "tel",
+        '@type': "textfield",
         '@name': 'Phone',
+        subtype:'tel',
         key: 'phone',
-        value: '',
+        value:{
+          min:1,
+          max:1,
+          values:[''],
+        },
+        hint: "e.g. 555-555-1212",
         required: false,
-        helptext: "The phon enumber of your contact"
+        helptext: "The phone number of your contact"
       },
-    },
-
-
+      "context": {
+        '@type': "textfield",
+        '@name': 'Context',
+        subtype:'text',
+        key: 'context',
+        value:{
+          min:1,
+          max:1,
+          values:[''],
+        },
+        required: false,
+        helptext: "The context of your project",
+        hint: "e.g. NCI"
+      },
+      "classification": {
+        '@type': "textfield",
+        '@name': 'Classification',
+        subtype:'text',
+        key: 'classification',
+        value:{
+          min:1,
+          max:1,
+          values:[''],
+        },
+        required: false,
+        helptext: "The classification of your project",
+        hint: "e.g. Cancer"
+      },
+      "address": {
+        '@type': "element",
+        '@name': 'Address',
+        'phone': {
+          '@type': "textfield",
+          '@name': 'Phone',
+          subtype:'tel',
+          key: 'phone',
+          value:{
+            min:1,
+            max:1,
+            values:[''],
+          },
+          hint: "e.g. 555-555-1212",
+          required: false,
+          helptext: "The phone number of your contact"
+        },
+        "context": {
+          '@type': "textfield",
+          '@name': 'Context',
+          subtype:'text',
+          key: 'context',
+          value:{
+            min:1,
+            max:1,
+            values:[''],
+          },
+          required: false,
+          helptext: "The context of your project",
+          hint: "e.g. NCI"
+        },
+      }
+    }
   }
 });
 
@@ -255,6 +368,7 @@ export class FileDatabase {
 
       if (value != null) {
         if (typeof value === 'object') {
+
           node.filename = key;
           node.name = value['@name'];
           node.value = value['value'];
@@ -265,6 +379,7 @@ export class FileDatabase {
           node.hint = value['hint'];
           node.min = value['min'];
           node.max = value['max'];
+          node.subtype = value['subtype'];
 
 
           if (value['@type'] == 'element' || value['@type'] == 'template') {
@@ -364,7 +479,7 @@ export class InstanceComponent implements OnInit {
 
 
   onSubmit(value: any, source: string) {
-    console.log('onSubmit', source, value);
+    console.log('onSubmit', source, value, this.form);
     this.payload = this.form.value;
   }
 

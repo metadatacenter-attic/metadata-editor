@@ -1,132 +1,102 @@
-<div [formGroup]="node.formGroup" class="form-group" >
+<div [formGroup]="node.formGroup" class="form-group">
 
-  <label class="question-label" [attr.for]="node.filename" >{{node.name}}</label>
+
+  <label class="question-label" [attr.for]="node.filename">{{node.name}}</label>
   <div [ngSwitch]="node.type" style="margin:10px 0;">
 
+    <div *ngFor="let control of formControl;index as i">
 
-    <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
-      <input matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="text" [value]="node.value"
-        [required]="node.required"
-        [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
+      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
+        <input matInput [placeholder]="node.helptext" [formControl]="control" type="node.subtype"
+          [value]="node.value.values[i]"
+          [required]="node.required"
+          [min]="node.min" [max]="node.max"
+          [errorStateMatcher]="matcher">
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-error *ngIf="control.hasError('url') && !control.hasError('required')">
+          Please enter a valid URL
+        </mat-error>
+        <mat-error *ngIf="control.hasError('tel') && !control.hasError('required')">
+          Please enter a valid telephone number
+        </mat-error>
+        <mat-error *ngIf="control.hasError('email') && !control.hasError('required')">
+          Please enter a valid email address
+        </mat-error>
+        <mat-error *ngIf="control.hasError('required')">
+          Value is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('min')">
+          Value {{control.errors['min']['actual']}} is smaller than
+          <strong>{{control.errors['min']['min']}}</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('max')">
+          Value {{control.errors['max']['actual']}} is larger than
+          <strong>{{control.errors['max']['max']}}</strong>
+        </mat-error>
+      </mat-form-field>
 
-    <mat-form-field *ngSwitchCase="'paragraph'" class="example-full-width mat-form-field">
-      <textarea matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="text" [value]="node.value"
+      <mat-form-field *ngSwitchCase="'paragraph'" class="example-full-width mat-form-field">
+      <textarea matInput [placeholder]="node.helptext" [formControl]="control" type="text"
+        [value]="node.value.values[i]"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
-      <mat-hint>{{node.hint}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field *ngSwitchCase="'url'" class="example-full-width mat-form-field">
-      <input matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="url" [value]="node.value"
-        [required]="node.required"
-        [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}} {{formControl.errors |json}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('url') && !formControl.hasError('required')">
-        Please enter a valid URL
-      </mat-error>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field *ngSwitchCase="'tel'" class="example-full-width mat-form-field">
-      <input matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="email" [value]="node.value"
-        [required]="node.required"
-        [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}} {{formControl.errors |json}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('tel') && !formControl.hasError('required')">
-        Please enter a valid telephone number
-      </mat-error>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field *ngSwitchCase="'email'" class="example-full-width mat-form-field">
-      <input matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="email" [value]="node.value"
-        [required]="node.required"
-        [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('email') && !formControl.hasError('required')">
-        Please enter a valid email address
-      </mat-error>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-error *ngIf="control.hasError('required')">
+          Value is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
 
 
-    <mat-form-field *ngSwitchCase="'number'" class="example-full-width mat-form-field">
-      <input matInput [placeholder]="node.helptext" [formControlName]="node.filename" type="number" [value]="node.value"
-        [min]="node.min" [max]="node.max"
-        [required]="node.required"
-        [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}} {{formControl.errors |json}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-      <mat-error *ngIf="formControl.hasError('min')">
-        Value {{formControl.errors['min']['actual']}} is smaller than <strong>{{formControl.errors['min']['min']}}</strong>
-      </mat-error>
-      <mat-error *ngIf="formControl.hasError('max')">
-        Value {{formControl.errors['max']['actual']}} is larger than <strong>{{formControl.errors['max']['max']}}</strong>
-      </mat-error>
-    </mat-form-field>
+      <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
+        <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.helptext"
+          [value]="control.value">
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field *ngSwitchCase="'dropdown'" class="mat-form-field">
+        <mat-select matNativeControl [placeholder]="node.helptext" [formControl]="control"
+          [value]="node.value.values[i]"
+          [required]="node.required">
+          <mat-option *ngFor="let opt of node.options" [value]="opt.key">{{opt.value}}</mat-option>
+        </mat-select>
+        <mat-hint>{{node.hint}}</mat-hint>
+      </mat-form-field>
 
 
-    <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
-      <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.helptext" [required]="node.required" [errorStateMatcher]="matcher">
-      <mat-hint>{{node.hint}}</mat-hint>
-      <mat-error *ngIf="formControl.hasError('required')">
-        Value is <strong>required</strong>
-      </mat-error>
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
+    </div>
 
-    </mat-form-field>
+    <div *ngSwitchCase="'radio'">
+      <div *ngFor="let group of radioGroup;index as i">
+        <mat-radio-group [name]="node.filename + i" [labelPosition]="'after'"
+          [value]="node.value.values[i]"
+          class="mat-form-field">
 
-    <mat-form-field *ngSwitchCase="'time'" class="mat-form-field">
-      <input matInput type="time" [placeholder]="node.helptext" required]="node.required">
-      <mat-hint>{{node.hint}}</mat-hint>
-    </mat-form-field>
+          <label class="radio-label">
+            <mat-radio-button *ngFor="let opt of node.options; let j = index" [value]="opt.value"
+              [aria-label]="opt.value"
+                style="padding-right:10px">
+              {{opt.value}}
+            </mat-radio-button>
+          </label>
+        </mat-radio-group>
+      </div>
+    </div>
 
-    <mat-form-field *ngSwitchCase="'dropdown'" class="mat-form-field">
-      <mat-select matNativeControl [placeholder]="node.helptext" [formControlName]="node.filename" [value]="node.value"
-        [required]="node.required">
-        <mat-option *ngFor="let opt of node.options" [value]="opt.key">{{opt.value}}</mat-option>
-      </mat-select>
-      <mat-hint>{{node.hint}}</mat-hint>
-    </mat-form-field>
+    <div *ngSwitchCase="'checkbox'">
 
+      <div [formGroup]="group" *ngFor="let group of checkboxGroup;index as i" class="mat-form-field">
 
-      <mat-radio-group *ngSwitchCase="'radio'" [name]="node.filename" [labelPosition]="'after'" [value]="node.value" class="mat-form-field">
-        <label class="radio-label">
-        <mat-radio-button *ngFor="let opt of node.options; let i = index" [value]="opt.value" [aria-label]="opt.value"
-          [checked]="node.value == opt.value" (click)="toggle(i)" style="padding-right:10px" >
-          {{opt.value}}
-        </mat-radio-button>
-        </label>
-      </mat-radio-group>
-
-
-
-      <div [formGroup]="checkboxGroup" *ngSwitchCase="'checkbox'"   class="mat-form-field">
-      <span *ngFor="let control of checkboxGroup.controls['values'].controls; let i = index" style="padding-right:10px">
+      <span *ngFor="let control of group.controls.values.controls; let j = index" style="padding-right:10px">
         <label class="checkbox-label">
-          <mat-checkbox [id]="node.options[i].key" [value]="node.value[i]" [formControl]="control"
-            [aria-label]="node.options[i].label"></mat-checkbox>
-          {{node.options[i].label}}
+          <mat-checkbox  [formControl]="control"  [value]="node.value.values[i][j]"
+            [aria-label]="node.options[j].label"></mat-checkbox>
+          {{node.options[j].label}}
         </label>
       </span>
       </div>
+    </div>
 
 
   </div>
