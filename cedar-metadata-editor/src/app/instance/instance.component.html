@@ -44,7 +44,7 @@
         </mat-tree>
 
         <div class="form-row">
-          <button mat-raised-button color="primary" [disabled]="!form.valid"
+          <button mat-raised-button color="primary" [disabled]="formInvalid"
             (click)="onSubmit(form.value, 'saveButton')">Save
           </button>
         </div>

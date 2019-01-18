@@ -12,9 +12,14 @@ import {FileNode} from "../../instance.component";
 export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
   @Input() parentForm: FormGroup;
-  formControl: FormControl[];
-  checkboxGroup:FormGroup[];
+
+
   radioGroup:FormGroup[];
+
+  formGroup:FormGroup;
+
+
+
   _fb: FormBuilder;
 
 
@@ -27,49 +32,68 @@ export class QuestionComponent implements OnInit {
     const validators = this.getValidators(this.node);
 
     if (this.node.type == 'textfield' || this.node.type == 'paragraph' ||  this.node.type == 'dropdown' ) {
-      this.formControl = [];
-      this.node.value.values.forEach((item, index) => {
-        let control = new FormControl(item, validators);
-        this.formControl.push(control);
-        this.parentForm.addControl(this.node.filename +  index, control);
+
+      // build the controls
+      let arr = [];
+      this.node.value.values.forEach((value, i) => {
+        let control = new FormControl(value, validators);
+        arr.push(control);
       });
+
+      // build the array of controls and add it to the parent
+      this.formGroup = this._fb.group({values: this._fb.array(arr)});
+      this.parentForm.addControl(this.node.filename , this.formGroup);
     }
 
     if (this.node.type == 'date') {
-      this.formControl = [];
-      this.node.value.values.forEach((item, index) => {
-        let date = new Date(item);
-        console.log('date',date.toDateString(), item)
-        let control = new FormControl(date, validators);
-        this.formControl.push(control);
-        this.parentForm.addControl(this.node.filename +  index, control);
-      });
-    }
 
-    if (this.node.type == 'checkbox') {
-      this.checkboxGroup = [];
+      // build the controls
+      let arr = [];
       this.node.value.values.forEach((value, i) => {
-        let arr = [];
-        this.node.options.forEach ((opt,  j) => {
-          let control =  new FormControl(value[j]);
-          arr.push(control);
-        });
-        let group = this._fb.group({
-          values: this._fb.array(arr)});
-        this.checkboxGroup.push(group);
-        this.parentForm.addControl(this.node.filename + i, group);
+        let control = new FormControl(new Date(value), validators);
+        arr.push(control);
       });
+
+      this.formGroup = this._fb.group({values: this._fb.array(arr)});
+      this.parentForm.addControl(this.node.filename , this.formGroup);
     }
 
     if (this.node.type == 'radio') {
-      this.radioGroup = [];
+
+      let arr = [];
       this.node.value.values.forEach((item, index) => {
-        let group = this._fb.group({
-          value: this.node.value.values[index]});
-        this.radioGroup.push(group);
-        this.parentForm.addControl(this.node.filename + index, group);
+        let obj = {};
+        obj[this.node.filename + index] = this.node.value.values[index];
+        let control = new FormControl(this.node.value.values[index]);
+        arr.push(control);
       });
+      this.formGroup = this._fb.group({values: this._fb.array(arr)});
+      this.parentForm.addControl(this.node.filename , this.formGroup);
+
     }
+
+    if (this.node.type == 'checkbox') {
+
+      // build the controls
+      let arr = [];
+      this.node.value.values.forEach((value, i) => {
+
+        let  controls = [];
+        this.node.options.forEach ((opt,  j) => {
+          let control =  new FormControl(value[j]);
+          controls.push(control);
+        });
+        let group = this._fb.group({
+          values: this._fb.array(controls)});
+        arr.push(group);
+      });
+
+      this.formGroup = this._fb.group({values: this._fb.array(arr)});
+      this.parentForm.addControl(this.node.filename , this.formGroup);
+
+    }
+
+
   }
 
 
@@ -97,7 +121,7 @@ export class QuestionComponent implements OnInit {
       validators.push(Validators.pattern(this.node.pattern));
     }
     if (this.node.type == 'url') {
-      //validators.push(this.validateUrl);
+      validators.push(this.validateUrl);
     }
     return validators;
   }
@@ -115,26 +139,6 @@ export class QuestionComponent implements OnInit {
     // Prevent Saturday and Sunday from being selected.
     return day !== 0 && day !== 6;
   }
-
-  toggle(i:number, j:number) {
-    if (this.node.type == 'checkbox') {
-      let arr = this.node.value.values[i];
-      let value = this.node.options[j].key;
-      if (arr.includes(value)) {
-        arr.splice(arr.indexOf(value),1);
-      } else {
-        arr.push(value);
-      }
-    }
-    if (this.node.type == 'radio') {
-      let arr = this.node.value.values[i];
-      let value = this.node.options[j].key;
-      arr = value;
-      this.radioGroup[i].setValue({value:arr});
-    }
-  }
-
-
 
   get isValid() {
     let result = false;

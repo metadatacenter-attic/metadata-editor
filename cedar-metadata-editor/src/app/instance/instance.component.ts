@@ -179,16 +179,16 @@ const TREE_DATA = JSON.stringify({
       value:{
         min:1,
         max:2,
-        values:['begin','finish'],
+        values:[0,3],
       },
       required: false,
       helptext: "status of project",
       hint: "begin",
       options: [
-        {key: 'begin', label: 'begin', value: 'begin'},
-        {key: 'start', label: 'start', value: 'start'},
-        {key: 'middle', label: 'middle', value: 'middle'},
-        {key: 'finish', label: 'finish', value: 'finish'}
+        {label: 'begin', value: 0},
+        {label: 'start', value: 1},
+        {label: 'middle', value: 2},
+        {label: 'finish', value: 3}
       ],
     },
     "organism": {
@@ -416,7 +416,7 @@ export class InstanceComponent implements OnInit {
   payload: any;
 
   private _subscription: Subscription;
-  formInvalid: boolean = false;
+  formInvalid: boolean = true;
 
   title: string;
   questions: [QuestionBase<any>];
@@ -443,6 +443,7 @@ export class InstanceComponent implements OnInit {
   ngAfterViewInit() {
     //this.payload = this.form.value;
     this.onChanges();
+    setTimeout(() => { this.formInvalid = !this.form.valid; }, 0);
   }
 
   ngOnInit() {
@@ -455,10 +456,9 @@ export class InstanceComponent implements OnInit {
   }
 
   onChanges(): void {
-
     this.form.valueChanges.subscribe(val => {
-      console.log('onChanges')
       this.payload = val;
+      setTimeout(() => { this.formInvalid = !this.form.valid; }, 0);
     });
   }
 
@@ -479,7 +479,6 @@ export class InstanceComponent implements OnInit {
 
 
   onSubmit(value: any, source: string) {
-    console.log('onSubmit', source, value, this.form);
     this.payload = this.form.value;
   }
 
