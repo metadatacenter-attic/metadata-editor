@@ -18,47 +18,47 @@ import { ElementService } from '../element/service/element.service'
 @Injectable()
 export class FormService {
 
-  private templateForm: BehaviorSubject<FormGroup | undefined> =
-    new BehaviorSubject(this.fb.group(new TemplateForm(new Template(this.qs, 'projectForm', 'project form'))))
-  templateForm$: Observable<FormGroup> = this.templateForm.asObservable()
+  // private templateForm: BehaviorSubject<FormGroup | undefined> =
+  //   new BehaviorSubject(this.fb.group(new TemplateForm(new Template(this.qs, 'projectForm', 'project form'))))
+  // templateForm$: Observable<FormGroup> = this.templateForm.asObservable()
 
 
 
   constructor(private fb: FormBuilder, private es: ElementService, private qs: QuestionService, private qcs: QuestionControlService) {}
 
-  addQuestion() {
-    const currentTeam = this.templateForm.getValue()
-    const currentPlayers = currentTeam.get('questions') as FormArray
-    console.log('currentTeam',currentTeam);
-    console.log('currentPlayers',currentPlayers);
-
-    currentPlayers.push(
-      this.fb.group(
-        new QuestionForm(new Question(this.qs,  'project'))
-      )
-    )
-
-    this.templateForm.next(currentTeam)
-  }
-
-
-  addElement(formGroup:FormGroup, key:string) {
-    console.log('addElement',key);
-
-    this.es.addElement(formGroup,'project');
-    const currentTemplate = this.templateForm.getValue()
-    this.templateForm.next(currentTemplate)
-  }
+  // addQuestion() {
+  //   const currentTeam = this.templateForm.getValue()
+  //   const currentPlayers = currentTeam.get('questions') as FormArray
+  //   console.log('currentTeam',currentTeam);
+  //   console.log('currentPlayers',currentPlayers);
+  //
+  //   currentPlayers.push(
+  //     this.fb.group(
+  //       new QuestionForm(new Question(this.qs,  'project'))
+  //     )
+  //   )
+  //
+  //   this.templateForm.next(currentTeam)
+  // }
 
 
+  // addElement(formGroup:FormGroup, key:string) {
+  //   console.log('addElement',key);
+  //
+  //   this.es.addElement(formGroup,'project');
+  //   const currentTemplate = this.templateForm.getValue()
+  //   this.templateForm.next(currentTemplate)
+  // }
 
 
-  deleteQuestion(i: number) {
-    const currentTeam = this.templateForm.getValue()
-    const currentPlayers = currentTeam.get('questions') as FormArray
 
-    currentPlayers.removeAt(i)
 
-    this.templateForm.next(currentTeam)
-  }
+  // deleteQuestion(i: number) {
+  //   const currentTeam = this.templateForm.getValue()
+  //   const currentPlayers = currentTeam.get('questions') as FormArray
+  //
+  //   currentPlayers.removeAt(i)
+  //
+  //   this.templateForm.next(currentTeam)
+  // }
 }

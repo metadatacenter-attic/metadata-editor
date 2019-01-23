@@ -1,7 +1,12 @@
 <div [formGroup]="node.formGroup" class="form-group">
 
 
-  <label class="question-label" [attr.for]="node.filename">{{node.name}}</label>
+  <label class="question-label" [attr.for]="node.filename">
+    <span>{{node.name}}</span>
+    <span class="example-spacer"></span>
+    <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
+    <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
+  </label>
 
   <ng-template #others>
     <div [ngSwitch]="node.type" style="margin:10px 0;">
@@ -62,7 +67,6 @@
             Value is <strong>required</strong>
           </mat-error>
         </mat-form-field>
-
 
         <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
           <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.helptext"

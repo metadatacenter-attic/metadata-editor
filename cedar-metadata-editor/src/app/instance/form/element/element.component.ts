@@ -4,15 +4,14 @@ import {Subscription} from "rxjs";
 
 import {ElementService} from './service/element.service'
 import {UiService} from "../../../services/ui/ui.service";
-import {FormService} from "../service/form.service";
-import {FileNode} from "../../instance.component";
+import {FileNode} from "../../_models/file-node";
 
 
 @Component({
   selector: 'app-element',
   templateUrl: './element.component.html',
   styleUrls: ['./element.component.less'],
-  providers: [ FormService, ElementService],
+  providers: [  ElementService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {

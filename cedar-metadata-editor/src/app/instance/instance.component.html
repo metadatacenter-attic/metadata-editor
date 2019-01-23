@@ -3,22 +3,16 @@
   <mat-tab-group>
     <mat-tab label="Form">
 
-      <!--<paginator-component></paginator-component>-->
+      <form [formGroup]="form">
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit(form.value, 'saveButton')">
 
         <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-
-
           <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-
-
             <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
               <button mat-icon-button disabled></button>
               <app-question [node]="node" [parentForm]="node.formGroup" style="width:100%"></app-question>
             </li>
           </mat-tree-node>
-
           <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
 
             <li>
@@ -43,11 +37,14 @@
           </mat-nested-tree-node>
         </mat-tree>
 
-        <div class="form-row">
+
+        <div>
           <button mat-raised-button color="primary" [disabled]="formInvalid"
             (click)="onSubmit(form.value, 'saveButton')">Save
           </button>
         </div>
+
+
       </form>
 
     </mat-tab>

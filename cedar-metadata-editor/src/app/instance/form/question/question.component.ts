@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, Validators, FormControl } from '@angular/forms';
+import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
-import {FileNode} from "../../instance.component";
+import {FileNode} from "../../_models/file-node";
+
 
 
 @Component({
@@ -13,17 +14,12 @@ export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
   @Input() parentForm: FormGroup;
 
+  radioGroup: FormGroup[];
 
-  radioGroup:FormGroup[];
-
-  formGroup:FormGroup;
-
-
-
+  formGroup: FormGroup;
   _fb: FormBuilder;
 
-
-  constructor(fb:FormBuilder) {
+  constructor(fb: FormBuilder) {
     this._fb = fb;
   }
 
@@ -31,7 +27,7 @@ export class QuestionComponent implements OnInit {
 
     const validators = this.getValidators(this.node);
 
-    if (this.node.type == 'textfield' || this.node.type == 'paragraph' ||  this.node.type == 'dropdown' ) {
+    if (this.node.type == 'textfield' || this.node.type == 'paragraph' || this.node.type == 'dropdown') {
 
       // build the controls
       let arr = [];
@@ -42,7 +38,7 @@ export class QuestionComponent implements OnInit {
 
       // build the array of controls and add it to the parent
       this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename , this.formGroup);
+      this.parentForm.addControl(this.node.filename, this.formGroup);
     }
 
     if (this.node.type == 'date') {
@@ -55,7 +51,7 @@ export class QuestionComponent implements OnInit {
       });
 
       this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename , this.formGroup);
+      this.parentForm.addControl(this.node.filename, this.formGroup);
     }
 
     if (this.node.type == 'radio') {
@@ -68,7 +64,7 @@ export class QuestionComponent implements OnInit {
         arr.push(control);
       });
       this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename , this.formGroup);
+      this.parentForm.addControl(this.node.filename, this.formGroup);
 
     }
 
@@ -78,18 +74,19 @@ export class QuestionComponent implements OnInit {
       let arr = [];
       this.node.value.values.forEach((value, i) => {
 
-        let  controls = [];
-        this.node.options.forEach ((opt,  j) => {
-          let control =  new FormControl(value[j]);
+        let controls = [];
+        this.node.options.forEach((opt, j) => {
+          let control = new FormControl(value[j]);
           controls.push(control);
         });
         let group = this._fb.group({
-          values: this._fb.array(controls)});
+          values: this._fb.array(controls)
+        });
         arr.push(group);
       });
 
       this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename , this.formGroup);
+      this.parentForm.addControl(this.node.filename, this.formGroup);
 
     }
 
@@ -97,7 +94,7 @@ export class QuestionComponent implements OnInit {
   }
 
 
-  getValidators(node:FileNode) {
+  getValidators(node: FileNode) {
     let validators = [];
     if (this.node.required) {
       validators.push(Validators.required);
@@ -129,7 +126,7 @@ export class QuestionComponent implements OnInit {
   validateUrl(control: FormControl) {
     let result = null;
     if (!control.value.startsWith('http')) {
-      result = {'url':true};
+      result = {'url': true};
     }
     return result;
   }
@@ -147,6 +144,25 @@ export class QuestionComponent implements OnInit {
       result = this.parentForm.controls[this.node.filename].valid;
     }
     return result;
+  }
+
+  addNewItem() {
+
+    let value = '';
+    this.node.value.values.push(value);
+    let control = new FormControl(value, this.getValidators(this.node));
+    let fa = this.formGroup.controls.values as FormArray;
+    fa.push(control);
+
+    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+  }
+
+  deleteLastItem() {
+    this.node.value.values.splice(this.node.value.values.length - 1, 1);
+    let fa = this.formGroup.controls.values as FormArray;
+    fa.removeAt(fa.length-1);
+
+    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   loadForm(key, form) {
