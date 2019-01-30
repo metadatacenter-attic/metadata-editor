@@ -1,10 +1,16 @@
-import {FormGroup} from "@angular/forms";
-import {ValueArray} from "./value-array";
+import {FormGroup} from '@angular/forms';
+
 
 
 export class FileNode {
-  filename: string;
-  helptext: string;
+  key: string;
+  name: string;
+  minItems: number;
+  maxItems: number;
+  itemCount: number;
+  type: string;
+  subtype: string;
+  help: string;
   required: boolean;
   hint: string;
   min: number;
@@ -12,14 +18,14 @@ export class FileNode {
   minLength: number;
   maxLength: number;
   pattern: string;
-  type: string;
-  subtype: string;
-  name: string;
   options: any;
-  value: ValueArray;
+  value: {
+    values: any[];
+  };
   formGroup: FormGroup;
-  elementGroup: FormGroup;
+  parent: FileNode;
+  parentGroup: FormGroup;
   children: FileNode[];
-  parent:FileNode;
+
 
 }

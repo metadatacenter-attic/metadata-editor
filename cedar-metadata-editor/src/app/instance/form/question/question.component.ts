@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
-import {FileNode} from "../../_models/file-node";
+import {FileNode} from '../../_models/file-node';
 
 
 
@@ -12,10 +12,7 @@ import {FileNode} from "../../_models/file-node";
 })
 export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
-  @Input() parentForm: FormGroup;
-
-  radioGroup: FormGroup[];
-
+  @Input() parentGroup: FormGroup;
   formGroup: FormGroup;
   _fb: FormBuilder;
 
@@ -26,98 +23,85 @@ export class QuestionComponent implements OnInit {
   ngOnInit() {
 
     const validators = this.getValidators(this.node);
+    const arr = [];
 
-    if (this.node.type == 'textfield' || this.node.type == 'paragraph' || this.node.type == 'dropdown') {
-
-      // build the controls
-      let arr = [];
-      this.node.value.values.forEach((value, i) => {
-        let control = new FormControl(value, validators);
-        arr.push(control);
-      });
-
-      // build the array of controls and add it to the parent
-      this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename, this.formGroup);
-    }
-
-    if (this.node.type == 'date') {
-
-      // build the controls
-      let arr = [];
-      this.node.value.values.forEach((value, i) => {
-        let control = new FormControl(new Date(value), validators);
-        arr.push(control);
-      });
-
-      this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename, this.formGroup);
-    }
-
-    if (this.node.type == 'radio') {
-
-      let arr = [];
-      this.node.value.values.forEach((item, index) => {
-        let obj = {};
-        obj[this.node.filename + index] = this.node.value.values[index];
-        let control = new FormControl(this.node.value.values[index]);
-        arr.push(control);
-      });
-      this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename, this.formGroup);
-
-    }
-
-    if (this.node.type == 'checkbox') {
-
-      // build the controls
-      let arr = [];
-      this.node.value.values.forEach((value, i) => {
-
-        let controls = [];
-        this.node.options.forEach((opt, j) => {
-          let control = new FormControl(value[j]);
-          controls.push(control);
+    switch (this.node.type) {
+      case 'textfield':
+      case 'paragraph':
+      case 'dropdown':
+        this.node.value.values.forEach((value, i) => {
+          const control = new FormControl(value, validators);
+          arr.push(control);
         });
-        let group = this._fb.group({
-          values: this._fb.array(controls)
+
+        // build the array of controls and add it to the parent
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+      case 'date':
+        this.node.value.values.forEach((value, i) => {
+          const control = new FormControl(new Date(value), validators);
+          arr.push(control);
         });
-        arr.push(group);
-      });
 
-      this.formGroup = this._fb.group({values: this._fb.array(arr)});
-      this.parentForm.addControl(this.node.filename, this.formGroup);
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+      case 'radio':
+        this.node.value.values.forEach((item, index) => {
+          const obj = {};
+          obj[this.node.key + index] = this.node.value.values[index];
+          const control = new FormControl(this.node.value.values[index]);
+          arr.push(control);
+        });
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+      case 'checkbox':
+        this.node.value.values.forEach((value, i) => {
 
+          const controls = [];
+          this.node.options.forEach((opt, j) => {
+            const control = new FormControl(value[j]);
+            controls.push(control);
+          });
+          const group = this._fb.group({
+            values: this._fb.array(controls)
+          });
+          arr.push(group);
+        });
+
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
     }
-
-
   }
 
 
   getValidators(node: FileNode) {
-    let validators = [];
-    if (this.node.required) {
+    const validators = [];
+    if (node.required) {
       validators.push(Validators.required);
     }
-    if (this.node.type == 'email') {
+    if (node.type === 'email') {
       validators.push(Validators.email);
     }
-    if (this.node.min !== null) {
-      validators.push(Validators.min(this.node.min));
+    if (node.min !== null) {
+      validators.push(Validators.min(node.min));
     }
-    if (this.node.max !== null) {
-      validators.push(Validators.max(this.node.max));
+    if (node.max !== null) {
+      validators.push(Validators.max(node.max));
     }
-    if (this.node.minLength !== null) {
-      validators.push(Validators.minLength(this.node.minLength));
+    if (node.minLength !== null) {
+      validators.push(Validators.minLength(node.minLength));
     }
-    if (this.node.maxLength !== null) {
-      validators.push(Validators.maxLength(this.node.maxLength));
+    if (node.maxLength !== null) {
+      validators.push(Validators.maxLength(node.maxLength));
     }
-    if (this.node.pattern !== null) {
-      validators.push(Validators.pattern(this.node.pattern));
+    if (node.pattern !== null) {
+      validators.push(Validators.pattern(node.pattern));
     }
-    if (this.node.type == 'url') {
+    if (node.type === 'url') {
       validators.push(this.validateUrl);
     }
     return validators;
@@ -140,18 +124,22 @@ export class QuestionComponent implements OnInit {
   get isValid() {
     let result = false;
 
-    if (this.parentForm && this.parentForm.controls.hasOwnProperty(this.node.filename)) {
-      result = this.parentForm.controls[this.node.filename].valid;
+    if (this.parentGroup && this.parentGroup.controls.hasOwnProperty(this.node.key)) {
+      result = this.parentGroup.controls[this.node.key].valid;
     }
     return result;
   }
 
+  onChange(node: FileNode, val) {
+    console.log('onChange', val);
+  }
+
   addNewItem() {
 
-    let value = '';
+    const value = '';
     this.node.value.values.push(value);
-    let control = new FormControl(value, this.getValidators(this.node));
-    let fa = this.formGroup.controls.values as FormArray;
+    const control = new FormControl(value, this.getValidators(this.node));
+    const fa = this.formGroup.controls.values as FormArray;
     fa.push(control);
 
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
@@ -159,8 +147,8 @@ export class QuestionComponent implements OnInit {
 
   deleteLastItem() {
     this.node.value.values.splice(this.node.value.values.length - 1, 1);
-    let fa = this.formGroup.controls.values as FormArray;
-    fa.removeAt(fa.length-1);
+    const fa = this.formGroup.controls.values as FormArray;
+    fa.removeAt(fa.length - 1);
 
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }

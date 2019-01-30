@@ -15,26 +15,25 @@ import {FileNode} from "../../_models/file-node";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {
-  @Input() parentForm: FormGroup;
-  @Input() elementForm: FormGroup;
+
+
   @Input() node: FileNode;
+  @Input() parentGroup: FormGroup;
+  @Input() formGroup: FormGroup;
 
 
-  darkMode:boolean;
+  darkMode: boolean;
   private _darkModeSub: Subscription;
 
   constructor(private ui:UiService) {
   }
 
   ngOnInit() {
-    this.parentForm.addControl(this.node.filename, this.elementForm);
+    this.parentGroup.addControl(this.node.key, this.formGroup);
 
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;
     });
   }
 
-  loadForm() {
-    console.log('loadForm');
-  }
 }

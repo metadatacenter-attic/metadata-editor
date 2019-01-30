@@ -2,25 +2,43 @@
 
 
   <label class="question-label" [attr.for]="node.filename">
-    <span>{{node.name}}</span>
-    <span class="example-spacer"></span>
-    <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
-    <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
+    {{node.name}}
   </label>
 
+  <div *ngIf="node.type == 'checkbox';else others;">
+    <div [formGroup]="group" *ngFor="let group of formGroup.controls.values.controls;index as i"
+         class="mat-form-field">
+
+      <span *ngFor="let control of group.controls.values.controls; let j = index" style="padding-right:10px">
+        <label class="checkbox-label">
+          <mat-checkbox [formControl]="control" [value]="node.value.values[i][j]"
+                        [aria-label]="node.options[j].label"></mat-checkbox>
+          {{node.options[j].label}}
+        </label>
+      </span>
+    </div>
+  </div>
+
   <ng-template #others>
-    <div [ngSwitch]="node.type" style="margin:10px 0;">
+    <div *ngIf="node.type != 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
       <div *ngFor="let control of formGroup.controls.values.controls;index as i">
+
+        <span *ngIf="node.maxItems">
+          {{node.name}}
+          ({{(i + 1)}}  of {{ node.maxItems}})
+          <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
+          <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
+        </span>
 
         <div *ngSwitchCase="'radio'">
           <mat-radio-group [formControl]="control" [labelPosition]="'after'"
-            [value]="node.value.values[i]"
-            class="mat-form-field">
+                           [value]="node.value.values[i]"
+                           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
             <mat-radio-button [value]="opt.value"
-              [aria-label]="opt.value"
-              style="padding-right:10px">
+                              [aria-label]="opt.value"
+                              style="padding-right:10px">
               {{opt.label}}
             </mat-radio-button>
           </label>
@@ -29,11 +47,12 @@
         </div>
 
         <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
-          <input matInput [placeholder]="node.helptext" [formControl]="control" type="node.subtype"
-            [value]="node.value.values[i]"
-            [required]="node.required"
-            [min]="node.min" [max]="node.max"
-            [errorStateMatcher]="matcher">
+          <input matInput [placeholder]="node.help" [formControl]="control" type="node.subtype"
+                 (change)="onChange(node)"
+                 [value]="node.value.values[i]"
+                 [required]="node.required"
+                 [min]="node.min" [max]="node.max"
+                 [errorStateMatcher]="matcher">
           <mat-hint>{{node.hint}}</mat-hint>
           <mat-error *ngIf="control.hasError('url') && !control.hasError('required')">
             Please enter a valid URL
@@ -58,10 +77,10 @@
         </mat-form-field>
 
         <mat-form-field *ngSwitchCase="'paragraph'" class="example-full-width mat-form-field">
-      <textarea matInput [placeholder]="node.helptext" [formControl]="control" type="text"
-        [value]="node.value.values[i]"
-        [required]="node.required"
-        [errorStateMatcher]="matcher"></textarea>
+      <textarea matInput [placeholder]="node.help" [formControl]="control" type="text"
+                [value]="node.value.values[i]"
+                [required]="node.required"
+                [errorStateMatcher]="matcher"></textarea>
           <mat-hint>{{node.hint}}</mat-hint>
           <mat-error *ngIf="control.hasError('required')">
             Value is <strong>required</strong>
@@ -69,17 +88,17 @@
         </mat-form-field>
 
         <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
-          <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.helptext"
-            [value]="control.value">
+          <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.help"
+                 [value]="control.value">
           <mat-hint>{{node.hint}}</mat-hint>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field *ngSwitchCase="'dropdown'" class="mat-form-field">
-          <mat-select matNativeControl [placeholder]="node.helptext" [formControl]="control"
-            [value]="node.value.values[i]"
-            [required]="node.required">
+          <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
+                      [value]="node.value.values[i]"
+                      [required]="node.required">
             <mat-option *ngFor="let opt of node.options" [value]="opt.key">{{opt.value}}</mat-option>
           </mat-select>
           <mat-hint>{{node.hint}}</mat-hint>
@@ -89,35 +108,5 @@
     </div>
   </ng-template>
 
-  <div *ngIf="node.type == 'checkbox';else others;">
-    <div [formGroup]="group" *ngFor="let group of formGroup.controls.values.controls;index as i"
-      class="mat-form-field">
-
-      <span *ngFor="let control of group.controls.values.controls; let j = index" style="padding-right:10px">
-        <label class="checkbox-label">
-          <mat-checkbox [formControl]="control" [value]="node.value.values[i][j]"
-            [aria-label]="node.options[j].label"></mat-checkbox>
-          {{node.options[j].label}}
-        </label>
-      </span>
-    </div>
-  </div>
-
-  <!--<div *ngIf="node.formGroup.invalid && (node.formGroup.dirty || node.formGroup.touched)" class="alert alert-danger">-->
-
-  <!--invalid dirty touched {{node.formGroup.errors}}-->
-
-  <!--<div *ngIf="node.formGroup.errors">-->
-  <!--Name is required.-->
-  <!--</div>-->
-  <!--<div *ngIf="node.formGroup.errors">-->
-  <!--Name must be at least 4 characters long.-->
-  <!--</div>-->
-  <!--<div *ngIf="node.formGroup.errors">-->
-  <!--Name cannot be Bob.-->
-  <!--</div>-->
-  <!--</div>-->
-
-  <!--<div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div>-->
 </div>
 
