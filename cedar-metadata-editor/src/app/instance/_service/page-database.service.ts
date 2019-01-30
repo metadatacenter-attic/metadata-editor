@@ -8,7 +8,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {FileDatabase} from "./file-database";
+import {FileDatabase} from './file-database';
 
 /**
  * The page structure tree data in string.

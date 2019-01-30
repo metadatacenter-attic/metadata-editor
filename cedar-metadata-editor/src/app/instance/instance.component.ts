@@ -3,13 +3,13 @@ import {Subscription} from 'rxjs';
 import {FormArray, FormGroup, FormControl, AbstractControl} from '@angular/forms';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {NestedTreeControl} from '@angular/cdk/tree';
-import {BehaviorSubject, Observable, of as observableOf} from 'rxjs';
+
 
 import {UiService} from '../services/ui/ui.service';
 import {QuestionBase} from './form/question/_models/question-base';
-import {ValueArray} from './_models/value-array';
 import {FileNode} from './_models/file-node';
 import {FileDatabase} from './_service/file-database';
+import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 
@@ -19,7 +19,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
   selector: 'app-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.less'],
-  providers: [FileDatabase]
+  providers: [FileDatabase, TemplateService]
 })
 
 export class InstanceComponent implements OnInit {
@@ -42,7 +42,7 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  constructor(private ui: UiService,  database: FileDatabase) {
+  constructor(private ui: UiService,  database: FileDatabase, template: TemplateService) {
 
     this.projectFormName = 'projectFormName';
     this.payload = {};
@@ -56,6 +56,9 @@ export class InstanceComponent implements OnInit {
     });
     this.form =  this.dataSource.data[0].parentGroup;
     console.log('form',this.form);
+
+
+
   }
 
   ngAfterViewInit() {
