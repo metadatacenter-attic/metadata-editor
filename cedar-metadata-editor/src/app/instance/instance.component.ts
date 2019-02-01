@@ -3,6 +3,8 @@ import {Subscription} from 'rxjs';
 import {FormArray, FormGroup, FormControl, AbstractControl} from '@angular/forms';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {NestedTreeControl} from '@angular/cdk/tree';
+import {ActivatedRoute} from '@angular/router';
+
 
 
 import {UiService} from '../services/ui/ui.service';
@@ -25,7 +27,8 @@ import * as cloneDeep from 'lodash/cloneDeep';
 export class InstanceComponent implements OnInit {
   treeControl: NestedTreeControl<FileNode>;
   dataSource: MatTreeNestedDataSource<FileNode>;
-  database: FileDatabase;
+  database: TemplateService;
+
 
   formId: string;
   projectFormName: string;
@@ -42,20 +45,53 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  constructor(private ui: UiService,  database: FileDatabase, template: TemplateService) {
+  constructor(private ui: UiService,   ts: TemplateService, route: ActivatedRoute) {
+    this.database = ts;
+    const id = route.params.subscribe(
+      {
+        next(val) {
+          this.database = ts;
+          console.log('database observer',val, this.database);
+          this.projectFormName = 'projectFormName';
+          this.payload = {};
 
-    this.projectFormName = 'projectFormName';
-    this.payload = {};
-    this.database = database;
+          this.form = new FormGroup({});
+          this.database.initialize(this.form, val.templateId);
+          this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+          this.dataSource = new MatTreeNestedDataSource();
+
+          // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+          // this.dataSource = new MatTreeNestedDataSource();
+          //
+          //
+          this.database.dataChange.subscribe(data => {
+            this.dataSource.data = data;
+          });
+          //this.form =  this.dataSource.data[0].parentGroup;
+
+          },
+        error(msg) { console.log('Error Getting templateId: ', msg); }
+      }
+    );
+    this.form = new FormGroup({});
+    this.database.initialize(this.form, '1');
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.dataSource = new MatTreeNestedDataSource();
-
-
-    database.dataChange.subscribe(data => {
+    this.database.dataChange.subscribe(data => {
       this.dataSource.data = data;
     });
-    this.form =  this.dataSource.data[0].parentGroup;
-    console.log('form',this.form);
+    // this.projectFormName = 'projectFormName';
+    // this.payload = {};
+    // this.database = database;
+    // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    // this.dataSource = new MatTreeNestedDataSource();
+    //
+    //
+    // database.dataChange.subscribe(data => {
+    //   this.dataSource.data = data;
+    // });
+    // this.form =  this.dataSource.data[0].parentGroup;
+    // console.log('form', this.form);
 
 
 
@@ -69,6 +105,7 @@ export class InstanceComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.title = 'Cedar Metadata Editor';
     this.formId = 'projectForm';
 
