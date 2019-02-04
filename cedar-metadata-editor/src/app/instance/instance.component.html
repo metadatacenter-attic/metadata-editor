@@ -1,9 +1,9 @@
-<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree">
+<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree" >
 
   <mat-tab-group>
     <mat-tab label="Form">
 
-      <form [formGroup]="form">
+      <form [formGroup]="form" *ngIf="form">
 
 
         <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
@@ -24,8 +24,8 @@
                   </mat-icon>
                 </button>
                 {{node.name}}
-                <span *ngIf="node.maxItems" style="padding:0 5px">
-                  ({{(node.itemCount + 1)}}  of {{ node.maxItems}})
+                <span *ngIf="node.minItems" style="padding:0 5px">
+                  ({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
                   <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
                   <button mat-icon-button (click)="deleteLastItem(node)"><mat-icon>remove</mat-icon></button>
                 </span>
@@ -43,7 +43,7 @@
 
         <div>
           <button mat-raised-button color="primary" [disabled]="formInvalid"
-                  (click)="onSubmit(form.value, 'saveButton')">Save
+                  (click)="onSubmit(form.value)">Save
           </button>
         </div>
 

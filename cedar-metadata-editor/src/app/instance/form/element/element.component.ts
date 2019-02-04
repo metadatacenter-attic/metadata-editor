@@ -29,7 +29,9 @@ export class ElementComponent {
   }
 
   ngOnInit() {
-    this.parentGroup.addControl(this.node.key, this.formGroup);
+    if (this.parentGroup) {
+      this.parentGroup.addControl(this.node.key, this.formGroup);
+    }
 
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;

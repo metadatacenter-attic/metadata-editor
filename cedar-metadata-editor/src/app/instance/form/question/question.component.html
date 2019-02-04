@@ -5,7 +5,7 @@
     {{node.name}}
   </label>
 
-  <div *ngIf="node.type == 'checkbox';else others;">
+  <div *ngIf="node.type == 'checkbox';else others;" style="margin:10px 0">
     <div [formGroup]="group" *ngFor="let group of formGroup.controls.values.controls;index as i"
          class="mat-form-field">
 
@@ -23,9 +23,9 @@
     <div *ngIf="node.type != 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
       <div *ngFor="let control of formGroup.controls.values.controls;index as i">
 
-        <span *ngIf="node.maxItems">
+        <span *ngIf="node.minItems">
           {{node.name}}
-          ({{(i + 1)}}  of {{ node.maxItems}})
+          ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
           <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
           <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
         </span>
@@ -95,11 +95,11 @@
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
 
-        <mat-form-field *ngSwitchCase="'dropdown'" class="mat-form-field">
+        <mat-form-field *ngSwitchCase="'list'" class="mat-form-field" >
           <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
                       [value]="node.value.values[i]"
                       [required]="node.required">
-            <mat-option *ngFor="let opt of node.options" [value]="opt.key">{{opt.value}}</mat-option>
+            <mat-option *ngFor="let opt of node.options" [value]="opt.value">{{opt.label}}</mat-option>
           </mat-select>
           <mat-hint>{{node.hint}}</mat-hint>
         </mat-form-field>

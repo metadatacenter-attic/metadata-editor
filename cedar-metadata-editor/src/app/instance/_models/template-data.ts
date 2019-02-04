@@ -1123,6 +1123,7 @@ const TEMPLATE_DATA1 = JSON.stringify({
     'date': {
       'type': 'array',
       'minItems': 1,
+      'maxItems': 3,
       'items': {
         'type': 'object',
         '@type': 'https://schema.metadatacenter.org/core/TemplateField',
@@ -2098,9 +2099,11 @@ const MODEL_DATA1 = JSON.stringify({
   'paragraph': {
     '@value': 'This is my very long paragraph.'
   },
-  'radio': {
-    '@value': 'Untitled-0'
-  },
+  'radio':
+    {
+      '@value': 'Untitled-0'
+    },
+
   'checkbox': [
     {
       '@value': 'Untitled-0'

@@ -6,15 +6,12 @@ import {NestedTreeControl} from '@angular/cdk/tree';
 import {ActivatedRoute} from '@angular/router';
 
 
-
 import {UiService} from '../services/ui/ui.service';
 import {QuestionBase} from './form/question/_models/question-base';
 import {FileNode} from './_models/file-node';
 import {FileDatabase} from './_service/file-database';
 import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
-
-
 
 
 @Component({
@@ -45,13 +42,13 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  constructor(private ui: UiService,   ts: TemplateService, route: ActivatedRoute) {
+  constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
     this.database = ts;
     const id = route.params.subscribe(
       {
         next(val) {
           this.database = ts;
-          console.log('database observer',val, this.database);
+          console.log('database observer', val, this.database);
           this.projectFormName = 'projectFormName';
           this.payload = {};
 
@@ -59,41 +56,16 @@ export class InstanceComponent implements OnInit {
           this.database.initialize(this.form, val.templateId);
           this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
           this.dataSource = new MatTreeNestedDataSource();
-
-          // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-          // this.dataSource = new MatTreeNestedDataSource();
-          //
-          //
           this.database.dataChange.subscribe(data => {
             this.dataSource.data = data;
           });
-          //this.form =  this.dataSource.data[0].parentGroup;
 
-          },
-        error(msg) { console.log('Error Getting templateId: ', msg); }
+        },
+        error(msg) {
+          console.log('Error Getting templateId: ', msg);
+        }
       }
     );
-    this.form = new FormGroup({});
-    this.database.initialize(this.form, '1');
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
-    });
-    // this.projectFormName = 'projectFormName';
-    // this.payload = {};
-    // this.database = database;
-    // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    // this.dataSource = new MatTreeNestedDataSource();
-    //
-    //
-    // database.dataChange.subscribe(data => {
-    //   this.dataSource.data = data;
-    // });
-    // this.form =  this.dataSource.data[0].parentGroup;
-    // console.log('form', this.form);
-
-
 
   }
 
@@ -109,18 +81,30 @@ export class InstanceComponent implements OnInit {
     this.title = 'Cedar Metadata Editor';
     this.formId = 'projectForm';
 
+    this.form = new FormGroup({});
+    this.database.initialize(this.form, '1');
+    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.dataSource = new MatTreeNestedDataSource();
+    this.database.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
+
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;
     });
   }
 
   onChanges(): void {
-    this._subscription = this.form.valueChanges.subscribe(val => {
-      this.payload = val;
-      setTimeout(() => {
-        this.formInvalid = !this.form.valid;
-      }, 0);
-    });
+    console.log('onChanges', this.form);
+    if (this.form) {
+      this._subscription = this.form.valueChanges.subscribe(val => {
+        this.payload = val;
+        setTimeout(() => {
+          this.formInvalid = !this.form.valid;
+        }, 0);
+      });
+    }
+
   }
 
   cloneAbstractControl(control: AbstractControl) {
@@ -153,7 +137,8 @@ export class InstanceComponent implements OnInit {
 
     return newControl;
   }
-  walkTree(node: FileNode, formGroup: FormGroup, parent: FileNode ) {
+
+  walkTree(node: FileNode, formGroup: FormGroup, parent: FileNode) {
 
     if (node.children) {
       console.log('key', node.key, 'element', node.formGroup);
@@ -161,13 +146,14 @@ export class InstanceComponent implements OnInit {
         item.parent = node;
         item.name += index;
         item.formGroup = formGroup;
-        this.walkTree(item,  item.formGroup, node);
+        this.walkTree(item, item.formGroup, node);
       });
     } else {
       node.parent = parent;
-      console.log('key', node.key, 'formGroup', node.formGroup,  'parent', node.parent);
+      console.log('key', node.key, 'formGroup', node.formGroup, 'parent', node.parent);
     }
   }
+
   addNewItem(node: FileNode) {
 
     const clonedObject: FileNode = cloneDeep(node);
@@ -176,7 +162,6 @@ export class InstanceComponent implements OnInit {
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index + 1, 0, clonedObject);
-
 
 
     clonedObject.parentGroup = node.parentGroup;
@@ -190,6 +175,7 @@ export class InstanceComponent implements OnInit {
     // });
 
   }
+
   deleteLastItem(node: FileNode) {
     console.log('deleteLastItem', node);
     const siblings = node.parent ? node.parent.children : this.database.data;
@@ -216,8 +202,9 @@ export class InstanceComponent implements OnInit {
   private _getChildren = (node: FileNode) => node.children;
 
 
-  onSubmit(value: any, source: string) {
-    this.payload = this.form.getRawValue();
+  onSubmit(value: any,) {
+    console.log('form.value', value)
+    this.payload = this.form.value;
   }
 
 

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
 import {Inject, Optional} from '@angular/core';
 
@@ -8,218 +8,6 @@ import {TemplateData} from '../_models/template-data';
 import {InputTypes} from '../_models/input-types';
 
 
-const FIELD_TYPES = JSON.stringify([
-  {
-    'cedarType': 'textfield',
-    'iconClass': 'fa fa-font',
-    'label': 'Text',
-    'allowedInElement': true,
-    'primaryField': true,
-    'hasControlledTerms': true,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': true,
-    'hasInstanceTerm': true,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'link',
-    'iconClass': 'fa fa-link',
-    'label': 'link',
-    'allowedInElement': true,
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': true,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'textarea',
-    'iconClass': 'fa fa-paragraph',
-    'label': 'Text Area',
-    'allowedInElement': true,
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'radio',
-    'iconClass': 'fa fa-dot-circle-o',
-    'label': 'Multiple Choice',
-    'allowedInElement': true,
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'checkbox',
-    'iconClass': 'fa fa-check-square-o',
-    'label': 'Checkbox',
-    'allowedInElement': true,
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'date',
-    'iconClass': 'fa fa-calendar',
-    'label': 'Date',
-    'allowedInElement': true,
-    'primaryField': true,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'email',
-    'iconClass': 'fa fa-envelope',
-    'label': 'Email',
-    'allowedInElement': true,
-    'primaryField': true,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'list',
-    'iconClass': 'fa fa-list',
-    'allowedInElement': true,
-    'primaryField': false,
-    'label': 'List',
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'numeric',
-    'iconClass': 'fa fa-hashtag',
-    'allowedInElement': true,
-    'primaryField': true,
-    'Label': 'Number',
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'phone-number',
-    'iconClass': 'fa fa-th',
-    'allowedInElement': true,
-    'label': 'Phone Number',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': true,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': true
-  },
-  {
-    'cedarType': 'attribute-value',
-    'iconClass': 'fa fa-plus-square',
-    'label': 'Attribute Value',
-    'allowedInElement': true,
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': false,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  },
-  {
-    'cedarType': 'page-break',
-    'iconClass': 'fa fa-file-o',
-    'allowedInElement': false,
-    'label': 'Page Break',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': true,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  },
-  {
-    'cedarType': 'section-break',
-    'iconClass': 'fa fa-minus',
-    'allowedInElement': true,
-    'label': 'Section Break',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': true,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  },
-  {
-    'cedarType': 'richtext',
-    'iconClass': 'fa fa-pencil-square-o',
-    'allowedInElement': true,
-    'label': 'Rich Text',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': true,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  },
-  {
-    'cedarType': 'image',
-    'iconClass': 'fa fa-image',
-    'allowedInElement': true,
-    'label': 'Image',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': true,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  },
-  {
-    'cedarType': 'youtube',
-    'iconClass': 'fa fa-youtube-square',
-    'allowedInElement': true,
-    'label': 'YouTube Video',
-    'primaryField': false,
-    'hasControlledTerms': false,
-    'staticField': true,
-    'allowsMultiple': false,
-    'allowsValueRecommendation': false,
-    'hasInstanceTerm': false,
-    'allowsRequired': false
-  }
-]);
-const specialKeyPattern = /(^@)|(^_)|(^schema:)|(^pav:)|(^rdfs:)|(^oslc:)/i;
-
 @Injectable()
 export class TemplateService {
 
@@ -227,7 +15,6 @@ export class TemplateService {
   dataChange = new BehaviorSubject<FileNode[]>([]);
   model: object;
   template: object;
-  fieldTypes: object;
   td: TemplateData;
   it: InputTypes;
 
@@ -237,12 +24,8 @@ export class TemplateService {
   }
 
   constructor(@Inject('templateId') @Optional() public templateId?: string) {
-
-    this.fieldTypes = JSON.parse(FIELD_TYPES);
     this.td = new TemplateData();
     this.it = new InputTypes();
-
-
   }
 
 
@@ -280,6 +63,7 @@ export class TemplateService {
   }
 
   getInputType(schema) {
+    console.log('getInputType', schema._ui.inputType);
     return (schema && schema._ui && schema._ui.inputType) ? schema._ui.inputType : null;
   }
 
@@ -314,7 +98,7 @@ export class TemplateService {
 
   isStaticField = inputType => {
     return this.it.config[inputType].staticField;
-  }
+  };
 
   /* create the context  */
   setContext(schema, model) {
@@ -356,9 +140,10 @@ export class TemplateService {
     if (instanceType) {
       model['@type'] = instanceType;
     }
-  }
+  };
 
   isSpecialKey(key) {
+    const specialKeyPattern = /(^@)|(^_)|(^schema:)|(^pav:)|(^rdfs:)|(^oslc:)/i;
     return specialKeyPattern.test(key);
   }
 
@@ -657,82 +442,208 @@ export class TemplateService {
 
   /* build the tree of FileNodes*/
   initialize(formGroup: FormGroup, templateId: string) {
-      console.log('initialize', formGroup, templateId);
+
     if (templateId === '1') {
-      this.template = this.td.templateData[1];
-      this.model = this.td.modelData[1];
-    } else {
       this.template = this.td.templateData[0];
       this.model = this.td.modelData[0];
+      const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
+      this.dataChange.next(data);
     }
-    console.log('this.template[properties]', this.template['properties']);
-    const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
-    console.log('data', data);
-    this.dataChange.next(data);
+    if (templateId === '2') {
+      this.template = this.td.templateData[1];
+      this.model = this.td.modelData[1];
+      const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
+      this.dataChange.next(data);
+    }
   }
 
-  getValues(schema, inputType, modelValue) {
-    const result = {'values': ['one', 'two']};
-    const valueLocation = this.getValueLocation(schema, inputType);
-    console.log('isArray', Array.isArray(modelValue), 'modelValue', modelValue, 'valueLocation', valueLocation);
+  getRadioValue(literals, label): number {
+    return literals
+      .map(function (element) {
+        return element.label;
+      })
+      .indexOf(label);
+  }
+
+  getListValue(literals, label): number {
+    console.log('getListValue', literals, label);
+    return literals
+      .map(function (element) {
+        return element.label;
+      })
+      .indexOf(label);
+  }
+
+  getCheckValue(literals, values, valueLocation): boolean[] {
+    let result = [];
+
+    let literal = literals
+      .map(function (literal) {
+          return literal.label;
+        }
+      );
+
+    if (Array.isArray(values[0])) {
+      for (let i = 0; i < values.length; i++) {
+        let r = [];
+        for (let j = 0; i < values[i].length; i++) {
+          r.push(literal.indexOf(values[i][j][valueLocation]) > 0);
+        }
+        result.push(r);
+      }
+    } else {
+      let r = [];
+      for (let i = 0; i < values.length; i++) {
+        r.push(literal.indexOf(values[i][valueLocation]) > 0);
+      }
+      result.push(r);
+    }
+
     return result;
   }
 
-  buildFileTree(obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
-    console.log('object', obj, 'model', model);
-    return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
 
-      const special = this.isSpecialKey(key);
-      const value = obj[key];
+  getValues(schema, inputType, modelValue) {
+    const result = {'values': []};
+    const valueLocation = this.getValueLocation(schema, inputType);
 
-      const node = new FileNode();
-
-      if (!special) {
-
-        const schema = this.schemaOf(value);
-        const modelValue = model[key];
-        const inputType = this.getInputType(schema);
-
-
-        node.key = key;
-        node.name = this.getTitle(schema);
-        node.formGroup = formGroup;
-        node.parentGroup = parent ? parent.formGroup : null;
-        node.parent = parent;
-
-        if (value['minItems'] || value['maxItems']) {
-          node.minItems = value['minItems'];
-          node.maxItems = value['maxItems'];
-          node.itemCount = value['itemCount'];
+    if (modelValue) {
+      if (Array.isArray(modelValue)) {
+        if (inputType === 'checkbox') {
+          result.values = this.getCheckValue(schema._valueConstraints.literals, modelValue, valueLocation);
+        } else {
+          result.values = modelValue.map(value => {
+            if (inputType === 'radio') {
+              return this.getRadioValue(schema._valueConstraints.literals, value[valueLocation])
+            } else {
+              return value[valueLocation];
+            }
+          });
         }
-        if (this.isElement(schema)) {
-          console.log('isElement');
-          node.parentGroup = node.formGroup;
-          node.formGroup = new FormGroup({});
-          if (schema.properties) {
-            node.children = this.buildFileTree(schema.properties, modelValue,level + 1, node.formGroup, node);
+      } else {
+        if (modelValue.hasOwnProperty(valueLocation)) {
+          if (inputType === 'radio') {
+            result.values.push(this.getRadioValue(schema._valueConstraints.literals, modelValue[valueLocation]))
+          } else if (inputType === 'checkbox') {
+            result.values.push(this.getCheckValue(schema._valueConstraints.literals, modelValue, valueLocation))
           } else {
-            console.log('error');
+            result.values.push(modelValue[valueLocation]);
           }
-        }
-        if (this.isField(schema)) {
-          console.log('isField');
-
-          node.type = 'textfield';
-          node.subtype = inputType;
-          node.min = 0;
-          node.max = 2;
-          node.options = null;
-
-          node.value = this.getValues(schema, inputType, modelValue);
-
-          node.help = 'help text';
-          node.required = false;
-          node.hint = 'hint text';
+        } else {
+          result.values.push(modelValue);
         }
       }
+    }
+    return result;
+  }
 
-      return (special ? accumulator : accumulator.concat(node));
+
+  getOptions(schema, inputType, modelValue) {
+    let options: any[] = [];
+    if (inputType === 'radio' || inputType === 'checkbox' || inputType === 'list') {
+      if (schema._valueConstraints && schema._valueConstraints.literals) {
+        for (let i = 0; i < schema._valueConstraints.literals.length; i++) {
+          let val: any = schema._valueConstraints.literals[i];
+          let obj = {};
+          obj['label'] = val.label;
+          obj['value'] = i;
+          options.push(obj);
+        }
+      }
+    }
+    return options;
+  }
+
+  notTextInput(inputType) {
+    return (inputType === 'checkbox' || inputType === 'list' || inputType === 'radio' || inputType === 'date' || inputType === 'paragraph')
+  }
+
+  getType(inputType) {
+    return this.notTextInput(inputType) ? inputType : 'textfield';
+  }
+
+  getSubtype(inputType) {
+    return this.notTextInput(inputType) ? '' : inputType;
+  }
+
+  fieldNode(schema, inputType, minItems, maxItems, key, modelValue, formGroup, parent) {
+    const node = new FileNode();
+    node.minItems = minItems;
+    node.maxItems = maxItems;
+    node.itemCount = 0;
+    node.key = key;
+    node.name = this.getTitle(schema);
+    node.formGroup = formGroup;
+    node.parentGroup = parent ? parent.formGroup : null;
+    node.parent = parent;
+    node.type = this.getType(inputType);
+    node.subtype = this.getSubtype(inputType);
+    node.min = 0;
+    node.max = 2;
+    node.value = this.getValues(schema, inputType, modelValue);
+    node.options = this.getOptions(schema, inputType, modelValue);
+    node.help = 'help text';
+    node.required = false;
+    node.hint = 'hint text';
+    return node;
+  }
+
+// generate a node for each element instance
+  elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent) {
+    const node = new FileNode();
+    node.key = key;
+    node.name = this.getTitle(schema);
+    node.parent = parent;
+    node.parentGroup = parent ? parent.formGroup : null;
+    node.formGroup = new FormGroup({});
+    node.minItems = minItems;
+    node.maxItems = maxItems;
+    node.itemCount = i;
+    if (schema.properties) {
+      node.children = this.buildFileTree(schema.properties, modelValue[i], level + 1, node.formGroup, node);
+    }
+    return node;
+  }
+
+  buildFileTree(obj
+                  :
+                  {
+                    [key
+                      :
+                      string
+                      ]:
+                      any
+                  }
+    ,
+                model: any, level
+                  :
+                  number, formGroup
+                  :
+                  FormGroup, parent
+                  :
+                  FileNode
+  ):
+    FileNode[] {
+    return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
+
+      if (!this.isSpecialKey(key)) {
+        const value = obj[key];
+        const modelValue = model[key];
+        const schema = this.schemaOf(value);
+        const maxItems = value['maxItems'];
+        const minItems = value['minItems'] || 0;
+        if (this.isField(schema)) {
+          const node = this.fieldNode(schema, this.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+          accumulator = accumulator.concat(node);
+        } else if (this.isElement(schema)) {
+          const itemCount = Array.isArray(modelValue) ? modelValue.length : 0;
+          for (let i = 0; i < itemCount; i++) {
+            const node = this.elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+            accumulator = accumulator.concat(node);
+          }
+        }
+      }
+      return accumulator;
 
     }, []);
   }

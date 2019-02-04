@@ -28,7 +28,7 @@ export class QuestionComponent implements OnInit {
     switch (this.node.type) {
       case 'textfield':
       case 'paragraph':
-      case 'dropdown':
+      case 'list':
         this.node.value.values.forEach((value, i) => {
           const control = new FormControl(value, validators);
           arr.push(control);
@@ -131,7 +131,7 @@ export class QuestionComponent implements OnInit {
   }
 
   onChange(node: FileNode, val) {
-    console.log('onChange', val);
+    console.log('onChange', node, val);
   }
 
   addNewItem() {
