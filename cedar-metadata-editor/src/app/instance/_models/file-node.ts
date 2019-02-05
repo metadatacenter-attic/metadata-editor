@@ -1,5 +1,6 @@
 import {FormGroup} from '@angular/forms';
 
+import {InputType} from './input-types';
 
 
 export class FileNode {
@@ -8,8 +9,8 @@ export class FileNode {
   minItems: number;
   maxItems: number;
   itemCount: number;
-  type: string;
-  subtype: string;
+  type: InputType;
+  subtype: InputType;
   help: string;
   required: boolean;
   hint: string;

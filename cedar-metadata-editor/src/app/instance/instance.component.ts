@@ -203,7 +203,7 @@ export class InstanceComponent implements OnInit {
 
 
   onSubmit(value: any,) {
-    console.log('form.value', value)
+    console.log('form', this.form)
     this.payload = this.form.value;
   }
 

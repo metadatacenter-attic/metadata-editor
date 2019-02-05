@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
+import {InputType} from '../../_models/input-types';
 
 
 
@@ -26,9 +27,9 @@ export class QuestionComponent implements OnInit {
     const arr = [];
 
     switch (this.node.type) {
-      case 'textfield':
-      case 'paragraph':
-      case 'list':
+      case InputType.textfield:
+      case InputType.textarea:
+      case InputType.list:
         this.node.value.values.forEach((value, i) => {
           const control = new FormControl(value, validators);
           arr.push(control);
@@ -38,7 +39,7 @@ export class QuestionComponent implements OnInit {
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
-      case 'date':
+      case InputType.date:
         this.node.value.values.forEach((value, i) => {
           const control = new FormControl(new Date(value), validators);
           arr.push(control);
@@ -47,7 +48,7 @@ export class QuestionComponent implements OnInit {
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
-      case 'radio':
+      case InputType.radio:
         this.node.value.values.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value.values[index];
@@ -57,7 +58,7 @@ export class QuestionComponent implements OnInit {
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
-      case 'checkbox':
+      case InputType.checkbox:
         this.node.value.values.forEach((value, i) => {
 
           const controls = [];
@@ -83,7 +84,7 @@ export class QuestionComponent implements OnInit {
     if (node.required) {
       validators.push(Validators.required);
     }
-    if (node.type === 'email') {
+    if (node.type === InputType.email) {
       validators.push(Validators.email);
     }
     if (node.min !== null) {
@@ -101,7 +102,7 @@ export class QuestionComponent implements OnInit {
     if (node.pattern !== null) {
       validators.push(Validators.pattern(node.pattern));
     }
-    if (node.type === 'url') {
+    if (node.type === InputType.link) {
       validators.push(this.validateUrl);
     }
     return validators;

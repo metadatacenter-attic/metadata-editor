@@ -76,7 +76,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field *ngSwitchCase="'paragraph'" class="example-full-width mat-form-field">
+        <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.help" [formControl]="control" type="text"
                 [value]="node.value.values[i]"
                 [required]="node.required"

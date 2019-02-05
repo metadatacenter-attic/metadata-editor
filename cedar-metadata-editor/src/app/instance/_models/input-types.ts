@@ -1,6 +1,26 @@
 import {Injectable} from '@angular/core';
 
 
+
+export enum InputType {
+  textfield = 'textfield',
+  link = 'link',
+  textarea = 'textarea',
+  radio = 'radio',
+  checkbox = 'checkbox',
+  date = 'date',
+  email = 'email',
+  list = 'list',
+  numeric = 'numeric',
+  phoneNumber = 'phone-number',
+  attributeValue = 'attribute-value',
+  pageBreak = 'page-break',
+  sectionBreak = 'section-break',
+  richText = 'richtext',
+  image = 'image',
+  youTube = 'youtube'
+}
+
 const INPUT_TYPES = JSON.stringify({
     'textfield': {
       'cedarType': 'textfield',
@@ -214,11 +234,34 @@ const INPUT_TYPES = JSON.stringify({
 
 
 @Injectable()
-export class InputTypes {
+export class InputTypeService {
 
-  public config: object;
+  private config: object;
+
+
 
   constructor() {
     this.config = JSON.parse(INPUT_TYPES);
   }
+
+  isStatic(t: InputType) {
+    return this.config[t].staticField;
+  }
+
+  isNotTextInput(t:string) {
+    return t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
+  }
+
+  isCheckbox(t:string) {
+    return t === InputType.checkbox;
+  }
+
+  isRadio(t:string) {
+    return t === InputType.radio;
+  }
+
+  isList(t:string) {
+    return t === InputType.list;
+  }
+
 }

@@ -5,7 +5,7 @@ import {Inject, Optional} from '@angular/core';
 
 import {FileNode} from '../_models/file-node';
 import {TemplateData} from '../_models/template-data';
-import {InputTypes} from '../_models/input-types';
+import {InputType, InputTypeService} from '../_models/input-types';
 
 
 @Injectable()
@@ -16,8 +16,7 @@ export class TemplateService {
   model: object;
   template: object;
   td: TemplateData;
-  it: InputTypes;
-
+  it: InputTypeService;
 
   get data(): FileNode[] {
     return this.dataChange.value;
@@ -25,7 +24,7 @@ export class TemplateService {
 
   constructor(@Inject('templateId') @Optional() public templateId?: string) {
     this.td = new TemplateData();
-    this.it = new InputTypes();
+    this.it = new InputTypeService();
   }
 
 
@@ -62,43 +61,14 @@ export class TemplateService {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateField');
   }
 
-  getInputType(schema) {
-    console.log('getInputType', schema._ui.inputType);
+  getInputType(schema):InputType {
     return (schema && schema._ui && schema._ui.inputType) ? schema._ui.inputType : null;
-  }
-
-  isCheckboxField(inputType) {
-    return inputType === 'checkbox';
-  }
-
-  isTextType(inputType) {
-    return (inputType === 'textfield');
-  }
-
-  isLinkType(inputType) {
-    return (inputType === 'link');
-  }
-
-  isNumericType(inputType) {
-    return (inputType === 'numeric');
-  }
-
-  isAttributeValueType(inputType) {
-    return (inputType === 'attribute-value');
-  }
-
-  isDateType(inputType) {
-    return (inputType === 'date');
   }
 
   // has multiple choice value constraints?
   isMultiValue(schema) {
     return schema._valueConstraints && schema._valueConstraints.multipleChoice;
   }
-
-  isStaticField = inputType => {
-    return this.it.config[inputType].staticField;
-  };
 
   /* create the context  */
   setContext(schema, model) {
@@ -166,8 +136,8 @@ export class TemplateService {
   }
 
   // get the controlled terms list for field types
-  getFieldControlledTerms(schema, inputType) {
-    if (!this.isStaticField(inputType) && !this.isAttributeValueType(inputType)) {
+  getFieldControlledTerms(schema, inputType:InputType) {
+    if (!this.it.isStatic(inputType) && inputType !== InputType.attributeValue) {
       const properties = this.propertiesOf(schema);
       if (properties['@type'] && properties['@type'].oneOf && properties['@type'].oneOf[1]) {
         return properties['@type'].oneOf[1].items['enum'];
@@ -176,10 +146,10 @@ export class TemplateService {
   }
 
   // where is the value of this field, @id or @value?
-  getValueLocation(schema, inputType) {
+  getValueLocation(schema, inputType:InputType) {
     const ct = this.getFieldControlledTerms(schema, inputType);
     const ctv = this.hasControlledTermValue(schema);
-    const link = this.isLinkType(inputType);
+    const link = inputType === InputType.link;
     return (ct || ctv || link) ? '@id' : '@value';
   }
 
@@ -191,13 +161,13 @@ export class TemplateService {
     return schema._valueConstraints.defaultValue;
   }
 
-  getDefaultValue(value, schema, inputType, valueLocation) {
+  getDefaultValue(value, schema, inputType:InputType, valueLocation) {
     if (valueLocation === '@value') {
       // If the template contains a user-defined default value, we use it as the default value for the field
-      if (this.isTextType(inputType) && this.hasUserDefinedDefaultValue(schema)) {
+      if (inputType === InputType.textfield && this.hasUserDefinedDefaultValue(schema)) {
         return this.getUserDefinedDefaultValue(schema);
       }
-      if (this.isAttributeValueType(inputType)) {
+      if (inputType === InputType.attributeValue) {
         return this.getTitle(schema);
       } else {
         return null;
@@ -233,9 +203,9 @@ export class TemplateService {
   // This function initializes the @value field (in the model) to null if it has not been initialized yet.
   // For text fields, it may also set it to a default value set by the user when creating the template. Note that
   // the @id field can't be initialized to null. In JSON-LD, @id must be a string, so we don't initialize it.
-  initializeValue(value, schema, inputType, model) {
+  initializeValue(value, schema, inputType:InputType, model) {
 
-    if (!this.isAttributeValueType(inputType)) {
+    if (inputType !== InputType.attributeValue) {
 
       const valueLocation = this.getValueLocation(schema, inputType);
       const defaultValue = this.getDefaultValue(value, schema, inputType, valueLocation);
@@ -274,11 +244,11 @@ export class TemplateService {
   // Users may want to manually create instances that use different date or numeric types (e.g., xsd:integer).
   // As a consequence, we cannot use the @type definition from the schema to generate the @type for the instance
   // field. We 'manually' generate those types.
-  initializeValueType(value, schema, inputType, model) {
+  initializeValueType(value, schema, inputType:InputType, model) {
     let fieldType;
-    if (this.isNumericType(inputType)) {
+    if (inputType === InputType.numeric) {
       fieldType = this.generateInstanceTypeForNumericField(schema);
-    } else if (this.isDateType(inputType)) {
+    } else if (inputType === InputType.date) {
       fieldType = this.generateInstanceTypeForDateField();
     } else {
       const properties = this.propertiesOf(schema);
@@ -310,13 +280,13 @@ export class TemplateService {
     }
   }
 
-  isCheckboxListRadioType(inputType) {
-    return ((inputType === 'checkbox') || (inputType === 'radio') || (inputType === 'list'));
+  isCheckboxListRadioType(inputType:InputType) {
+    return ((inputType === InputType.checkbox) || (inputType === InputType.radio) || (inputType === InputType.list));
   }
 
   // is this a radio, or a single-choice list?
-  isSingleChoice(schema, inputType) {
-    return ((inputType === 'radio') || ((inputType === 'list') && !this.isMultiValue(schema)));
+  isSingleChoice(schema, inputType:InputType) {
+    return ((inputType === InputType.radio) || ((inputType === InputType.list) && !this.isMultiValue(schema)));
   }
 
   // get the value constraint literal values
@@ -326,12 +296,12 @@ export class TemplateService {
     }
   }
 
-  defaultOptionsToModel(value, schema, inputType, model) {
+  defaultOptionsToModel(value, schema, inputType:InputType, model) {
     if (this.isCheckboxListRadioType(inputType)) {
       const literals = this.getLiterals(schema);
       const valueLocation = this.getValueLocation(schema, inputType);
       // Checkbox or multi-choice  list
-      if ((this.isCheckboxField(inputType) || this.isMultiValue(schema))) {
+      if ((inputType === InputType.checkbox || this.isMultiValue(schema))) {
         for (let i = 0; i < literals.length; i++) {
           if (literals[i].selectedByDefault) {
             const newValue = {};
@@ -371,7 +341,7 @@ export class TemplateService {
   parseField(value: object, schema: object, key: string, minItems: number, model: object) {
 
     const inputType = this.getInputType(schema);
-    if (!this.isStaticField(inputType)) {
+    if (!this.it.isStatic(inputType)) {
 
       // Assign empty field instance model to model only if it does not exist
       if (model[key] === undefined) {
@@ -383,16 +353,16 @@ export class TemplateService {
           }
         } else {
           // is this a multiple choice field (checkbox and multi-choice list) that stores an array of values?
-          model[key] = (this.isCheckboxField(inputType) || this.isMultiValue(schema)) ? [] : {};
+          model[key] = (inputType === InputType.checkbox || this.isMultiValue(schema)) ? [] : {};
         }
 
         // Set default values and types for fields
         this.initializeValue(value, schema, inputType, model[key]);
         // Initialize value type for those fields that have it
-        if (this.isTextType(inputType) || this.isDateType(inputType) || this.isNumericType(inputType)) {
+        if (inputType === InputType.textfield || inputType === InputType.date || inputType === InputType.numeric) {
           this.initializeValueType(value, schema, inputType, model[key]);
         }
-        if (this.isAttributeValueType(inputType)) {
+        if (inputType === InputType.attributeValue) {
           model[key] = [];
           // remove the @context entry for this attribute-value field
           this.removeContext(model, key);
@@ -503,13 +473,13 @@ export class TemplateService {
   }
 
 
-  getValues(schema, inputType, modelValue) {
+  getValues(schema, inputType:InputType, modelValue) {
     const result = {'values': []};
     const valueLocation = this.getValueLocation(schema, inputType);
 
     if (modelValue) {
       if (Array.isArray(modelValue)) {
-        if (inputType === 'checkbox') {
+        if (this.it.isCheckbox(inputType)) {
           result.values = this.getCheckValue(schema._valueConstraints.literals, modelValue, valueLocation);
         } else {
           result.values = modelValue.map(value => {
@@ -522,7 +492,7 @@ export class TemplateService {
         }
       } else {
         if (modelValue.hasOwnProperty(valueLocation)) {
-          if (inputType === 'radio') {
+          if (this.it.isRadio(inputType)) {
             result.values.push(this.getRadioValue(schema._valueConstraints.literals, modelValue[valueLocation]))
           } else if (inputType === 'checkbox') {
             result.values.push(this.getCheckValue(schema._valueConstraints.literals, modelValue, valueLocation))
@@ -538,9 +508,9 @@ export class TemplateService {
   }
 
 
-  getOptions(schema, inputType, modelValue) {
+  getOptions(schema, inputType:InputType, modelValue) {
     let options: any[] = [];
-    if (inputType === 'radio' || inputType === 'checkbox' || inputType === 'list') {
+    if (this.it.isRadio(inputType) || this.it.isCheckbox(inputType) || this.it.isList(inputType)) {
       if (schema._valueConstraints && schema._valueConstraints.literals) {
         for (let i = 0; i < schema._valueConstraints.literals.length; i++) {
           let val: any = schema._valueConstraints.literals[i];
@@ -554,19 +524,16 @@ export class TemplateService {
     return options;
   }
 
-  notTextInput(inputType) {
-    return (inputType === 'checkbox' || inputType === 'list' || inputType === 'radio' || inputType === 'date' || inputType === 'paragraph')
-  }
 
-  getType(inputType) {
-    return this.notTextInput(inputType) ? inputType : 'textfield';
+  getNodeType(inputType:InputType):InputType {
+    return this.it.isNotTextInput(inputType) ? inputType : InputType.textfield;
   }
 
   getSubtype(inputType) {
-    return this.notTextInput(inputType) ? '' : inputType;
+    return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
-  fieldNode(schema, inputType, minItems, maxItems, key, modelValue, formGroup, parent) {
+  fieldNode(schema, inputType:InputType, minItems, maxItems, key, modelValue, formGroup:FormGroup, parent:FileNode) {
     const node = new FileNode();
     node.minItems = minItems;
     node.maxItems = maxItems;
@@ -576,7 +543,7 @@ export class TemplateService {
     node.formGroup = formGroup;
     node.parentGroup = parent ? parent.formGroup : null;
     node.parent = parent;
-    node.type = this.getType(inputType);
+    node.type = this.getNodeType(inputType);
     node.subtype = this.getSubtype(inputType);
     node.min = 0;
     node.max = 2;
@@ -589,13 +556,14 @@ export class TemplateService {
   }
 
 // generate a node for each element instance
-  elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent) {
+  elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup:FormGroup, parent:FileNode) {
     const node = new FileNode();
     node.key = key;
     node.name = this.getTitle(schema);
     node.parent = parent;
     node.parentGroup = parent ? parent.formGroup : null;
     node.formGroup = new FormGroup({});
+    formGroup.addControl(key+i, node.formGroup);
     node.minItems = minItems;
     node.maxItems = maxItems;
     node.itemCount = i;
@@ -605,25 +573,7 @@ export class TemplateService {
     return node;
   }
 
-  buildFileTree(obj
-                  :
-                  {
-                    [key
-                      :
-                      string
-                      ]:
-                      any
-                  }
-    ,
-                model: any, level
-                  :
-                  number, formGroup
-                  :
-                  FormGroup, parent
-                  :
-                  FileNode
-  ):
-    FileNode[] {
+  buildFileTree(obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
     return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
 
       if (!this.isSpecialKey(key)) {
