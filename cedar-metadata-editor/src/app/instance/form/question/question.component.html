@@ -51,6 +51,7 @@
                  (change)="onChange(node)"
                  [value]="node.value.values[i]"
                  [required]="node.required"
+                 [minlength]="node.minLength" [maxlength]="node.maxLength"
                  [min]="node.min" [max]="node.max"
                  [errorStateMatcher]="matcher">
           <mat-hint>{{node.hint}}</mat-hint>
@@ -73,6 +74,14 @@
           <mat-error *ngIf="control.hasError('max')">
             Value {{control.errors['max']['actual']}} is larger than
             <strong>{{control.errors['max']['max']}}</strong>
+          </mat-error>
+          <mat-error *ngIf="control.hasError('minlength')">
+            Value {{control.errors['minlength']['actualLength']}} is smaller than
+            <strong>{{control.errors['minlength']['requiredLength']}}</strong>
+          </mat-error>
+          <mat-error *ngIf="control.hasError('maxlength')">
+            Value {{control.errors['maxlength']['actualLength']}} is larger than
+            <strong>{{control.errors['maxlength']['requiredLength']}}</strong>
           </mat-error>
         </mat-form-field>
 

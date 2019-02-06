@@ -10,6 +10,7 @@ import {UiService} from '../services/ui/ui.service';
 import {QuestionBase} from './form/question/_models/question-base';
 import {FileNode} from './_models/file-node';
 import {FileDatabase} from './_service/file-database';
+import {TemplateSchemaService} from './_service/template-schema.service';
 import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
 
@@ -18,75 +19,67 @@ import * as cloneDeep from 'lodash/cloneDeep';
   selector: 'app-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.less'],
-  providers: [FileDatabase, TemplateService]
+  providers: [FileDatabase, TemplateService, TemplateSchemaService]
 })
 
 export class InstanceComponent implements OnInit {
   treeControl: NestedTreeControl<FileNode>;
   dataSource: MatTreeNestedDataSource<FileNode>;
   database: TemplateService;
-
-
-  formId: string;
-  projectFormName: string;
   form: FormGroup;
+
   payload: any;
+  jsonld: any;
+  rdf: any;
+
+  id:number;
+
+  formTitle: string;
+  formDescription: string;
+  formIdentifier: string;
+
+  formInvalid:boolean = false;
 
   private _subscription: Subscription;
-  formInvalid = true;
 
-  title: string;
+  title: string = 'Cedar Metadata Editor';
   questions: [QuestionBase<any>];
-
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
+  route: ActivatedRoute;
+  private _routeSubscribe: Subscription;
+
   constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
     this.database = ts;
-    const id = route.params.subscribe(
-      {
-        next(val) {
-          this.database = ts;
-          console.log('database observer', val, this.database);
-          this.projectFormName = 'projectFormName';
-          this.payload = {};
+    this.route = route;
+  }
 
-          this.form = new FormGroup({});
-          this.database.initialize(this.form, val.templateId);
-          this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-          this.dataSource = new MatTreeNestedDataSource();
-          this.database.dataChange.subscribe(data => {
-            this.dataSource.data = data;
-          });
+  initialize(templateId:string) {
 
-        },
-        error(msg) {
-          console.log('Error Getting templateId: ', msg);
-        }
-      }
-    );
+    let getChildren = (node: FileNode) => node.children;
+
+    this.form = new FormGroup({});
+    this.database.initialize(this.form, templateId);
+    this.treeControl = new NestedTreeControl<FileNode>(getChildren);
+    this.dataSource = new MatTreeNestedDataSource();
+    this.database.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
 
   }
 
   ngAfterViewInit() {
     this.onChanges();
     setTimeout(() => {
-      this.formInvalid = !this.form.valid;
+      //this.formInvalid = !this.form.valid;
     }, 0);
   }
 
   ngOnInit() {
-
-    this.title = 'Cedar Metadata Editor';
-    this.formId = 'projectForm';
-
-    this.form = new FormGroup({});
-    this.database.initialize(this.form, '1');
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
+    this.route.params.subscribe((val) => {
+      this.initialize(val.templateId);
     });
 
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
@@ -95,7 +88,6 @@ export class InstanceComponent implements OnInit {
   }
 
   onChanges(): void {
-    console.log('onChanges', this.form);
     if (this.form) {
       this._subscription = this.form.valueChanges.subscribe(val => {
         this.payload = val;
@@ -104,7 +96,6 @@ export class InstanceComponent implements OnInit {
         }, 0);
       });
     }
-
   }
 
   cloneAbstractControl(control: AbstractControl) {
@@ -203,7 +194,6 @@ export class InstanceComponent implements OnInit {
 
 
   onSubmit(value: any,) {
-    console.log('form', this.form)
     this.payload = this.form.value;
   }
 

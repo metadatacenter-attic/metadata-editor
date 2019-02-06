@@ -3,7 +3,8 @@
   <mat-tab-group>
     <mat-tab label="Form">
 
-      <form [formGroup]="form" *ngIf="form">
+      <h2>{{database.getTitle()}}</h2>
+      <form [formGroup]="form" *ngIf="form" style="margin:10px">
 
 
         <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
@@ -54,6 +55,16 @@
     <mat-tab label="Value">
       <div *ngIf="payload">
         <pre>value: <span class="value">{{ payload | json}}</span></pre>
+      </div>
+    </mat-tab>
+    <mat-tab label="JSON-LD">
+      <div *ngIf="jsonld">
+        <pre>value: <span class="value">{{ jsonld | json}}</span></pre>
+      </div>
+    </mat-tab>
+    <mat-tab label="RDF">
+      <div *ngIf="rdf">
+        <pre>value: <span class="value">{{ rdf | json}}</span></pre>
       </div>
     </mat-tab>
   </mat-tab-group>

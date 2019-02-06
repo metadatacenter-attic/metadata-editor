@@ -84,7 +84,7 @@ export class QuestionComponent implements OnInit {
     if (node.required) {
       validators.push(Validators.required);
     }
-    if (node.type === InputType.email) {
+    if (node.subtype === InputType.email) {
       validators.push(Validators.email);
     }
     if (node.min !== null) {
@@ -102,7 +102,7 @@ export class QuestionComponent implements OnInit {
     if (node.pattern !== null) {
       validators.push(Validators.pattern(node.pattern));
     }
-    if (node.type === InputType.link) {
+    if (node.subtype === InputType.link) {
       validators.push(this.validateUrl);
     }
     return validators;

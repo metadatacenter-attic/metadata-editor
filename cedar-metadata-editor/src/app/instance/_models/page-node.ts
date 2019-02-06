@@ -1,7 +1,7 @@
 import {FileNode} from "./file-node";
 
 
-export class PageNode {
+export interface PageNode {
   page: FileNode;
   pageName: string;
   helpText: string;

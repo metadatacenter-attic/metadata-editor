@@ -18,7 +18,6 @@ export class AppComponent implements OnInit {
 
   constructor(public ui: UiService) {
     this.title = 'Cedar Metadata Editor';
-
   }
 
   ngOnInit() { this._subscription = this.ui.darkModeState$.subscribe(res => {
@@ -32,9 +31,7 @@ export class AppComponent implements OnInit {
 
   modeToggleSwitch() {
     this.ui.update(!this.darkMode);
-
     // this.ui.darkModeState.next(!this.darkModeActive);
-    console.log('modeToggleSwitch', this.darkMode)
   }
 
 

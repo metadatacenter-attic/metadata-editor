@@ -238,8 +238,6 @@ export class InputTypeService {
 
   private config: object;
 
-
-
   constructor() {
     this.config = JSON.parse(INPUT_TYPES);
   }
@@ -250,6 +248,10 @@ export class InputTypeService {
 
   isNotTextInput(t:string) {
     return t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
+  }
+
+  isRadioCheckList(t:string) {
+    return this.isRadio(t) || this.isCheckbox(t) || this.isList(t);
   }
 
   isCheckbox(t:string) {
