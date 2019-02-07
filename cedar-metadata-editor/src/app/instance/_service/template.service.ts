@@ -1,7 +1,6 @@
-import {Injectable} from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
+import {Inject, Injectable, Optional} from '@angular/core';
+import {FormGroup} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
-import {Inject, Optional} from '@angular/core';
 
 import {FileNode} from '../_models/file-node';
 import {TemplateDataService} from '../_service/template-data.service';
@@ -376,7 +375,7 @@ export class TemplateService {
       .indexOf(label);
   }
 
-  getListValue(literals, label): number {
+  getListSingleValue(literals, label): number {
     return literals
       .map(function (element) {
         return element.label;
@@ -384,7 +383,7 @@ export class TemplateService {
       .indexOf(label);
   }
 
-  getCheckValue(literals, values, valueLocation): boolean[] {
+  getListMultipleValue(literals, values, valueLocation): string[] {
     let result = [];
 
     let literal = literals
@@ -393,61 +392,66 @@ export class TemplateService {
         }
       );
 
-    if (Array.isArray(values[0])) {
-      for (let i = 0; i < values.length; i++) {
-        let r = [];
-        for (let j = 0; i < values[i].length; i++) {
-          r.push(literal.indexOf(values[i][j][valueLocation]) > 0);
-        }
-        result.push(r);
-      }
-    } else {
       let r = [];
       for (let i = 0; i < values.length; i++) {
-        r.push(literal.indexOf(values[i][valueLocation]) > 0);
+        r.push(values[i][valueLocation]);
       }
       result.push(r);
-    }
 
+    console.log('getListMultipleValue', literals, values, valueLocation, result)
     return result;
   }
 
+  getCheckValue(literals, values, valueLocation): string[] {
+    let result = [];
+    for (let i = 0; i < values.length; i++) {
+      result.push(values[i][valueLocation]);
+    }
+    console.log('result',result);
+    return result;
+  }
 
   getValues(schema: TemplateSchema, inputType: InputType, modelValue) {
     const result = {'values': []};
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
-    if (modelValue) {
-      if (Array.isArray(modelValue)) {
-        if (this.it.isCheckbox(inputType)) {
-          result.values = this.getCheckValue(literals, modelValue, valueLocation);
-        } else {
-          result.values = modelValue.map(value => {
-            if (inputType === 'radio') {
-              return this.getRadioValue(literals, value[valueLocation])
+    if (this.it.isCheckbox(inputType)) {
+      result.values.push(this.getCheckValue(literals, modelValue, valueLocation));
+    } else {
+      if (modelValue) {
+        if (Array.isArray(modelValue)) {
+          if (this.it.isList(inputType)) {
+            if (this.ts.isMultiValue(schema)) {
+              result.values = this.getListMultipleValue(literals, modelValue, valueLocation);
             } else {
-              return value[valueLocation];
+              result.values.push(this.getListSingleValue(literals, modelValue));
             }
-          });
-        }
-      } else {
-        if (modelValue.hasOwnProperty(valueLocation)) {
-          if (this.it.isRadio(inputType)) {
-            result.values.push(this.getRadioValue(literals, modelValue[valueLocation]))
-          } else if (inputType === 'checkbox') {
-            result.values.push(this.getCheckValue(literals, modelValue, valueLocation))
+            //
           } else {
-            result.values.push(modelValue[valueLocation]);
+            result.values = modelValue.map(value => {
+              if (inputType === 'radio') {
+                return this.getRadioValue(literals, value[valueLocation])
+              } else {
+                return value[valueLocation];
+              }
+            });
           }
         } else {
-          result.values.push(modelValue);
+          if (modelValue.hasOwnProperty(valueLocation)) {
+            if (this.it.isRadio(inputType)) {
+              result.values.push(this.getRadioValue(literals, modelValue[valueLocation]))
+            } else {
+              result.values.push(modelValue[valueLocation]);
+            }
+          } else {
+            result.values.push(modelValue);
+          }
         }
       }
     }
     return result;
   }
-
 
   getOptions(schema: TemplateSchema, inputType: InputType, modelValue) {
     let options: any[] = [];
@@ -464,18 +468,13 @@ export class TemplateService {
     return options;
   }
 
-
   getNodeType(inputType: InputType): InputType {
     return this.it.isNotTextInput(inputType) ? inputType : InputType.textfield;
   }
 
   getSubtype(inputType) {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
-
   }
-
-
-
 
   fieldNode(schema: TemplateSchema, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode) {
     const node = {
@@ -495,6 +494,7 @@ export class TemplateService {
       'maxLength' : this.ts.getMaxStringLength(schema),
       'value': this.getValues(schema, inputType, modelValue),
       'options': this.getOptions(schema, inputType, modelValue),
+      'multipleChoice': this.ts.isMultiValue(schema),
       'help': this.ts.getHelp(schema),
       'required': this.ts.isRequired(schema),
       'hint': 'hint text'

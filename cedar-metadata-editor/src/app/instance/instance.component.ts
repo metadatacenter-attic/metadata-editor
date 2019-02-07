@@ -68,6 +68,12 @@ export class InstanceComponent implements OnInit {
       this.dataSource.data = data;
     });
 
+    setTimeout(() => {
+      this.payload = this.form.value;
+      this.formInvalid = !this.form.valid
+    }, 0);
+
+
   }
 
   ngAfterViewInit() {

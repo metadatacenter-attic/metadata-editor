@@ -26,6 +26,7 @@ export interface FileNode {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  multipleChoice?: boolean;
   options?: any;
   value?: {
     values: any[];

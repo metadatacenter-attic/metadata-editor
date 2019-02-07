@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
-import {InputType} from '../../_models/input-types';
+import {InputType, InputTypeService} from '../../_models/input-types';
 
 
 
@@ -16,9 +16,11 @@ export class QuestionComponent implements OnInit {
   @Input() parentGroup: FormGroup;
   formGroup: FormGroup;
   _fb: FormBuilder;
+  it: InputTypeService;
 
   constructor(fb: FormBuilder) {
     this._fb = fb;
+    this.it = new InputTypeService();
   }
 
   ngOnInit() {
@@ -78,6 +80,33 @@ export class QuestionComponent implements OnInit {
     }
   }
 
+  isChecked (node, i, index) {
+    let label = node.options[index].label;
+    return node.value.values[i].indexOf(label) !== -1
+  }
+
+  setChecked(node, i, index) {
+    let label = node.options[index].label;
+    let checked = node.value.values[i].indexOf(label) > -1;
+    let checkGroup = node.formGroup.controls[node.key].controls.values as FormArray;
+    let checkboxes = checkGroup.controls[0]['controls']['values']['controls'];
+
+
+    console.log('setChecked',node.formGroup, checkGroup, checkboxes);
+
+    if (checked) {
+      console.log('set unchecked',label);
+      node.value.values[i].splice(node.value.values[i].indexOf(label), 1);
+    } else {
+      console.log('set checked',label);
+      node.value.values[i].push(label);
+    }
+  };
+
+  allowsMultiple(type:InputType) {
+    return this.it.allowsMultiple(type);
+  }
+
 
   getValidators(node: FileNode) {
     const validators = [];
@@ -103,17 +132,32 @@ export class QuestionComponent implements OnInit {
       validators.push(Validators.pattern(node.pattern));
     }
     if (node.subtype === InputType.link) {
-      validators.push(this.validateUrl);
+      // validators.push(this.validateUrl);
+      validators.push(this.urlValidator);
     }
     return validators;
   }
 
-  validateUrl(control: FormControl) {
-    let result = null;
-    if (!control.value.startsWith('http')) {
-      result = {'url': true};
+  // validateUrl(control: FormControl) {
+  //   let result = null;
+  //   if (!control.value.startsWith('http')) {
+  //     result = {'url': true};
+  //   }
+  //   return result;
+  // }
+
+  urlValidator(url:FormControl): any {
+    if (url.pristine) {
+      return null;
     }
-    return result;
+    const URL_REGEXP = /^(http?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/;
+    url.markAsTouched();
+    if (URL_REGEXP.test(url.value)) {
+      return null;
+    }
+    return {
+      url: true
+    };
   }
 
   dateFilter = (d: Date): boolean => {

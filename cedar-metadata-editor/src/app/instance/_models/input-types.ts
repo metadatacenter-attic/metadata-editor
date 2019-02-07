@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
 
-
 export enum InputType {
   textfield = 'textfield',
   link = 'link',
@@ -246,6 +245,10 @@ export class InputTypeService {
     return this.config[t].staticField;
   }
 
+  allowsMultiple(t: string) {
+    return this.config[t].allowsMultiple;
+  }
+
   isNotTextInput(t:string) {
     return t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
   }
@@ -254,16 +257,18 @@ export class InputTypeService {
     return this.isRadio(t) || this.isCheckbox(t) || this.isList(t);
   }
 
-  isCheckbox(t:string) {
+  isCheckbox(t: string) {
     return t === InputType.checkbox;
   }
 
-  isRadio(t:string) {
+  isRadio(t: string) {
     return t === InputType.radio;
   }
 
-  isList(t:string) {
+  isList(t: string) {
     return t === InputType.list;
   }
+
+
 
 }

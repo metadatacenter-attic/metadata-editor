@@ -35,7 +35,7 @@ export class TemplateSchemaService {
   }
 
   isRequired(schema:TemplateSchema) {
-    return schema._valueConstraints.requiredValue;
+    return schema._valueConstraints && schema._valueConstraints.requiredValue;
   }
 
   getMinStringLength(schema:TemplateSchema) {
@@ -50,8 +50,16 @@ export class TemplateSchemaService {
     return schema._valueConstraints.defaultValue;
   }
 
-  getTitle(schema: TemplateSchema) {
+  getName(schema: TemplateSchema) {
     return schema['schema:name'];
+  }
+
+  getPrefLabel(schema:TemplateSchema) {
+    return schema['skos:prefLabel'];
+  }
+
+  getTitle(schema:TemplateSchema) {
+    return this.getPrefLabel(schema) || this.getName(schema);
   }
 
   isElement(schema: TemplateSchema) {

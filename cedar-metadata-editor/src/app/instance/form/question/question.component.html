@@ -5,117 +5,133 @@
     {{node.name}}
   </label>
 
-  <div *ngIf="node.type == 'checkbox';else others;" style="margin:10px 0">
-    <div [formGroup]="group" *ngFor="let group of formGroup.controls.values.controls;index as i"
-         class="mat-form-field">
 
-      <span *ngFor="let control of group.controls.values.controls; let j = index" style="padding-right:10px">
-        <label class="checkbox-label">
-          <mat-checkbox [formControl]="control" [value]="node.value.values[i][j]"
-                        [aria-label]="node.options[j].label"></mat-checkbox>
-          {{node.options[j].label}}
-        </label>
+
+
+
+
+  <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
+    <div *ngFor="let control of formGroup.controls.values.controls;index as i">
+
+
+      <span *ngIf="node.minItems && allowsMultiple(node.type)">
+        {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
+        <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
+        <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
       </span>
-    </div>
-  </div>
 
-  <ng-template #others>
-    <div *ngIf="node.type != 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
-      <div *ngFor="let control of formGroup.controls.values.controls;index as i">
 
-        <span *ngIf="node.minItems">
-          {{node.name}}
-          ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-          <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
-          <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
+      <div *ngSwitchCase="'checkbox'">
+
+        <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
+          <label class="checkbox-label">
+            <mat-checkbox  (change)="setChecked(node, i, j)"
+              [value]="opt.label"
+              [checked]="isChecked(node, i, j)"
+              [aria-label]="opt.label">
+            </mat-checkbox>
+            {{opt.label}}
+          </label>
         </span>
+        <div> {{node.options | json}} {{node.value.values[0] | json}}</div>
+      </div>
 
-        <div *ngSwitchCase="'radio'">
-          <mat-radio-group [formControl]="control" [labelPosition]="'after'"
-                           [value]="node.value.values[i]"
-                           class="mat-form-field">
+
+      <div *ngSwitchCase="'radio'">
+        <mat-radio-group [formControl]="control" [labelPosition]="'after'"
+          [value]="node.value.values[i]"
+          class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
             <mat-radio-button [value]="opt.value"
-                              [aria-label]="opt.value"
-                              style="padding-right:10px">
+              [aria-label]="opt.value"
+              style="padding-right:10px">
               {{opt.label}}
             </mat-radio-button>
           </label>
           </span>
-          </mat-radio-group>
-        </div>
+        </mat-radio-group>
+      </div>
 
-        <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
-          <input matInput [placeholder]="node.help" [formControl]="control" type="node.subtype"
-                 (change)="onChange(node)"
-                 [value]="node.value.values[i]"
-                 [required]="node.required"
-                 [minlength]="node.minLength" [maxlength]="node.maxLength"
-                 [min]="node.min" [max]="node.max"
-                 [errorStateMatcher]="matcher">
-          <mat-hint>{{node.hint}}</mat-hint>
-          <mat-error *ngIf="control.hasError('url') && !control.hasError('required')">
-            Please enter a valid URL
-          </mat-error>
-          <mat-error *ngIf="control.hasError('tel') && !control.hasError('required')">
-            Please enter a valid telephone number
-          </mat-error>
-          <mat-error *ngIf="control.hasError('email') && !control.hasError('required')">
-            Please enter a valid email address
-          </mat-error>
-          <mat-error *ngIf="control.hasError('required')">
-            Value is <strong>required</strong>
-          </mat-error>
-          <mat-error *ngIf="control.hasError('min')">
-            Value {{control.errors['min']['actual']}} is smaller than
-            <strong>{{control.errors['min']['min']}}</strong>
-          </mat-error>
-          <mat-error *ngIf="control.hasError('max')">
-            Value {{control.errors['max']['actual']}} is larger than
-            <strong>{{control.errors['max']['max']}}</strong>
-          </mat-error>
-          <mat-error *ngIf="control.hasError('minlength')">
-            Value {{control.errors['minlength']['actualLength']}} is smaller than
-            <strong>{{control.errors['minlength']['requiredLength']}}</strong>
-          </mat-error>
-          <mat-error *ngIf="control.hasError('maxlength')">
-            Value {{control.errors['maxlength']['actualLength']}} is larger than
-            <strong>{{control.errors['maxlength']['requiredLength']}}</strong>
-          </mat-error>
-        </mat-form-field>
+      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
+        <input matInput [placeholder]="node.help" [formControl]="control" [type]="node.subtype"
+          (change)="onChange(node)"
+          [value]="node.value.values[i]"
+          [required]="node.required"
+          [minlength]="node.minLength" [maxlength]="node.maxLength"
+          [min]="node.min" [max]="node.max"
+          [errorStateMatcher]="matcher">
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-error *ngIf="control.hasError('url') && !control.hasError('required')">
+          Please enter a valid URL
+        </mat-error>
+        <mat-error *ngIf="control.hasError('tel') && !control.hasError('required')">
+          Please enter a valid telephone number
+        </mat-error>
+        <mat-error *ngIf="control.hasError('email') && !control.hasError('required')">
+          Please enter a valid email address
+        </mat-error>
+        <mat-error *ngIf="control.hasError('required')">
+          Value is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('min')">
+          Value {{control.errors['min']['actual']}} is smaller than <strong>{{control.errors['min']['min']}}</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('max')">
+          Value {{control.errors['max']['actual']}} is larger than <strong>{{control.errors['max']['max']}}</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('minlength')">
+          Value length {{control.errors['minlength']['actualLength']}} is smaller than
+          <strong>{{control.errors['minlength']['requiredLength']}}</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('maxlength')">
+          Value length {{control.errors['maxlength']['actualLength']}} is larger than
+          <strong>{{control.errors['maxlength']['requiredLength']}}</strong>
+        </mat-error>
+      </mat-form-field>
 
-        <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
+      <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.help" [formControl]="control" type="text"
-                [value]="node.value.values[i]"
-                [required]="node.required"
-                [errorStateMatcher]="matcher"></textarea>
-          <mat-hint>{{node.hint}}</mat-hint>
-          <mat-error *ngIf="control.hasError('required')">
-            Value is <strong>required</strong>
-          </mat-error>
-        </mat-form-field>
+        [value]="node.value.values[i]"
+        [required]="node.required"
+        [errorStateMatcher]="matcher"></textarea>
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-error *ngIf="control.hasError('required')">
+          Value is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
 
-        <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
-          <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.help"
-                 [value]="control.value">
-          <mat-hint>{{node.hint}}</mat-hint>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
+      <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
+        <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.help"
+          [value]="control.value">
+        <mat-hint>{{node.hint}}</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
 
-        <mat-form-field *ngSwitchCase="'list'" class="mat-form-field" >
-          <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
-                      [value]="node.value.values[i]"
-                      [required]="node.required">
-            <mat-option *ngFor="let opt of node.options" [value]="opt.value">{{opt.label}}</mat-option>
-          </mat-select>
-          <mat-hint>{{node.hint}}</mat-hint>
-        </mat-form-field>
-
+      <div *ngSwitchCase="'list'">
+        <div *ngIf="node.multipleChoice">
+          <mat-form-field>
+            <mat-select [placeholder]="node.help" [formControl]="control" multiple [(ngModel)]="node.value.values[i]"
+              [required]="node.required">
+              <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div *ngIf="!node.multipleChoice">
+          <mat-form-field class="mat-form-field">
+            <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
+              [value]="node.value.values[i]"
+              [required]="node.required">
+              <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
+            </mat-select>
+            <mat-hint>{{node.hint}}</mat-hint>
+          </mat-form-field>
+        </div>
       </div>
     </div>
-  </ng-template>
+  </div>
+
 
 </div>
 
