@@ -23,12 +23,12 @@ export interface FileNode {
   hint?: string;
   min?: number;
   max?: number;
+  decimals?: number;
   minLength?: number;
   maxLength?: number;
   pattern?: string;
   multipleChoice?: boolean;
+
   options?: any;
-  value?: {
-    values: any[];
-  };
+  value?: any[];
 }

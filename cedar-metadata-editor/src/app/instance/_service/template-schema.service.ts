@@ -38,6 +38,18 @@ export class TemplateSchemaService {
     return schema._valueConstraints && schema._valueConstraints.requiredValue;
   }
 
+  getMin(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.minValue;
+  }
+
+  getMax(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.maxValue;
+  }
+
+  getDecimals(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.decimalPlace;
+  }
+
   getMinStringLength(schema:TemplateSchema) {
     return schema && schema._valueConstraints && schema._valueConstraints.minLength;
   }

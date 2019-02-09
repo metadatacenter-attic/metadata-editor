@@ -24,7 +24,7 @@ export class QuestionComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
     const arr = [];
 
@@ -32,81 +32,59 @@ export class QuestionComponent implements OnInit {
       case InputType.textfield:
       case InputType.textarea:
       case InputType.list:
-        this.node.value.values.forEach((value, i) => {
+        this.node.value.forEach((value, i) => {
           const control = new FormControl(value, validators);
           arr.push(control);
         });
-
-        // build the array of controls and add it to the parent
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.date:
-        this.node.value.values.forEach((value, i) => {
+        this.node.value.forEach((value, i) => {
           const control = new FormControl(new Date(value), validators);
           arr.push(control);
         });
-
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.radio:
-        this.node.value.values.forEach((item, index) => {
+        this.node.value.forEach((item, index) => {
           const obj = {};
-          obj[this.node.key + index] = this.node.value.values[index];
-          const control = new FormControl(this.node.value.values[index]);
+          obj[this.node.key + index] = this.node.value[index];
+          const control = new FormControl(this.node.value[index]);
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.checkbox:
-        this.node.value.values.forEach((value, i) => {
-
-          const controls = [];
-          this.node.options.forEach((opt, j) => {
-            const control = new FormControl(value[j]);
-            controls.push(control);
-          });
-          const group = this._fb.group({
-            values: this._fb.array(controls)
-          });
-          arr.push(group);
+        this.node.value.forEach((item, index) => {
+          const obj = {};
+          obj[this.node.key + index] = this.node.value[index];
+          const control = new FormControl(this.node.value[index]);
+          arr.push(control);
         });
-
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
     }
   }
 
-  isChecked (node, i, index) {
-    let label = node.options[index].label;
-    return node.value.values[i].indexOf(label) !== -1
+  isChecked (node, label) {
+    return node.value[0].indexOf(label) !== -1;
   }
 
-  setChecked(node, i, index) {
-    let label = node.options[index].label;
-    let checked = node.value.values[i].indexOf(label) > -1;
-    let checkGroup = node.formGroup.controls[node.key].controls.values as FormArray;
-    let checkboxes = checkGroup.controls[0]['controls']['values']['controls'];
-
-
-    console.log('setChecked',node.formGroup, checkGroup, checkboxes);
-
-    if (checked) {
-      console.log('set unchecked',label);
-      node.value.values[i].splice(node.value.values[i].indexOf(label), 1);
+  setChecked(node, label) {
+    if (this.isChecked(node,label)) {
+      node.value[0].splice(node.value[0].indexOf(label), 1);
     } else {
-      console.log('set checked',label);
-      node.value.values[i].push(label);
+      node.value[0].push(label);
     }
   };
 
   allowsMultiple(type:InputType) {
     return this.it.allowsMultiple(type);
   }
-
 
   getValidators(node: FileNode) {
     const validators = [];
@@ -121,6 +99,9 @@ export class QuestionComponent implements OnInit {
     }
     if (node.max !== null) {
       validators.push(Validators.max(node.max));
+    }
+    if (node.decimals !== null) {
+      validators.push(this.decimalValidator);
     }
     if (node.minLength !== null) {
       validators.push(Validators.minLength(node.minLength));
@@ -138,13 +119,16 @@ export class QuestionComponent implements OnInit {
     return validators;
   }
 
-  // validateUrl(control: FormControl) {
-  //   let result = null;
-  //   if (!control.value.startsWith('http')) {
-  //     result = {'url': true};
-  //   }
-  //   return result;
-  // }
+  decimalValidator(decimal: FormControl) {
+    let result = null;
+    if (decimal.value) {
+      console.log('decimal',decimal.value);
+      result = {
+        decimal: true
+      };
+    }
+    return result;
+  }
 
   urlValidator(url:FormControl): any {
     if (url.pristine) {
@@ -182,7 +166,7 @@ export class QuestionComponent implements OnInit {
   addNewItem() {
 
     const value = '';
-    this.node.value.values.push(value);
+    this.node.value.push(value);
     const control = new FormControl(value, this.getValidators(this.node));
     const fa = this.formGroup.controls.values as FormArray;
     fa.push(control);
@@ -191,7 +175,7 @@ export class QuestionComponent implements OnInit {
   }
 
   deleteLastItem() {
-    this.node.value.values.splice(this.node.value.values.length - 1, 1);
+    this.node.value.splice(this.node.value.length - 1, 1);
     const fa = this.formGroup.controls.values as FormArray;
     fa.removeAt(fa.length - 1);
 

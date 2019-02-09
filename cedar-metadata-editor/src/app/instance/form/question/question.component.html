@@ -1,14 +1,8 @@
 <div [formGroup]="node.formGroup" class="form-group">
 
-
   <label class="question-label" [attr.for]="node.filename">
     {{node.name}}
   </label>
-
-
-
-
-
 
   <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
     <div *ngFor="let control of formGroup.controls.values.controls;index as i">
@@ -20,26 +14,23 @@
         <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
       </span>
 
-
-      <div *ngSwitchCase="'checkbox'">
-
+      <div *ngSwitchCase="'checkbox'" class="mat-form-field">
         <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
           <label class="checkbox-label">
-            <mat-checkbox  (change)="setChecked(node, i, j)"
+            <mat-checkbox
               [value]="opt.label"
-              [checked]="isChecked(node, i, j)"
+              (change)="setChecked(node,opt.label)"
+              [checked]="isChecked(node, opt.label)"
               [aria-label]="opt.label">
             </mat-checkbox>
             {{opt.label}}
           </label>
         </span>
-        <div> {{node.options | json}} {{node.value.values[0] | json}}</div>
       </div>
-
 
       <div *ngSwitchCase="'radio'">
         <mat-radio-group [formControl]="control" [labelPosition]="'after'"
-          [value]="node.value.values[i]"
+          [value]="node.value[i]"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
@@ -56,7 +47,7 @@
       <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
         <input matInput [placeholder]="node.help" [formControl]="control" [type]="node.subtype"
           (change)="onChange(node)"
-          [value]="node.value.values[i]"
+          [value]="node.value[i]"
           [required]="node.required"
           [minlength]="node.minLength" [maxlength]="node.maxLength"
           [min]="node.min" [max]="node.max"
@@ -74,11 +65,14 @@
         <mat-error *ngIf="control.hasError('required')">
           Value is <strong>required</strong>
         </mat-error>
+        <mat-error *ngIf="control.hasError('decimal')">
+          Value {{control.errors['decimal']}} must be larger than <strong>{{control.errors['decimal']}}</strong>
+        </mat-error>
         <mat-error *ngIf="control.hasError('min')">
-          Value {{control.errors['min']['actual']}} is smaller than <strong>{{control.errors['min']['min']}}</strong>
+          Value {{control.errors['min']['actual']}} must be larger than <strong>{{control.errors['min']['min']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('max')">
-          Value {{control.errors['max']['actual']}} is larger than <strong>{{control.errors['max']['max']}}</strong>
+          Value {{control.errors['max']['actual']}} must be smaller than <strong>{{control.errors['max']['max']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('minlength')">
           Value length {{control.errors['minlength']['actualLength']}} is smaller than
@@ -92,7 +86,7 @@
 
       <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.help" [formControl]="control" type="text"
-        [value]="node.value.values[i]"
+        [value]="node.value[i]"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
         <mat-hint>{{node.hint}}</mat-hint>
@@ -111,8 +105,8 @@
 
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">
-          <mat-form-field>
-            <mat-select [placeholder]="node.help" [formControl]="control" multiple [(ngModel)]="node.value.values[i]"
+          <mat-form-field  class="mat-form-field">
+            <mat-select [placeholder]="node.help" [formControl]="control" multiple [(ngModel)]="node.value[i]"
               [required]="node.required">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
@@ -121,7 +115,7 @@
         <div *ngIf="!node.multipleChoice">
           <mat-form-field class="mat-form-field">
             <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
-              [value]="node.value.values[i]"
+              [value]="node.value[i]"
               [required]="node.required">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
@@ -131,7 +125,6 @@
       </div>
     </div>
   </div>
-
 
 </div>
 

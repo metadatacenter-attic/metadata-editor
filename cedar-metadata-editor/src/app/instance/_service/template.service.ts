@@ -364,15 +364,8 @@ export class TemplateService {
     this.template = this.td.templateData[id - 1];
     this.model = this.td.modelData[id - 1];
     const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
+    console.log('data',data);
     this.dataChange.next(data);
-  }
-
-  getRadioValue(literals, label): number {
-    return literals
-      .map(function (element) {
-        return element.label;
-      })
-      .indexOf(label);
   }
 
   getListSingleValue(literals, label): number {
@@ -402,35 +395,42 @@ export class TemplateService {
     return result;
   }
 
-  getCheckValue(literals, values, valueLocation): string[] {
+  getRadioValue(literals, label): number {
+    return literals
+      .map(function (element) {
+        return element.label;
+      })
+      .indexOf(label);
+  }
+
+  getCheckValue(values, valueLocation): string[] {
     let result = [];
     for (let i = 0; i < values.length; i++) {
       result.push(values[i][valueLocation]);
     }
-    console.log('result',result);
     return result;
   }
 
-  getValues(schema: TemplateSchema, inputType: InputType, modelValue) {
-    const result = {'values': []};
+  getValues(schema: TemplateSchema, inputType: InputType, modelValue):any[] {
+    let result = [];
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
     if (this.it.isCheckbox(inputType)) {
-      result.values.push(this.getCheckValue(literals, modelValue, valueLocation));
+      result.push(this.getCheckValue(modelValue, valueLocation));
     } else {
       if (modelValue) {
         if (Array.isArray(modelValue)) {
           if (this.it.isList(inputType)) {
             if (this.ts.isMultiValue(schema)) {
-              result.values = this.getListMultipleValue(literals, modelValue, valueLocation);
+              result = this.getListMultipleValue(literals, modelValue, valueLocation);
             } else {
-              result.values.push(this.getListSingleValue(literals, modelValue));
+              result.push(this.getListSingleValue(literals, modelValue));
             }
             //
           } else {
-            result.values = modelValue.map(value => {
-              if (inputType === 'radio') {
+            result = modelValue.map(value => {
+              if (inputType === 'radio' || inputType === 'checkbox') {
                 return this.getRadioValue(literals, value[valueLocation])
               } else {
                 return value[valueLocation];
@@ -439,17 +439,18 @@ export class TemplateService {
           }
         } else {
           if (modelValue.hasOwnProperty(valueLocation)) {
-            if (this.it.isRadio(inputType)) {
-              result.values.push(this.getRadioValue(literals, modelValue[valueLocation]))
+            if (this.it.isRadio(inputType) || inputType === 'checkbox') {
+              result.push(this.getRadioValue(literals, modelValue[valueLocation]))
             } else {
-              result.values.push(modelValue[valueLocation]);
+              result.push(modelValue[valueLocation]);
             }
           } else {
-            result.values.push(modelValue);
+            result.push(modelValue);
           }
         }
       }
     }
+    console.log('getValues',this.ts.getTitle(schema),result);
     return result;
   }
 
@@ -477,6 +478,7 @@ export class TemplateService {
   }
 
   fieldNode(schema: TemplateSchema, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode) {
+
     const node = {
       'key': key,
       'name': this.ts.getTitle(schema),
@@ -488,8 +490,9 @@ export class TemplateService {
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      'min': 0,
-      'max': 2,
+      'min': this.ts.getMin(schema),
+      'max': this.ts.getMax(schema),
+      'decimals': this.ts.getDecimals(schema),
       'minLength' : this.ts.getMinStringLength(schema),
       'maxLength' : this.ts.getMaxStringLength(schema),
       'value': this.getValues(schema, inputType, modelValue),
