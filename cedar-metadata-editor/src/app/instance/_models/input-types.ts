@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 
 export enum InputType {
   textfield = 'textfield',
+  controlled = 'controlled',
   link = 'link',
   textarea = 'textarea',
   radio = 'radio',
@@ -34,6 +35,19 @@ const INPUT_TYPES = JSON.stringify({
       'hasInstanceTerm': true,
       'allowsRequired': true
     },
+  'controlled': {
+    'cedarType': 'controlled',
+    'iconClass': 'fa fa-font',
+    'label': 'Controlled',
+    'allowedInElement': true,
+    'primaryField': true,
+    'hasControlledTerms': true,
+    'staticField': false,
+    'allowsMultiple': true,
+    'allowsValueRecommendation': true,
+    'hasInstanceTerm': true,
+    'allowsRequired': true
+  },
     'link': {
       'cedarType': 'link',
       'iconClass': 'fa fa-font',
@@ -250,7 +264,7 @@ export class InputTypeService {
   }
 
   isNotTextInput(t:string) {
-    return t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
+    return t === InputType.controlled || t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
   }
 
   isRadioCheckList(t:string) {
@@ -267,6 +281,10 @@ export class InputTypeService {
 
   isList(t: string) {
     return t === InputType.list;
+  }
+
+  isControlled(t: string) {
+    return t === InputType.controlled;
   }
 
 

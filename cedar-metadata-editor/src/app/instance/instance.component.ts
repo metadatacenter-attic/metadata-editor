@@ -15,6 +15,7 @@ import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 
+
 @Component({
   selector: 'app-instance',
   templateUrl: './instance.component.html',
@@ -27,6 +28,7 @@ export class InstanceComponent implements OnInit {
   dataSource: MatTreeNestedDataSource<FileNode>;
   database: TemplateService;
   form: FormGroup;
+  route: ActivatedRoute;
 
   payload: any;
   jsonld: any;
@@ -48,7 +50,6 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  route: ActivatedRoute;
   private _routeSubscribe: Subscription;
 
   constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
@@ -84,6 +85,7 @@ export class InstanceComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.route.params.subscribe((val) => {
       this.initialize(val.templateId);
     });
@@ -91,7 +93,12 @@ export class InstanceComponent implements OnInit {
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
       this.darkMode = value;
     });
+
+    console.log('form',this.form);
+
   }
+
+
 
   onChanges(): void {
     if (this.form) {

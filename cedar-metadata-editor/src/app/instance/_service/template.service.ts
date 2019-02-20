@@ -411,12 +411,25 @@ export class TemplateService {
     return result;
   }
 
+
+  getControlledValue(values, valueLocation): string[] {
+    let result = [];
+    for (let i = 0; i < values.length; i++) {
+      result.push(values[i][valueLocation]);
+    }
+    return result;
+  }
+
+
+
   getValues(schema: TemplateSchema, inputType: InputType, modelValue):any[] {
     let result = [];
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
-    if (this.it.isCheckbox(inputType)) {
+    if (this.it.isControlled(inputType)) {
+      result.push(this.getControlledValue(modelValue, valueLocation));
+    } else if (this.it.isCheckbox(inputType)) {
       result.push(this.getCheckValue(modelValue, valueLocation));
     } else {
       if (modelValue) {

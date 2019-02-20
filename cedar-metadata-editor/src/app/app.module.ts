@@ -8,6 +8,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {UiService} from './services/ui/ui.service';
 import {DemoMaterialModule} from '../material-module';
+import {HttpClientModule} from "@angular/common/http";
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {DemoMaterialModule} from '../material-module';
     NgbModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    DemoMaterialModule
+    DemoMaterialModule,
+    HttpClientModule
   ],
   providers: [{provide: LOCALE_ID, useValue: 'en-US'}, UiService],
   bootstrap: [AppComponent],

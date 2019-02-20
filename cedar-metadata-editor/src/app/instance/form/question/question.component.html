@@ -7,12 +7,15 @@
   <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
     <div *ngFor="let control of formGroup.controls.values.controls;index as i">
 
-
       <span *ngIf="node.minItems && allowsMultiple(node.type)">
         {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
         <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
         <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
       </span>
+
+      <div *ngSwitchCase="'controlled'">
+        <controlled [group]="node.formGroup" (onSelectedOption)="onSelectedOption($event)"></controlled>
+      </div>
 
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">
         <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
@@ -66,7 +69,8 @@
           Value is <strong>required</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('decimal')">
-          Value {{control.errors['decimal']}} must be larger than <strong>{{control.errors['decimal']}}</strong>
+          decimal error
+          <!--Value {{control.errors['decimal']['actual']} must be larger than <strong>{{control.errors['decimal']}}</strong>-->
         </mat-error>
         <mat-error *ngIf="control.hasError('min')">
           Value {{control.errors['min']['actual']}} must be larger than <strong>{{control.errors['min']['min']}}</strong>
@@ -102,6 +106,8 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
+
+
 
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">

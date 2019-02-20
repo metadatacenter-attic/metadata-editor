@@ -1,9 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, AfterViewInit, Output} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
+import {ControlledTermService} from '../../_service/controlled-terms.service';
 import {InputType, InputTypeService} from '../../_models/input-types';
-
+import {Post} from "../../_models/post";
+import {ControlledComponent} from '../controlled/controlled.component';
 
 
 @Component({
@@ -11,24 +13,51 @@ import {InputType, InputTypeService} from '../../_models/input-types';
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.less'],
 })
-export class QuestionComponent implements OnInit {
+export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
   formGroup: FormGroup;
   _fb: FormBuilder;
   it: InputTypeService;
 
-  constructor(fb: FormBuilder) {
+  selectable = true;
+  removable = true;
+
+  _ct: ControlledTermService;
+  post: Post[];
+  controlled: ControlledComponent;
+
+  constructor( fb: FormBuilder, ct: ControlledTermService) {
     this._fb = fb;
+    this._ct = ct;
     this.it = new InputTypeService();
   }
 
+  ngAfterViewInit() {
+    switch (this.node.type) {
+      case InputType.controlled:
+        this.controlled.setValue(this.node.value);
+        break;
+    }
+  }
+
   ngOnInit() {
+    this._ct.getPosts().subscribe(posts => {
+      this.post = posts
+      this._ct.postsData = posts
+    });
+
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
     const arr = [];
 
     switch (this.node.type) {
+      case InputType.controlled:
+        this.controlled = new ControlledComponent(this._ct);
+        arr.push(this.controlled.myControl);
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
       case InputType.textfield:
       case InputType.textarea:
       case InputType.list:
@@ -70,6 +99,12 @@ export class QuestionComponent implements OnInit {
     }
   }
 
+
+  protected onSelectedOption(e) {
+    console.log('onSelectedOption',this.node.key, e);
+  }
+
+
   isChecked (node, label) {
     return node.value[0].indexOf(label) !== -1;
   }
@@ -100,7 +135,7 @@ export class QuestionComponent implements OnInit {
     if (node.max !== null) {
       validators.push(Validators.max(node.max));
     }
-    if (node.decimals !== null) {
+    if (node.decimals) {
       validators.push(this.decimalValidator);
     }
     if (node.minLength !== null) {
