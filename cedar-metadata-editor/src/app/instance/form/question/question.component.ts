@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, AfterViewInit, Output} from '@angular/core';
+import {Component, Input, OnInit, AfterViewInit} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
@@ -19,13 +19,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   formGroup: FormGroup;
   _fb: FormBuilder;
   it: InputTypeService;
-
-  selectable = true;
-  removable = true;
-
   _ct: ControlledTermService;
   post: Post[];
   controlled: ControlledComponent;
+  controlledGroup: FormGroup;
 
   constructor( fb: FormBuilder, ct: ControlledTermService) {
     this._fb = fb;
@@ -36,7 +33,8 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     switch (this.node.type) {
       case InputType.controlled:
-        this.controlled.setValue(this.node.value);
+        // TODO set initial values in chip array here?
+        //this.controlled.setValue(this.node.value);
         break;
     }
   }
@@ -53,8 +51,13 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
     switch (this.node.type) {
       case InputType.controlled:
-        this.controlled = new ControlledComponent(this._ct);
-        arr.push(this.controlled.myControl);
+        // TODO set initial values in chip array here?
+        this.controlledGroup =  this._fb.group({
+          chips: this._fb.array([]),
+          search: new FormControl()
+        });
+
+        arr.push(this.controlledGroup);
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
@@ -99,11 +102,9 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-
   protected onSelectedOption(e) {
     console.log('onSelectedOption',this.node.key, e);
   }
-
 
   isChecked (node, label) {
     return node.value[0].indexOf(label) !== -1;
@@ -183,7 +184,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     const day = d.getDay();
     // Prevent Saturday and Sunday from being selected.
     return day !== 0 && day !== 6;
-  }
+  };
 
   get isValid() {
     let result = false;

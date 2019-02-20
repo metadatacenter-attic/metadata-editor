@@ -14,7 +14,7 @@
       </span>
 
       <div *ngSwitchCase="'controlled'">
-        <controlled [group]="node.formGroup" (onSelectedOption)="onSelectedOption($event)"></controlled>
+        <controlled [group]="formGroup"  [controlledGroup]="controlledGroup" (onSelectedOption)="onSelectedOption($event)"></controlled>
       </div>
 
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">

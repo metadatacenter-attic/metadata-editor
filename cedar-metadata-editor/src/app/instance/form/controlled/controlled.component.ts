@@ -1,9 +1,8 @@
 import {Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input} from '@angular/core';
-import {FormControl, FormGroup} from '@angular/forms';
+import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {ControlledTermService} from '../../_service/controlled-terms.service';
 import {Post} from '../../_models/post';
-import {HttpClient} from "@angular/common/http";
 
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 
@@ -15,21 +14,22 @@ import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material
 })
 export class ControlledComponent implements OnInit {
 
-  myControl = new FormControl();
   allPosts: Post[];
   autoCompleteList: any[];
   ct: ControlledTermService;
-  searchOption = [];
+  fb: FormBuilder;
   selectable = true;
   removable = true;
 
   @ViewChild('autocompleteInput') autocompleteInput: ElementRef;
+  @ViewChild('chipList') chipList: ElementRef;
   @Output() onSelectedOption = new EventEmitter();
   @Input() group: FormGroup;
+  @Input() controlledGroup: FormGroup;
 
-
-  constructor(ct: ControlledTermService) {
+  constructor(ct: ControlledTermService, fb:FormBuilder) {
     this.ct = ct;
+    this.fb = fb;
   }
 
   ngOnInit() {
@@ -39,42 +39,57 @@ export class ControlledComponent implements OnInit {
     });
 
     // when user types something in input, the value changes will come through this
-    this.myControl.valueChanges.subscribe(userInput => {
+    const search = this.controlledGroup.get('search');
+    search.valueChanges.subscribe(userInput => {
       let categoryList = this.filterCategoryList(userInput);
       this.autoCompleteList = categoryList;
-    })
+    });
+
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
-    console.log('selected', event.option.value);
-    this.searchOption.push(event.option.value);
+  remove(index: number): void {
+    const chips = this.controlledGroup.get('chips') as FormArray;
+
+    if (index >= 0) {
+      chips.removeAt(index);
+    }
+  }
+
+  add(event: MatChipInputEvent): void {
+    let input = event.input;
+    let value = event.value;
+
+    // Add our requirement
+    if ((value || '').trim()) {
+      const chips = this.controlledGroup.get('chips') as FormArray;
+      chips.push(this.fb.control(value.trim()));
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
+  }
+
+
+  selected(event: MatAutocompleteSelectedEvent, index:number): void {
+
     this.autocompleteInput.nativeElement.value = '';
     this.autocompleteInput.nativeElement.focus();
-    this.myControl.setValue(null);
-    this.onSelectedOption.emit(this.searchOption)
+    const search = this.controlledGroup.get('search');
+    search.setValue(null);
+
+    // notify the parent component of the selection
+    this.onSelectedOption.emit(event.option.value);
+
+    const value = event.option.value.title;
+    if ((value || '').trim()) {
+      const chips = this.controlledGroup.get('chips') as FormArray;
+      chips.push(this.fb.control(value.trim()));
+    }
   }
 
-  // TODO set initial value
-  setValue(value: any[]) {
 
-
-    const v = {
-        body: "est rerum tempore vitae↵sequi sint nihil reprehenderit dolor beatae ea dolores neque↵fugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis↵qui aperiam non debitis possimus qui neque nisi nulla",
-        id: 2,
-        title: "qui est esse",
-        userId: 1
-      };
-
-    setTimeout(() => {
-      this.searchOption.push(v);
-      //this.autocompleteInput.nativeElement.value = '';
-      //this.autocompleteInput.nativeElement.focus();
-      this.myControl.setValue(null);
-      this.onSelectedOption.emit(this.searchOption)
-      console.log('setValue', this.searchOption, this.myControl.value);
-    }, 0);
-
-  }
     // filter the data by the search string
     filterCategoryList(val)
     {
@@ -95,32 +110,6 @@ export class ControlledComponent implements OnInit {
       return k;
     }
 
-    // add a new selection
-    filterPostList(event)
-    {
-      console.log('filterPostList', event);
-      var posts = event.source.value;
-      if (!posts) {
-        this.searchOption = []
-      } else {
-
-        this.searchOption.push(posts);
-        this.onSelectedOption.emit(this.searchOption)
-      }
-      this.focusOnPlaceInput();
-    }
-
-    // remove an option from the selected list
-    removeOption(option)
-    {
-      console.log('removeOption', option, this.searchOption);
-      let index = this.searchOption.indexOf(option);
-      if (index >= 0)
-        this.searchOption.splice(index, 1);
-      this.focusOnPlaceInput();
-
-      this.onSelectedOption.emit(this.searchOption)
-    }
 
     // focus the input field and remove any unwanted text.
     focusOnPlaceInput()
