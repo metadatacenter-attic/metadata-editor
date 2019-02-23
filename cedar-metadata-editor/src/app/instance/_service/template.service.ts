@@ -353,18 +353,25 @@ export class TemplateService {
     console.log('startParseForm', model, template);
 
 
-    const data = this.buildFileTree(this.template['properties'], model, 0, this.formGroup, null);
+    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], model, 0, this.formGroup, null);
     this.dataChange.next(data);
     console.log('buildFileTree', data, this.formGroup);
   }
 
+
+
+
+
   /* build the tree of FileNodes*/
   initialize(formGroup: FormGroup, templateId: string) {
-    const id:number = Number.parseInt(templateId);
-    this.template = this.td.templateData[id - 1];
-    this.model = this.td.modelData[id - 1];
-    const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
-    console.log('data',data);
+
+    const id = Number.parseInt(templateId);
+    this.template = this.td.templateData[id];
+    this.model = this.td.modelData[id];
+    //console.log('initialize', id, this.template, this.model);
+    //console.log('walkFileTree',this.walkFileTree(this.template['_ui']['order'],this.template['properties']));
+    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], this.model, 0, formGroup, null);
+    console.log('data', data);
     this.dataChange.next(data);
   }
 
@@ -385,11 +392,11 @@ export class TemplateService {
         }
       );
 
-      let r = [];
-      for (let i = 0; i < values.length; i++) {
-        r.push(values[i][valueLocation]);
-      }
-      result.push(r);
+    let r = [];
+    for (let i = 0; i < values.length; i++) {
+      r.push(values[i][valueLocation]);
+    }
+    result.push(r);
 
     console.log('getListMultipleValue', literals, values, valueLocation, result)
     return result;
@@ -411,6 +418,17 @@ export class TemplateService {
     return result;
   }
 
+  getDateValue(values, valueLocation): Date[] {
+    let result = values.length ? [] : [new Date('')];
+    for (let i = 0; i < values.length; i++) {
+
+      // 'add' a timezone offset so we end up on the original date again
+      let dt = new Date(values[i][valueLocation]);
+      dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
+      result.push(dt);
+    }
+    return result;
+  }
 
   getControlledValue(values, valueLocation): string[] {
     let result = [];
@@ -420,9 +438,7 @@ export class TemplateService {
     return result;
   }
 
-
-
-  getValues(schema: TemplateSchema, inputType: InputType, modelValue):any[] {
+  getValues(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
     let result = [];
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
@@ -431,6 +447,9 @@ export class TemplateService {
       result.push(this.getControlledValue(modelValue, valueLocation));
     } else if (this.it.isCheckbox(inputType)) {
       result.push(this.getCheckValue(modelValue, valueLocation));
+    } else if (this.it.isDate(inputType)) {
+      console.log('isDate', this.ts.getTitle(schema));
+      result = this.getDateValue(modelValue, valueLocation);
     } else {
       if (modelValue) {
         if (Array.isArray(modelValue)) {
@@ -463,7 +482,7 @@ export class TemplateService {
         }
       }
     }
-    console.log('getValues',this.ts.getTitle(schema),result);
+    console.log('getValues', this.ts.getTitle(schema), result);
     return result;
   }
 
@@ -506,14 +525,15 @@ export class TemplateService {
       'min': this.ts.getMin(schema),
       'max': this.ts.getMax(schema),
       'decimals': this.ts.getDecimals(schema),
-      'minLength' : this.ts.getMinStringLength(schema),
-      'maxLength' : this.ts.getMaxStringLength(schema),
+      'minLength': this.ts.getMinStringLength(schema),
+      'maxLength': this.ts.getMaxStringLength(schema),
       'value': this.getValues(schema, inputType, modelValue),
       'options': this.getOptions(schema, inputType, modelValue),
       'multipleChoice': this.ts.isMultiValue(schema),
-      'help': this.ts.getHelp(schema),
       'required': this.ts.isRequired(schema),
-      'hint': 'hint text'
+      'help': this.ts.getHelp(schema),
+      'placeholder': this.ts.getPlaceholder(schema),
+      'hint': this.ts.getHint(schema),
     };
     return node;
   }
@@ -523,6 +543,9 @@ export class TemplateService {
     const node = {
       'key': key,
       'name': this.ts.getTitle(schema),
+      'help': this.ts.getHelp(schema),
+      'placeholder': this.ts.getPlaceholder(schema),
+      'hint': this.ts.getHint(schema),
       'minItems': minItems,
       'maxItems': maxItems,
       'itemCount': i,
@@ -532,13 +555,40 @@ export class TemplateService {
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
-      node['children'] = this.buildFileTree(schema.properties, modelValue[i], level + 1, node.formGroup, node);
+      node['children'] = this.buildFileTree(schema['_ui']['order'],schema.properties, modelValue[i], level + 1, node.formGroup, node);
     }
     return node;
   }
 
-  buildFileTree(obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
-    return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
+  walkFileTree(order: string[], obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
+    return order.reduce<FileNode[]>(
+      function (accumulator, currentValue, currentIndex, array) {
+        const key: string = currentValue;
+        if (!this.isSpecialKey(key)) {
+          const value = obj[key];
+          const modelValue = model[key];
+          const schema: TemplateSchema = this.ts.schemaOf(value);
+          const maxItems = value['maxItems'];
+          const minItems = value['minItems'] || 0;
+          if (this.ts.isField(schema)) {
+            const node = this.fieldNode(schema, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+            accumulator = accumulator.concat(node);
+          } else if (this.ts.isElement(schema)) {
+            const itemCount = Array.isArray(modelValue) ? modelValue.length : 0;
+            for (let i = 0; i < itemCount; i++) {
+              const node = this.elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+              accumulator = accumulator.concat(node);
+            }
+          }
+        }
+        return accumulator;
+      }, []);
+
+
+  }
+
+  buildFileTree(order: string[],obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
+    return order.reduce<FileNode[]>((accumulator, key) => {
       if (!this.isSpecialKey(key)) {
         const value = obj[key];
         const modelValue = model[key];

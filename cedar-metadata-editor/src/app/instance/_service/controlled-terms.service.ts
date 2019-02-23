@@ -12,6 +12,7 @@ export class ControlledTermService {
   constructor(private http: HttpClient) { }
 
   getPosts(): Observable<Post[]>{
+
     return this.http.get<Post[]>(this.postUrl);
   }
 

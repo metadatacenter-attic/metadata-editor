@@ -35,6 +35,7 @@ export class ControlledComponent implements OnInit {
   ngOnInit() {
     // get all the post
     this.ct.getPosts().subscribe(posts => {
+      console.log('posts',posts);
       this.allPosts = posts
     });
 

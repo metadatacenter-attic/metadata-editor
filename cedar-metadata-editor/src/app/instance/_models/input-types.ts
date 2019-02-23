@@ -283,6 +283,10 @@ export class InputTypeService {
     return t === InputType.list;
   }
 
+  isDate(t: string) {
+    return t === InputType.date;
+  }
+
   isControlled(t: string) {
     return t === InputType.controlled;
   }

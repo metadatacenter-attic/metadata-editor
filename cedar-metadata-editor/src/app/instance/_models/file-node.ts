@@ -19,6 +19,7 @@ export interface FileNode {
   children?: FileNode[];
 
   help?: string;
+  placeholder?: string;
   required?: boolean;
   hint?: string;
   min?: number;

@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, AfterViewInit} from '@angular/core';
-import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
+import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractControl, ValidatorFn} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
 import {ControlledTermService} from '../../_service/controlled-terms.service';
@@ -16,33 +16,35 @@ import {ControlledComponent} from '../controlled/controlled.component';
 export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
+
   formGroup: FormGroup;
-  _fb: FormBuilder;
-  it: InputTypeService;
-  _ct: ControlledTermService;
   post: Post[];
   controlled: ControlledComponent;
   controlledGroup: FormGroup;
 
+  _fb: FormBuilder;
+  _it: InputTypeService;
+  _ct: ControlledTermService;
+
   constructor( fb: FormBuilder, ct: ControlledTermService) {
     this._fb = fb;
     this._ct = ct;
-    this.it = new InputTypeService();
+    this._it = new InputTypeService();
   }
 
   ngAfterViewInit() {
-    switch (this.node.type) {
-      case InputType.controlled:
-        // TODO set initial values in chip array here?
-        //this.controlled.setValue(this.node.value);
-        break;
-    }
+    // switch (this.node.type) {
+    //   case InputType.controlled:
+    //     // TODO set initial values in chip array here?
+    //     //this.controlled.setValue(this.node.value);
+    //     break;
+    // }
   }
 
   ngOnInit() {
     this._ct.getPosts().subscribe(posts => {
-      this.post = posts
-      this._ct.postsData = posts
+      this.post = posts;
+      this._ct.postsData = posts;
     });
 
     // build the array of controls and add it to the parent
@@ -119,7 +121,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   };
 
   allowsMultiple(type:InputType) {
-    return this.it.allowsMultiple(type);
+    return this._it.allowsMultiple(type);
   }
 
   getValidators(node: FileNode) {
@@ -137,7 +139,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       validators.push(Validators.max(node.max));
     }
     if (node.decimals) {
-      validators.push(this.decimalValidator);
+      validators.push(this.decimalValidator(node.decimals));
     }
     if (node.minLength !== null) {
       validators.push(Validators.minLength(node.minLength));
@@ -155,15 +157,32 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return validators;
   }
 
-  decimalValidator(decimal: FormControl) {
-    let result = null;
-    if (decimal.value) {
-      console.log('decimal',decimal.value);
-      result = {
-        decimal: true
-      };
-    }
-    return result;
+  quantityRangeValidator(min: number, max: number): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
+      if (control.value !== undefined && (isNaN(control.value) || control.value < min || control.value > max)) {
+        return { 'quantityRange': true };
+      }
+      return null;
+    };
+  }
+
+  decimalValidator(precision: number): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: {actual:number,required:number} } | null => {
+      let result = null;
+      if (control.value) {
+        console.log('control',control, precision);
+        const actual = control.value.split(".")[1].length;
+        if (precision !== actual){
+          result = {
+            decimal: {
+              actual:actual,
+              required:precision
+            }
+          };
+        }
+      }
+      return result;
+    };
   }
 
   urlValidator(url:FormControl): any {
@@ -195,8 +214,15 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return result;
   }
 
-  onChange(node: FileNode, val) {
-    console.log('onChange', node, val);
+  onChange(node: FileNode, index, val) {
+    console.log('onChange', node, index, val);
+  }
+
+  public onDateChange(event: any,  node:FileNode, i:number, control:FormControl): void {
+    let d = new Date(event.value);
+    // strip off the minutes when saving as xsd:date
+    node.value[i] = d;
+    console.log('onDateChange', d);
   }
 
   addNewItem() {

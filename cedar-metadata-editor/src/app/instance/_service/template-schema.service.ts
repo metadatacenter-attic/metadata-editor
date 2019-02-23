@@ -34,6 +34,14 @@ export class TemplateSchemaService {
     return schema['schema:description'];
   }
 
+  getPlaceholder(schema:TemplateSchema) {
+    return 'placeholder text';
+  }
+
+  getHint(schema:TemplateSchema) {
+    return 'hint text';
+  }
+
   isRequired(schema:TemplateSchema) {
     return schema._valueConstraints && schema._valueConstraints.requiredValue;
   }

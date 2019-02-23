@@ -1,13 +1,13 @@
-<div [formGroup]="node.formGroup" class="form-group">
+<div [formGroup]="formGroup" class="form-group">
 
-  <label class="question-label" [attr.for]="node.filename">
+  <label class="question-label" [attr.for]="node.filename" [matTooltip]="node.help">
     {{node.name}}
   </label>
 
   <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
     <div *ngFor="let control of formGroup.controls.values.controls;index as i">
 
-      <span *ngIf="node.minItems && allowsMultiple(node.type)">
+      <span *ngIf="node.minItems && allowsMultiple(node.type)" >
         {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
         <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
         <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
@@ -48,8 +48,8 @@
       </div>
 
       <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
-        <input matInput [placeholder]="node.help" [formControl]="control" [type]="node.subtype"
-          (change)="onChange(node)"
+        <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
+          (change)="onChange(node.value, i, control.value)"
           [value]="node.value[i]"
           [required]="node.required"
           [minlength]="node.minLength" [maxlength]="node.maxLength"
@@ -69,8 +69,10 @@
           Value is <strong>required</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('decimal')">
-          decimal error
-          <!--Value {{control.errors['decimal']['actual']} must be larger than <strong>{{control.errors['decimal']}}</strong>-->
+          Value must have exactly
+          <strong>{{control.errors['decimal']['required']}}</strong>
+          decimal places instead of
+          <strong>{{control.errors['decimal']['actual']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('min')">
           Value {{control.errors['min']['actual']}} must be larger than <strong>{{control.errors['min']['min']}}</strong>
@@ -89,7 +91,7 @@
       </mat-form-field>
 
       <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
-      <textarea matInput [placeholder]="node.help" [formControl]="control" type="text"
+      <textarea matInput [placeholder]="node.placeholder" [formControl]="control" type="text"
         [value]="node.value[i]"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
@@ -100,7 +102,8 @@
       </mat-form-field>
 
       <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
-        <input matInput [matDatepicker]="picker" [matDatepickerFilter]="dateFilter" [placeholder]="node.help"
+        <input matInput [matDatepicker]="picker"  [placeholder]="node.placeholder" [formControl]="control"
+          (dateChange)="onDateChange($event, node, i, control)"
           [value]="control.value">
         <mat-hint>{{node.hint}}</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -112,7 +115,7 @@
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">
           <mat-form-field  class="mat-form-field">
-            <mat-select [placeholder]="node.help" [formControl]="control" multiple [(ngModel)]="node.value[i]"
+            <mat-select [placeholder]="node.placeholder" [formControl]="control" multiple [(ngModel)]="node.value[i]"
               [required]="node.required">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
@@ -120,7 +123,7 @@
         </div>
         <div *ngIf="!node.multipleChoice">
           <mat-form-field class="mat-form-field">
-            <mat-select matNativeControl [placeholder]="node.help" [formControl]="control"
+            <mat-select matNativeControl [placeholder]="node.placeholder" [formControl]="control"
               [value]="node.value[i]"
               [required]="node.required">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
