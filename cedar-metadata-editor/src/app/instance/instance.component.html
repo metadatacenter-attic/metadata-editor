@@ -1,12 +1,11 @@
-<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree" >
+<div [ngClass]="{'instance__container-dark': darkMode}" class="instance__container example-tree">
 
   <mat-tab-group>
     <mat-tab label="Form">
 
       <h2>{{database.getTitle()}}</h2>
+
       <form [formGroup]="form" *ngIf="form" style="margin:10px">
-
-
         <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
           <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
             <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
@@ -19,37 +18,36 @@
             <li>
               <div class="mat-tree-node">
                 <button mat-icon-button matTreeNodeToggle
-                        [attr.aria-label]="'toggle ' + node.filename">
+                  [attr.aria-label]="'toggle ' + node.filename">
                   <mat-icon class="mat-icon-rtl-mirror">
                     {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                   </mat-icon>
                 </button>
-                {{node.name}}
+                <span [matTooltip]="node.help">{{node.name}}</span>
                 <span *ngIf="node.minItems" style="padding:0 5px">
                   ({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
-                  <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
-                  <button mat-icon-button (click)="deleteLastItem(node)"><mat-icon>remove</mat-icon></button>
+                  <button  mat-icon-button (click)="addNewItem(node)">
+                    <mat-icon style="font-size:12px">add</mat-icon>
+                  </button>
+                  <button  mat-icon-button (click)="deleteLastItem(node)">
+                    <mat-icon style="font-size:12px">remove</mat-icon></button>
                 </span>
               </div>
 
-              <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)">
-                <app-element [node]="node" [parentGroup]="node.parentGroup" [formGroup]="node.formGroup"></app-element>
+              <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" *ngIf="treeControl.isExpanded(node)">
+                <app-element *ngIf="treeControl.isExpanded(node)" [node]="node" [parentGroup]="node.parentGroup" [formGroup]="node.formGroup"></app-element>
                 <ng-container matTreeNodeOutlet></ng-container>
               </ul>
 
             </li>
           </mat-nested-tree-node>
         </mat-tree>
-
-
-        <div>
-          <button mat-raised-button color="primary" [disabled]="formInvalid"
-                  (click)="onSubmit(form.value)">Save
-          </button>
-        </div>
-
-
       </form>
+
+      <div>
+        <button   mat-raised-button color="primary" [disabled]="formInvalid" (click)="onSubmit(form.value)">Save
+        </button>
+      </div>
 
     </mat-tab>
     <mat-tab label="Value">

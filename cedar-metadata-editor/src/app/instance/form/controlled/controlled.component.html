@@ -1,0 +1,22 @@
+<mat-form-field class="example-full-width" style="width: 100%" >
+
+  <mat-chip-list #chipList  >
+    <mat-chip   style="margin-top:0.4em;"  *ngFor="let chip of controlledGroup.get('chips').controls; let i = index;"   (change)="onSelectedOption($event, i)"
+      [selectable]="selectable" [removable]="removable"  (removed)="remove(i)">
+
+      <span>{{chip.value}}</span>
+
+      <mat-icon matChipRemove>cancel</mat-icon>
+    </mat-chip>
+    <input #autocompleteInput  type="text" placeholder="Enter title" aria-label="Number" matInput [formControl]="controlledGroup.get('search')"
+      [matAutocomplete]="auto" [matChipInputFor]="chipList" (matChipInputTokenEnd)="add($event)">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected($event)">
+      <mat-option *ngFor="let option of autoCompleteList" [value]="option"  >
+        {{option.title}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-chip-list>
+
+</mat-form-field>
+
+<pre>{{searchOption|json}}</pre>

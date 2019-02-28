@@ -3,14 +3,6 @@
   <nav class="slide-menu" [ngClass]="{'slide-menu-active': showMenu}" (click)="$event.stopImmediatePropagation();">
     <section class="menu-header">
       <span class="greeting__text">Select Page</span>
-      <div class="profile-image__container">
-        <img src="" alt="profile-image"
-          class="profile__image">
-      </div>
-      <div class="account-details">
-        <span class="name__text">name</span>
-        <span class="email__text">email</span>
-      </div>
     </section>
     <section class="menu-body">
       <div class="menu__container">
@@ -20,32 +12,44 @@
           </mat-toolbar-row>
 
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/1">
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/0">
               one template
             </button>
           </mat-toolbar-row>
 
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/2">
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/1">
               fieldtypes
             </button>
           </mat-toolbar-row>
 
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/3">
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/2">
               textfield and paragraph
             </button>
           </mat-toolbar-row>
 
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/4">
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/3">
              date email number
             </button>
           </mat-toolbar-row>
 
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/5">
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/4">
               link radio checkbox list
+            </button>
+          </mat-toolbar-row>
+
+          <mat-toolbar-row>
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/5">
+              controlled
+            </button>
+          </mat-toolbar-row>
+
+          <mat-toolbar-row>
+            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/6">
+              AIRR
             </button>
           </mat-toolbar-row>
 
@@ -120,10 +124,6 @@
   <main class="main__container">
     <div class="main-container__bg" [ngClass]="{'main-container__bg-dark': darkMode}"></div>
     <router-outlet></router-outlet>
-
-    <!--<tree-component>loading</tree-component>-->
-
-
   </main>
 
 

@@ -353,26 +353,23 @@ export class TemplateService {
     console.log('startParseForm', model, template);
 
 
-    const data = this.buildFileTree(this.template['properties'], model, 0, this.formGroup, null);
+    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], model, 0, this.formGroup, null);
     this.dataChange.next(data);
     console.log('buildFileTree', data, this.formGroup);
   }
 
-  /* build the tree of FileNodes*/
-  initialize(formGroup: FormGroup, templateId: string) {
-    const id:number = Number.parseInt(templateId);
-    this.template = this.td.templateData[id - 1];
-    this.model = this.td.modelData[id - 1];
-    const data = this.buildFileTree(this.template['properties'], this.model, 0, formGroup, null);
-    this.dataChange.next(data);
-  }
 
-  getRadioValue(literals, label): number {
-    return literals
-      .map(function (element) {
-        return element.label;
-      })
-      .indexOf(label);
+
+
+
+  /* build the tree of FileNodes*/
+  initialize(formGroup: FormGroup, templateId: string):any {
+    const id = Number.parseInt(templateId);
+    this.template = this.td.templateData[id];
+    this.model = this.td.modelData[id];
+    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], this.model, 0, formGroup, null);
+    this.dataChange.next(data);
+    return this.model;
   }
 
   getListSingleValue(literals, label): number {
@@ -392,45 +389,77 @@ export class TemplateService {
         }
       );
 
-      let r = [];
-      for (let i = 0; i < values.length; i++) {
-        r.push(values[i][valueLocation]);
-      }
-      result.push(r);
+    let r = [];
+    for (let i = 0; i < values.length; i++) {
+      r.push(values[i][valueLocation]);
+    }
+    result.push(r);
 
     console.log('getListMultipleValue', literals, values, valueLocation, result)
     return result;
   }
 
-  getCheckValue(literals, values, valueLocation): string[] {
+  getRadioValue(literals, label): number {
+    return literals
+      .map(function (element) {
+        return element.label;
+      })
+      .indexOf(label);
+  }
+
+  getCheckValue(values, valueLocation): string[] {
     let result = [];
     for (let i = 0; i < values.length; i++) {
       result.push(values[i][valueLocation]);
     }
-    console.log('result',result);
     return result;
   }
 
-  getValues(schema: TemplateSchema, inputType: InputType, modelValue) {
-    const result = {'values': []};
+  getDateValue(values, valueLocation): Date[] {
+    let result = values.length ? [] : [new Date('')];
+    for (let i = 0; i < values.length; i++) {
+
+      // 'add' a timezone offset so we end up on the original date again
+      let dt = new Date(values[i][valueLocation]);
+      dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
+      result.push(dt);
+    }
+    return result;
+  }
+
+  getControlledValue(values, valueLocation): string[] {
+    let result = [];
+    for (let i = 0; i < values.length; i++) {
+      result.push(values[i][valueLocation]);
+    }
+    return result;
+  }
+
+  getValues(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
+    let result = [];
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
-    if (this.it.isCheckbox(inputType)) {
-      result.values.push(this.getCheckValue(literals, modelValue, valueLocation));
+    if (this.it.isControlled(inputType)) {
+      result.push(this.getControlledValue(modelValue, valueLocation));
+    } else if (this.it.isCheckbox(inputType)) {
+      result.push(this.getCheckValue(modelValue, valueLocation));
+    } else if (this.it.isDate(inputType)) {
+      console.log('isDate', this.ts.getTitle(schema));
+      result = this.getDateValue(modelValue, valueLocation);
     } else {
       if (modelValue) {
         if (Array.isArray(modelValue)) {
           if (this.it.isList(inputType)) {
             if (this.ts.isMultiValue(schema)) {
-              result.values = this.getListMultipleValue(literals, modelValue, valueLocation);
+              result = this.getListMultipleValue(literals, modelValue, valueLocation);
             } else {
-              result.values.push(this.getListSingleValue(literals, modelValue));
+              result.push(this.getListSingleValue(literals, modelValue));
             }
             //
           } else {
-            result.values = modelValue.map(value => {
-              if (inputType === 'radio') {
+            result = modelValue.map(value => {
+              if (inputType === 'radio' || inputType === 'checkbox') {
                 return this.getRadioValue(literals, value[valueLocation])
               } else {
                 return value[valueLocation];
@@ -439,17 +468,18 @@ export class TemplateService {
           }
         } else {
           if (modelValue.hasOwnProperty(valueLocation)) {
-            if (this.it.isRadio(inputType)) {
-              result.values.push(this.getRadioValue(literals, modelValue[valueLocation]))
+            if (this.it.isRadio(inputType) || inputType === 'checkbox') {
+              result.push(this.getRadioValue(literals, modelValue[valueLocation]))
             } else {
-              result.values.push(modelValue[valueLocation]);
+              result.push(modelValue[valueLocation]);
             }
           } else {
-            result.values.push(modelValue);
+            result.push(modelValue);
           }
         }
       }
     }
+    console.log('getValues', this.ts.getTitle(schema), result);
     return result;
   }
 
@@ -476,9 +506,12 @@ export class TemplateService {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
-  fieldNode(schema: TemplateSchema, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode) {
+  fieldNode(schema: TemplateSchema, model:any, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
+
     const node = {
       'key': key,
+      'model':model,
+      'valueLocation': this.getValueLocation(schema, inputType),
       'name': this.ts.getTitle(schema),
       'type': this.getNodeType(inputType),
       'subtype': this.getSubtype(inputType),
@@ -488,54 +521,88 @@ export class TemplateService {
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      'min': 0,
-      'max': 2,
-      'minLength' : this.ts.getMinStringLength(schema),
-      'maxLength' : this.ts.getMaxStringLength(schema),
+      'min': this.ts.getMin(schema),
+      'max': this.ts.getMax(schema),
+      'decimals': this.ts.getDecimals(schema),
+      'minLength': this.ts.getMinStringLength(schema),
+      'maxLength': this.ts.getMaxStringLength(schema),
       'value': this.getValues(schema, inputType, modelValue),
       'options': this.getOptions(schema, inputType, modelValue),
       'multipleChoice': this.ts.isMultiValue(schema),
-      'help': this.ts.getHelp(schema),
       'required': this.ts.isRequired(schema),
-      'hint': 'hint text'
+      'help': this.ts.getHelp(schema),
+      'placeholder': this.ts.getPlaceholder(schema),
+      'hint': this.ts.getHint(schema)
     };
     return node;
   }
 
 // generate a node for each element instance
-  elementNode(schema: TemplateSchema, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode) {
+  elementNode(schema: TemplateSchema, model:any, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
     const node = {
       'key': key,
+      'model':model,
       'name': this.ts.getTitle(schema),
+      'help': this.ts.getHelp(schema),
+      'placeholder': this.ts.getPlaceholder(schema),
+      'hint': this.ts.getHint(schema),
       'minItems': minItems,
       'maxItems': maxItems,
       'itemCount': i,
       'parent': parent,
       'parentGroup': parent ? parent.formGroup : null,
-      'formGroup': new FormGroup({})
+      'formGroup': new FormGroup({}),
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
-      node['children'] = this.buildFileTree(schema.properties, modelValue[i], level + 1, node.formGroup, node);
+      node['children'] = this.buildFileTree(schema['_ui']['order'],schema.properties, modelValue[i], level + 1, node.formGroup, node);
     }
     return node;
   }
 
-  buildFileTree(obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
-    return Object.keys(obj).reduce<FileNode[]>((accumulator, key) => {
+  walkFileTree(order: string[], obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
+    return order.reduce<FileNode[]>(
+      function (accumulator, currentValue, currentIndex, array) {
+        const key: string = currentValue;
+        if (!this.isSpecialKey(key)) {
+          const value = obj[key];
+          const modelValue = model[key];
+          const schema: TemplateSchema = this.ts.schemaOf(value);
+          const maxItems = value['maxItems'];
+          const minItems = value['minItems'] || 0;
+          if (this.ts.isField(schema)) {
+            const node = this.fieldNode(schema, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+            accumulator = accumulator.concat(node);
+          } else if (this.ts.isElement(schema)) {
+            const itemCount = Array.isArray(modelValue) ? modelValue.length : 0;
+            for (let i = 0; i < itemCount; i++) {
+              const node = this.elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+              accumulator = accumulator.concat(node);
+            }
+          }
+        }
+        return accumulator;
+      }, []);
+
+
+  }
+
+  buildFileTree(order: string[],obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
+    return order.reduce<FileNode[]>((accumulator, key) => {
       if (!this.isSpecialKey(key)) {
         const value = obj[key];
-        const modelValue = model[key];
+        const modelValue = (model && model[key]) ? model[key] : [];
         const schema: TemplateSchema = this.ts.schemaOf(value);
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
         if (this.ts.isField(schema)) {
-          const node = this.fieldNode(schema, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+          let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+
           accumulator = accumulator.concat(node);
         } else if (this.ts.isElement(schema)) {
-          const itemCount = Array.isArray(modelValue) ? modelValue.length : 0;
+          const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
           for (let i = 0; i < itemCount; i++) {
-            const node = this.elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+            let node = this.elementNode(schema, model,minItems, maxItems, i, key, level, modelValue, formGroup, parent);
             accumulator = accumulator.concat(node);
           }
         }

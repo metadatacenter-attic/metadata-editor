@@ -12,11 +12,12 @@ import {QuestionComponent} from './form/question/question.component';
 import {ElementComponent} from './form/element/element.component';
 
 import {DemoMaterialModule} from '../../material-module';
+import {ControlledComponent} from './form/controlled/controlled.component';
 
 
 @NgModule({
   declarations: [
-    InstanceComponent, FormComponent,  QuestionComponent, ElementComponent],
+    InstanceComponent, FormComponent,  QuestionComponent, ElementComponent, ControlledComponent],
   imports: [
     ReactiveFormsModule,
     CommonModule,

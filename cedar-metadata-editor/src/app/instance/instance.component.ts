@@ -5,11 +5,10 @@ import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {ActivatedRoute} from '@angular/router';
 
-
 import {UiService} from '../services/ui/ui.service';
 import {QuestionBase} from './form/question/_models/question-base';
 import {FileNode} from './_models/file-node';
-import {FileDatabase} from './_service/file-database';
+
 import {TemplateSchemaService} from './_service/template-schema.service';
 import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -19,7 +18,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
   selector: 'app-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.less'],
-  providers: [FileDatabase, TemplateService, TemplateSchemaService]
+  providers: [TemplateService, TemplateSchemaService]
 })
 
 export class InstanceComponent implements OnInit {
@@ -27,18 +26,16 @@ export class InstanceComponent implements OnInit {
   dataSource: MatTreeNestedDataSource<FileNode>;
   database: TemplateService;
   form: FormGroup;
+  route: ActivatedRoute;
 
   payload: any;
   jsonld: any;
   rdf: any;
-
   id:number;
-
   formTitle: string;
   formDescription: string;
   formIdentifier: string;
-
-  formInvalid:boolean = false;
+  formInvalid:boolean;
 
   private _subscription: Subscription;
 
@@ -48,7 +45,6 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  route: ActivatedRoute;
   private _routeSubscribe: Subscription;
 
   constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
@@ -57,11 +53,10 @@ export class InstanceComponent implements OnInit {
   }
 
   initialize(templateId:string) {
-
     let getChildren = (node: FileNode) => node.children;
 
     this.form = new FormGroup({});
-    this.database.initialize(this.form, templateId);
+    this.jsonld = this.database.initialize(this.form, templateId);
     this.treeControl = new NestedTreeControl<FileNode>(getChildren);
     this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {
@@ -69,17 +64,9 @@ export class InstanceComponent implements OnInit {
     });
 
     setTimeout(() => {
+      console.log('initialize',this.form.value, this.form.valid);
       this.payload = this.form.value;
       this.formInvalid = !this.form.valid
-    }, 0);
-
-
-  }
-
-  ngAfterViewInit() {
-    this.onChanges();
-    setTimeout(() => {
-      //this.formInvalid = !this.form.valid;
     }, 0);
   }
 
@@ -93,9 +80,15 @@ export class InstanceComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    this.onChanges();
+  }
+
+  // keep payload and validation up-to-date on changes in the form
   onChanges(): void {
     if (this.form) {
       this._subscription = this.form.valueChanges.subscribe(val => {
+        console.log('onChanges',val, this.form.valid);
         this.payload = val;
         setTimeout(() => {
           this.formInvalid = !this.form.valid;
@@ -151,7 +144,9 @@ export class InstanceComponent implements OnInit {
     }
   }
 
+  // add new element to form
   addNewItem(node: FileNode) {
+    console.log('addNewItem', node);
 
     const clonedObject: FileNode = cloneDeep(node);
     clonedObject.itemCount++;
@@ -160,19 +155,15 @@ export class InstanceComponent implements OnInit {
     const index = siblings.indexOf(node);
     siblings.splice(index + 1, 0, clonedObject);
 
-
     clonedObject.parentGroup = node.parentGroup;
-    node.parentGroup.addControl(clonedObject.key, clonedObject.formGroup);
+    const parent = node.parentGroup || this.form;
+    parent.addControl(clonedObject.key, clonedObject.formGroup);
     //this.walkTree(clonedObject, clonedObject.formGroup, clonedObject.parent);
     this.database.dataChange.next(this.database.data);
     this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
-
-    // clonedObject.formGroup.valueChanges.subscribe(val => {
-    //   console.log('clonedObject valueChanges', val);
-    // });
-
   }
 
+  // delete last element in node array
   deleteLastItem(node: FileNode) {
     console.log('deleteLastItem', node);
     const siblings = node.parent ? node.parent.children : this.database.data;

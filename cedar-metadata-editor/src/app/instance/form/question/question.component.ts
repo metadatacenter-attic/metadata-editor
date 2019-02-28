@@ -1,9 +1,12 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormGroup, FormBuilder, FormArray, Validators, FormControl} from '@angular/forms';
+import {Component, Input, OnInit, AfterViewInit} from '@angular/core';
+import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractControl, ValidatorFn} from '@angular/forms';
 
 import {FileNode} from '../../_models/file-node';
+import {ControlledTermService} from '../../_service/controlled-terms.service';
+import {TemplateSchemaService} from '../../_service/template-schema.service';
 import {InputType, InputTypeService} from '../../_models/input-types';
-
+import {Post} from "../../_models/post";
+import {ControlledComponent} from '../controlled/controlled.component';
 
 
 @Component({
@@ -11,102 +14,108 @@ import {InputType, InputTypeService} from '../../_models/input-types';
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.less'],
 })
-export class QuestionComponent implements OnInit {
+export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
-  formGroup: FormGroup;
-  _fb: FormBuilder;
-  it: InputTypeService;
 
-  constructor(fb: FormBuilder) {
+  formGroup: FormGroup;
+  post: Post[];
+  controlled: ControlledComponent;
+  controlledGroup: FormGroup;
+
+  _fb: FormBuilder;
+  _it: InputTypeService;
+  _ts: TemplateSchemaService;
+  _ct: ControlledTermService;
+
+  constructor( fb: FormBuilder, ct: ControlledTermService, ts:TemplateSchemaService) {
     this._fb = fb;
-    this.it = new InputTypeService();
+    this._ct = ct;
+    this._ts = ts;
+    this._it = new InputTypeService();
+  }
+
+  ngAfterViewInit() {
+    // switch (this.node.type) {
+    //   case InputType.controlled:
+    //     // TODO set initial values in chip array here?
+    //     //this.controlled.setValue(this.node.value);
+    //     break;
+    // }
   }
 
   ngOnInit() {
+    this._ct.getPosts().subscribe(posts => {
+      this.post = posts;
+      this._ct.postsData = posts;
+    });
 
+    // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
     const arr = [];
 
     switch (this.node.type) {
+      case InputType.controlled:
+        // TODO set initial values in chip array here?
+        this.controlledGroup =  this._fb.group({
+          chips: this._fb.array([]),
+          search: new FormControl()
+        });
+
+        arr.push(this.controlledGroup);
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
       case InputType.textfield:
       case InputType.textarea:
       case InputType.list:
-        this.node.value.values.forEach((value, i) => {
+        this.node.value.forEach((value, i) => {
           const control = new FormControl(value, validators);
           arr.push(control);
         });
-
-        // build the array of controls and add it to the parent
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.date:
-        this.node.value.values.forEach((value, i) => {
+        this.node.value.forEach((value, i) => {
           const control = new FormControl(new Date(value), validators);
           arr.push(control);
         });
-
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.radio:
-        this.node.value.values.forEach((item, index) => {
+        this.node.value.forEach((item, index) => {
           const obj = {};
-          obj[this.node.key + index] = this.node.value.values[index];
-          const control = new FormControl(this.node.value.values[index]);
+          obj[this.node.key + index] = this.node.value[index];
+          const control = new FormControl(this.node.value[index]);
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
       case InputType.checkbox:
-        this.node.value.values.forEach((value, i) => {
-
-          const controls = [];
-          this.node.options.forEach((opt, j) => {
-            const control = new FormControl(value[j]);
-            controls.push(control);
-          });
-          const group = this._fb.group({
-            values: this._fb.array(controls)
-          });
-          arr.push(group);
+        this.node.value.forEach((item, index) => {
+          const obj = {};
+          obj[this.node.key + index] = this.node.value[index];
+          const control = new FormControl(this.node.value[index]);
+          arr.push(control);
         });
-
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
     }
   }
 
-  isChecked (node, i, index) {
-    let label = node.options[index].label;
-    return node.value.values[i].indexOf(label) !== -1
+  protected onSelectedOption(e) {
+    console.log('onSelectedOption',this.node.key, e);
   }
 
-  setChecked(node, i, index) {
-    let label = node.options[index].label;
-    let checked = node.value.values[i].indexOf(label) > -1;
-    let checkGroup = node.formGroup.controls[node.key].controls.values as FormArray;
-    let checkboxes = checkGroup.controls[0]['controls']['values']['controls'];
 
-
-    console.log('setChecked',node.formGroup, checkGroup, checkboxes);
-
-    if (checked) {
-      console.log('set unchecked',label);
-      node.value.values[i].splice(node.value.values[i].indexOf(label), 1);
-    } else {
-      console.log('set checked',label);
-      node.value.values[i].push(label);
-    }
-  };
 
   allowsMultiple(type:InputType) {
-    return this.it.allowsMultiple(type);
+    return this._it.allowsMultiple(type);
   }
-
 
   getValidators(node: FileNode) {
     const validators = [];
@@ -121,6 +130,9 @@ export class QuestionComponent implements OnInit {
     }
     if (node.max !== null) {
       validators.push(Validators.max(node.max));
+    }
+    if (node.decimals) {
+      validators.push(this.decimalValidator(node.decimals));
     }
     if (node.minLength !== null) {
       validators.push(Validators.minLength(node.minLength));
@@ -138,13 +150,33 @@ export class QuestionComponent implements OnInit {
     return validators;
   }
 
-  // validateUrl(control: FormControl) {
-  //   let result = null;
-  //   if (!control.value.startsWith('http')) {
-  //     result = {'url': true};
-  //   }
-  //   return result;
-  // }
+  quantityRangeValidator(min: number, max: number): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
+      if (control.value !== undefined && (isNaN(control.value) || control.value < min || control.value > max)) {
+        return { 'quantityRange': true };
+      }
+      return null;
+    };
+  }
+
+  decimalValidator(precision: number): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: {actual:number,required:number} } | null => {
+      let result = null;
+      if (control.value) {
+        console.log('control',control, precision);
+        const actual = control.value.split(".")[1].length;
+        if (precision !== actual){
+          result = {
+            decimal: {
+              actual:actual,
+              required:precision
+            }
+          };
+        }
+      }
+      return result;
+    };
+  }
 
   urlValidator(url:FormControl): any {
     if (url.pristine) {
@@ -164,7 +196,7 @@ export class QuestionComponent implements OnInit {
     const day = d.getDay();
     // Prevent Saturday and Sunday from being selected.
     return day !== 0 && day !== 6;
-  }
+  };
 
   get isValid() {
     let result = false;
@@ -175,26 +207,57 @@ export class QuestionComponent implements OnInit {
     return result;
   }
 
-  onChange(node: FileNode, val) {
-    console.log('onChange', node, val);
+  onChange(node: FileNode,  index:number, val:any) {
+    this._ts.setTextValue(node.model,node.key, index, node.valueLocation, val);
+  }
+
+  isChecked (node, label) {
+    return node.value[0].indexOf(label) !== -1;
+  }
+
+  setChecked(node, label) {
+    if (this.isChecked(node,label)) {
+      node.value[0].splice(node.value[0].indexOf(label), 1);
+    } else {
+      node.value[0].push(label);
+    }
+    this._ts.setCheckValue(node.model,node.key, node.options, node.value[0]);
+  };
+
+  onRadioChange(node: FileNode,  index:number, val:any) {
+    this._ts.setRadioValue(node.model,node.key, index, node.valueLocation, node.options[val].label);
+  }
+
+  public onDateChange(event: any,  node:FileNode,  i:number, control:FormControl): void {
+    let d = new Date(event.value);
+    node.value[i] = d;
+    this._ts.setDateValue(node.model,node.key, i, node.valueLocation, d.toISOString().substring(0,10));
   }
 
   addNewItem() {
+    console.log('addNewItem', this.node, this.node.model[this.node.key]);
 
     const value = '';
-    this.node.value.values.push(value);
+    this.node.value.push(value);
     const control = new FormControl(value, this.getValidators(this.node));
     const fa = this.formGroup.controls.values as FormArray;
     fa.push(control);
+
+    let obj = {};
+    obj[this.node.valueLocation] = '';
+    this.node.model[this.node.key].push(obj);
 
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   deleteLastItem() {
-    this.node.value.values.splice(this.node.value.values.length - 1, 1);
+    console.log('deleteLastItem', this.node);
+
+    const at = this.node.value.length - 1;
+    this.node.value.splice(at, 1);
     const fa = this.formGroup.controls.values as FormArray;
     fa.removeAt(fa.length - 1);
-
+    this.node.model[this.node.key].splice(at, 1);
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 

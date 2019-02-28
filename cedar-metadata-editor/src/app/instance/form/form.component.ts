@@ -11,25 +11,20 @@ import {QuestionControlService} from './service/question-control.service'
 
 
 @Component({
-  selector: 'app-form',
+  selector: 'cedar-form',
   templateUrl: './form.component.html',
-  providers: [FormService, ElementService, QuestionService, QuestionControlService]
+  providers: []
 })
 
 export class FormComponent implements OnInit {
-  @Input() questions: QuestionBase<any>[] = [];
-  @Input() form: FormGroup;
-  payload: string;
 
-  constructor(private qcs: QuestionControlService) {
+  constructor() {
   }
 
   ngOnInit() {
-    this.form = this.qcs.toFormGroup(this.questions);
   }
 
   onSubmit() {
-    this.payload = this.form.value;
   }
 }
 

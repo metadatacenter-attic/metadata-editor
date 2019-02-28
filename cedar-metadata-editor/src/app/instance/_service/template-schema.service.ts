@@ -34,8 +34,28 @@ export class TemplateSchemaService {
     return schema['schema:description'];
   }
 
+  getPlaceholder(schema:TemplateSchema) {
+    return 'placeholder text';
+  }
+
+  getHint(schema:TemplateSchema) {
+    return 'hint text';
+  }
+
   isRequired(schema:TemplateSchema) {
     return schema._valueConstraints && schema._valueConstraints.requiredValue;
+  }
+
+  getMin(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.minValue;
+  }
+
+  getMax(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.maxValue;
+  }
+
+  getDecimals(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.decimalPlace;
   }
 
   getMinStringLength(schema:TemplateSchema) {
@@ -101,6 +121,36 @@ export class TemplateSchemaService {
     if (schema._valueConstraints.hasOwnProperty('numberType')) {
       return schema._valueConstraints.numberType;
     }
+  }
+
+  setTextValue(model, key, index, valueLocation, val) {
+    if (Array.isArray(model[key])) {
+      model[key][index][valueLocation] = val;
+    } else {
+      model[key][valueLocation] = val;
+    }
+  }
+
+  setRadioValue(model, key, index, valueLocation, val) {
+    if (Array.isArray(model[key])) {
+      model[key][index][valueLocation] = val;
+    } else {
+      model[key][valueLocation] = val;
+    }
+  }
+
+  setCheckValue(model, key,  options, val) {
+    let arr = [];
+    for (const v in val) {
+      arr.push({'@value': options[v].label})
+    }
+    model[key] = arr;
+  }
+
+  setDateValue(model, key, index, valueLocation, val) {
+    let obj = Array.isArray(model[key]) ? model[key][index] :  model[key];
+    obj[valueLocation] = val;
+    obj['@type'] = 'xsd:date';
   }
 
 }
