@@ -363,16 +363,13 @@ export class TemplateService {
 
 
   /* build the tree of FileNodes*/
-  initialize(formGroup: FormGroup, templateId: string) {
-
+  initialize(formGroup: FormGroup, templateId: string):any {
     const id = Number.parseInt(templateId);
     this.template = this.td.templateData[id];
     this.model = this.td.modelData[id];
-    //console.log('initialize', id, this.template, this.model);
-    //console.log('walkFileTree',this.walkFileTree(this.template['_ui']['order'],this.template['properties']));
     const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], this.model, 0, formGroup, null);
-    console.log('data', data);
     this.dataChange.next(data);
+    return this.model;
   }
 
   getListSingleValue(literals, label): number {
@@ -509,10 +506,12 @@ export class TemplateService {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
-  fieldNode(schema: TemplateSchema, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode) {
+  fieldNode(schema: TemplateSchema, model:any, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
 
     const node = {
       'key': key,
+      'model':model,
+      'valueLocation': this.getValueLocation(schema, inputType),
       'name': this.ts.getTitle(schema),
       'type': this.getNodeType(inputType),
       'subtype': this.getSubtype(inputType),
@@ -533,15 +532,16 @@ export class TemplateService {
       'required': this.ts.isRequired(schema),
       'help': this.ts.getHelp(schema),
       'placeholder': this.ts.getPlaceholder(schema),
-      'hint': this.ts.getHint(schema),
+      'hint': this.ts.getHint(schema)
     };
     return node;
   }
 
 // generate a node for each element instance
-  elementNode(schema: TemplateSchema, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode) {
+  elementNode(schema: TemplateSchema, model:any, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
     const node = {
       'key': key,
+      'model':model,
       'name': this.ts.getTitle(schema),
       'help': this.ts.getHelp(schema),
       'placeholder': this.ts.getPlaceholder(schema),
@@ -551,7 +551,7 @@ export class TemplateService {
       'itemCount': i,
       'parent': parent,
       'parentGroup': parent ? parent.formGroup : null,
-      'formGroup': new FormGroup({})
+      'formGroup': new FormGroup({}),
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
@@ -591,17 +591,18 @@ export class TemplateService {
     return order.reduce<FileNode[]>((accumulator, key) => {
       if (!this.isSpecialKey(key)) {
         const value = obj[key];
-        const modelValue = model[key];
+        const modelValue = (model && model[key]) ? model[key] : [];
         const schema: TemplateSchema = this.ts.schemaOf(value);
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
         if (this.ts.isField(schema)) {
-          const node = this.fieldNode(schema, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+          let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+
           accumulator = accumulator.concat(node);
         } else if (this.ts.isElement(schema)) {
-          const itemCount = Array.isArray(modelValue) ? modelValue.length : 0;
+          const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
           for (let i = 0; i < itemCount; i++) {
-            const node = this.elementNode(schema, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+            let node = this.elementNode(schema, model,minItems, maxItems, i, key, level, modelValue, formGroup, parent);
             accumulator = accumulator.concat(node);
           }
         }

@@ -56,7 +56,7 @@ export class InstanceComponent implements OnInit {
     let getChildren = (node: FileNode) => node.children;
 
     this.form = new FormGroup({});
-    this.database.initialize(this.form, templateId);
+    this.jsonld = this.database.initialize(this.form, templateId);
     this.treeControl = new NestedTreeControl<FileNode>(getChildren);
     this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {

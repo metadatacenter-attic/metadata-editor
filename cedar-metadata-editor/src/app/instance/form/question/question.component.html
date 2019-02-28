@@ -9,8 +9,8 @@
 
       <span *ngIf="node.minItems && allowsMultiple(node.type)" >
         {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-        <button mat-icon-button (click)="addNewItem()"><mat-icon>add</mat-icon></button>
-        <button mat-icon-button (click)="deleteLastItem()"><mat-icon>remove</mat-icon></button>
+        <button mat-icon-button (click)="addNewItem()"><mat-icon [inline]="true" style="font-size:14px">add</mat-icon></button>
+        <button mat-icon-button (click)="deleteLastItem()"><mat-icon [inline]="true" style="font-size:14px">remove</mat-icon></button>
       </span>
 
       <div *ngSwitchCase="'controlled'">
@@ -22,7 +22,7 @@
           <label class="checkbox-label">
             <mat-checkbox
               [value]="opt.label"
-              (change)="setChecked(node,opt.label)"
+              (change)="setChecked(node,opt.label);"
               [checked]="isChecked(node, opt.label)"
               [aria-label]="opt.label">
             </mat-checkbox>
@@ -34,6 +34,7 @@
       <div *ngSwitchCase="'radio'">
         <mat-radio-group [formControl]="control" [labelPosition]="'after'"
           [value]="node.value[i]"
+          (change)="onRadioChange(node,  i, control.value)"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
@@ -49,7 +50,7 @@
 
       <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
         <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
-          (change)="onChange(node.value, i, control.value)"
+          (change)="onChange(node, i, control.value)"
           [value]="node.value[i]"
           [required]="node.required"
           [minlength]="node.minLength" [maxlength]="node.maxLength"
@@ -93,6 +94,7 @@
       <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.placeholder" [formControl]="control" type="text"
         [value]="node.value[i]"
+        (change)="onChange(node,  i, control.value)"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
         <mat-hint>{{node.hint}}</mat-hint>
@@ -110,13 +112,12 @@
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-
-
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">
           <mat-form-field  class="mat-form-field">
             <mat-select [placeholder]="node.placeholder" [formControl]="control" multiple [(ngModel)]="node.value[i]"
-              [required]="node.required">
+              [required]="node.required"
+              (change)="onChange(node,  i, control.value)">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
           </mat-form-field>
@@ -125,7 +126,8 @@
           <mat-form-field class="mat-form-field">
             <mat-select matNativeControl [placeholder]="node.placeholder" [formControl]="control"
               [value]="node.value[i]"
-              [required]="node.required">
+              [required]="node.required"
+              (change)="onChange(node,  i, control.value)">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
             <mat-hint>{{node.hint}}</mat-hint>

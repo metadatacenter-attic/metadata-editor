@@ -3,6 +3,7 @@ import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractCont
 
 import {FileNode} from '../../_models/file-node';
 import {ControlledTermService} from '../../_service/controlled-terms.service';
+import {TemplateSchemaService} from '../../_service/template-schema.service';
 import {InputType, InputTypeService} from '../../_models/input-types';
 import {Post} from "../../_models/post";
 import {ControlledComponent} from '../controlled/controlled.component';
@@ -24,11 +25,13 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   _fb: FormBuilder;
   _it: InputTypeService;
+  _ts: TemplateSchemaService;
   _ct: ControlledTermService;
 
-  constructor( fb: FormBuilder, ct: ControlledTermService) {
+  constructor( fb: FormBuilder, ct: ControlledTermService, ts:TemplateSchemaService) {
     this._fb = fb;
     this._ct = ct;
+    this._ts = ts;
     this._it = new InputTypeService();
   }
 
@@ -108,17 +111,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     console.log('onSelectedOption',this.node.key, e);
   }
 
-  isChecked (node, label) {
-    return node.value[0].indexOf(label) !== -1;
-  }
 
-  setChecked(node, label) {
-    if (this.isChecked(node,label)) {
-      node.value[0].splice(node.value[0].indexOf(label), 1);
-    } else {
-      node.value[0].push(label);
-    }
-  };
 
   allowsMultiple(type:InputType) {
     return this._it.allowsMultiple(type);
@@ -214,18 +207,35 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return result;
   }
 
-  onChange(node: FileNode, index, val) {
-    console.log('onChange', node, index, val);
+  onChange(node: FileNode,  index:number, val:any) {
+    this._ts.setTextValue(node.model,node.key, index, node.valueLocation, val);
   }
 
-  public onDateChange(event: any,  node:FileNode, i:number, control:FormControl): void {
+  isChecked (node, label) {
+    return node.value[0].indexOf(label) !== -1;
+  }
+
+  setChecked(node, label) {
+    if (this.isChecked(node,label)) {
+      node.value[0].splice(node.value[0].indexOf(label), 1);
+    } else {
+      node.value[0].push(label);
+    }
+    this._ts.setCheckValue(node.model,node.key, node.options, node.value[0]);
+  };
+
+  onRadioChange(node: FileNode,  index:number, val:any) {
+    this._ts.setRadioValue(node.model,node.key, index, node.valueLocation, node.options[val].label);
+  }
+
+  public onDateChange(event: any,  node:FileNode,  i:number, control:FormControl): void {
     let d = new Date(event.value);
-    // strip off the minutes when saving as xsd:date
     node.value[i] = d;
-    console.log('onDateChange', d);
+    this._ts.setDateValue(node.model,node.key, i, node.valueLocation, d.toISOString().substring(0,10));
   }
 
   addNewItem() {
+    console.log('addNewItem', this.node, this.node.model[this.node.key]);
 
     const value = '';
     this.node.value.push(value);
@@ -233,14 +243,21 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     const fa = this.formGroup.controls.values as FormArray;
     fa.push(control);
 
+    let obj = {};
+    obj[this.node.valueLocation] = '';
+    this.node.model[this.node.key].push(obj);
+
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   deleteLastItem() {
-    this.node.value.splice(this.node.value.length - 1, 1);
+    console.log('deleteLastItem', this.node);
+
+    const at = this.node.value.length - 1;
+    this.node.value.splice(at, 1);
     const fa = this.formGroup.controls.values as FormArray;
     fa.removeAt(fa.length - 1);
-
+    this.node.model[this.node.key].splice(at, 1);
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
