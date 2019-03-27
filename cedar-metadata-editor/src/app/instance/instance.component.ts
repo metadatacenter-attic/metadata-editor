@@ -4,15 +4,12 @@ import {FormArray, FormGroup, FormControl, AbstractControl} from '@angular/forms
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {ActivatedRoute} from '@angular/router';
-
-import {UiService} from '../services/ui/ui.service';
-import {QuestionBase} from './form/question/_models/question-base';
-import {FileNode} from './_models/file-node';
-
-import {TemplateSchemaService} from './_service/template-schema.service';
-import {TemplateService} from './_service/template.service';
 import * as cloneDeep from 'lodash/cloneDeep';
 
+import {UiService} from '../services/ui/ui.service';
+import {FileNode} from './_models/file-node';
+import {TemplateSchemaService} from './_service/template-schema.service';
+import {TemplateService} from './_service/template.service';
 
 @Component({
   selector: 'app-instance',
@@ -27,51 +24,25 @@ export class InstanceComponent implements OnInit {
   database: TemplateService;
   form: FormGroup;
   route: ActivatedRoute;
-
   payload: any;
   jsonld: any;
   rdf: any;
   id:number;
-  formTitle: string;
-  formDescription: string;
-  formIdentifier: string;
   formInvalid:boolean;
 
   private _subscription: Subscription;
 
-  title: string = 'Cedar Metadata Editor';
-  questions: [QuestionBase<any>];
-
   darkMode: boolean;
   private _darkModeSub: Subscription;
-
-  private _routeSubscribe: Subscription;
 
   constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
     this.database = ts;
     this.route = route;
   }
 
-  initialize(templateId:string) {
-    let getChildren = (node: FileNode) => node.children;
-
-    this.form = new FormGroup({});
-    this.jsonld = this.database.initialize(this.form, templateId);
-    this.treeControl = new NestedTreeControl<FileNode>(getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
-    });
-
-    setTimeout(() => {
-      console.log('initialize',this.form.value, this.form.valid);
-      this.payload = this.form.value;
-      this.formInvalid = !this.form.valid
-    }, 0);
-  }
-
   ngOnInit() {
     this.route.params.subscribe((val) => {
+      // got a new route, initialize new template and model by id
       this.initialize(val.templateId);
     });
 
@@ -80,16 +51,38 @@ export class InstanceComponent implements OnInit {
     });
   }
 
+  private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
+
+  private _getChildren = (node: FileNode) => node.children;
+
+  initialize(templateId:string) {
+
+    this.form = new FormGroup({});
+    this.jsonld = this.database.initialize(this.form, templateId);
+    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.dataSource = new MatTreeNestedDataSource();
+    this.database.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
+
+    setTimeout(() => {
+      this.payload = this.form.value;
+      this.formInvalid = !this.form.valid
+    }, 0);
+  }
+
   ngAfterViewInit() {
     this.onChanges();
   }
 
-  // keep payload and validation up-to-date on changes in the form
+  // keep up-to-date on changes in the form
   onChanges(): void {
     if (this.form) {
       this._subscription = this.form.valueChanges.subscribe(val => {
-        console.log('onChanges',val, this.form.valid);
         this.payload = val;
+        this.jsonld = this.database.model;
+        console.log('onChanges',this.payload, this.jsonld);
+
         setTimeout(() => {
           this.formInvalid = !this.form.valid;
         }, 0);
@@ -97,37 +90,39 @@ export class InstanceComponent implements OnInit {
     }
   }
 
-  cloneAbstractControl(control: AbstractControl) {
-    let newControl: AbstractControl;
+  // not in use at this time
+  // cloneAbstractControl(control: AbstractControl) {
+  //   let newControl: AbstractControl;
+  //
+  //   if (control instanceof FormGroup) {
+  //     const formGroup = new FormGroup({}, control.validator, control.asyncValidator);
+  //     const controls = control.controls;
+  //
+  //     Object.keys(controls).forEach(key => {
+  //       formGroup.addControl(key, this.cloneAbstractControl(controls[key]));
+  //     });
+  //
+  //     newControl = formGroup;
+  //   } else if (control instanceof FormArray) {
+  //     const formArray = new FormArray([], control.validator, control.asyncValidator);
+  //
+  //     control.controls.forEach(formControl => formArray.push(this.cloneAbstractControl(formControl)))
+  //
+  //     newControl = formArray;
+  //   } else if (control instanceof FormControl) {
+  //     newControl = new FormControl(control.value, control.validator, control.asyncValidator);
+  //   } else {
+  //     throw 'Error: unexpected control value';
+  //   }
+  //
+  //   if (control.disabled) {
+  //     newControl.disable({emitEvent: false});
+  //   }
+  //
+  //   return newControl;
+  // }
 
-    if (control instanceof FormGroup) {
-      const formGroup = new FormGroup({}, control.validator, control.asyncValidator);
-      const controls = control.controls;
-
-      Object.keys(controls).forEach(key => {
-        formGroup.addControl(key, this.cloneAbstractControl(controls[key]));
-      });
-
-      newControl = formGroup;
-    } else if (control instanceof FormArray) {
-      const formArray = new FormArray([], control.validator, control.asyncValidator);
-
-      control.controls.forEach(formControl => formArray.push(this.cloneAbstractControl(formControl)))
-
-      newControl = formArray;
-    } else if (control instanceof FormControl) {
-      newControl = new FormControl(control.value, control.validator, control.asyncValidator);
-    } else {
-      throw 'Error: unexpected control value';
-    }
-
-    if (control.disabled) {
-      newControl.disable({emitEvent: false});
-    }
-
-    return newControl;
-  }
-
+  // not in use at this time
   walkTree(node: FileNode, formGroup: FormGroup, parent: FileNode) {
 
     if (node.children) {
@@ -158,7 +153,7 @@ export class InstanceComponent implements OnInit {
     clonedObject.parentGroup = node.parentGroup;
     const parent = node.parentGroup || this.form;
     parent.addControl(clonedObject.key, clonedObject.formGroup);
-    //this.walkTree(clonedObject, clonedObject.formGroup, clonedObject.parent);
+
     this.database.dataChange.next(this.database.data);
     this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
@@ -173,22 +168,6 @@ export class InstanceComponent implements OnInit {
     node.parentGroup.removeControl(node.key);
     this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
-
-  // transformer = (node: FileNode, level: number) => {
-  //   return new FileNestedNode(!!node.children, node.filename, level, node.type, node.question);
-  // }
-
-  // private _getLevel = (node: FileNestedNode) => node.level;
-
-  // private _isExpandable = (node: FileNestedNode) => node.expandable;
-
-
-  // hasChild = (_: number, _nodeData: FileNestedNode) => _nodeData.expandable;
-
-  hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
-
-  private _getChildren = (node: FileNode) => node.children;
-
 
   onSubmit(value: any,) {
     this.payload = this.form.value;

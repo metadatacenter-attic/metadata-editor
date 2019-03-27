@@ -4984,7 +4984,11 @@ const DATA = [
   },
   "disease": [
     {
-      '@id': 'qui est esse',
+      '@id': '4',
+      "rdfs:label": "eum et est occaecati"
+    },
+    {
+      '@id': '2',
       "rdfs:label": "qui est esse"
     }
   ],
@@ -4994,7 +4998,7 @@ const DATA = [
     }
   ],
   "disease2": [{
-    "@id": "non est facere",
+    "@id": "41",
     "rdfs:label": "non est facere"
   }],
   "schema:isBasedOn": "https://repo.metadatacenter.org/templates/b599857e-832a-410f-b8f1-01917b3fa19c",

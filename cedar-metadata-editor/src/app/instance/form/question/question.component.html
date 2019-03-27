@@ -1,6 +1,6 @@
 <div [formGroup]="formGroup" class="form-group">
 
-  <label class="question-label" [attr.for]="node.filename" [matTooltip]="node.help">
+  <label class="question-label" [attr.for]="node.filename" >  <!--[matTooltip]="node.help"-->
     {{node.name}}
   </label>
 
@@ -14,7 +14,7 @@
       </span>
 
       <div *ngSwitchCase="'controlled'">
-        <controlled [group]="formGroup"  [controlledGroup]="controlledGroup" (onSelectedOption)="onSelectedOption($event)"></controlled>
+        <controlled [group]="formGroup"  [controlledGroup]="controlledGroup"   (onRemovedOption)="onRemovedControlled($event)" (onSelectedOption)="onSelectedControlled($event)"></controlled>
       </div>
 
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">

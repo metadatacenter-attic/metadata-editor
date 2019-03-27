@@ -10,7 +10,7 @@
     </mat-chip>
     <input #autocompleteInput  type="text" placeholder="Enter title" aria-label="Number" matInput [formControl]="controlledGroup.get('search')"
       [matAutocomplete]="auto" [matChipInputFor]="chipList" (matChipInputTokenEnd)="add($event)">
-    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected($event)">
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn"    (changed)="changed($event)" (optionSelected)="selected($event, controlledGroup.get('search').value.id, controlledGroup.get('search').value.title)">
       <mat-option *ngFor="let option of autoCompleteList" [value]="option"  >
         {{option.title}}
       </mat-option>

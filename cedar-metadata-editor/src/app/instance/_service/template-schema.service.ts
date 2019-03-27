@@ -139,7 +139,17 @@ export class TemplateSchemaService {
     }
   }
 
-  setCheckValue(model, key,  options, val) {
+  addControlledValue(model:any, key:string, value:string, label:string) {
+    let val = {'@id' : value, 'rdfs:label' : label};
+    model[key].push(val);
+    console.log('setControlledValue', value, label, model[key]);
+  }
+
+  removeControlledValue(model:any, key:string, index:number) {
+    model[key].splice(index, 1);
+  }
+
+  setCheckValue(model:any, key:string,  options, val) {
     let arr = [];
     for (const v in val) {
       arr.push({'@value': options[v].label})
@@ -147,7 +157,7 @@ export class TemplateSchemaService {
     model[key] = arr;
   }
 
-  setDateValue(model, key, index, valueLocation, val) {
+  setDateValue(model:any, key:string, index:number, valueLocation, val) {
     let obj = Array.isArray(model[key]) ? model[key][index] :  model[key];
     obj[valueLocation] = val;
     obj['@type'] = 'xsd:date';

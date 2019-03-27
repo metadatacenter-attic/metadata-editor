@@ -242,7 +242,6 @@ export class TemplateService {
     return ((inputType === InputType.radio) || ((inputType === InputType.list) && !this.ts.isMultiValue(schema)));
   }
 
-
   defaultOptionsToModel(value, schema: TemplateSchema, inputType: InputType, model) {
     if (this.isCheckboxListRadioType(inputType)) {
       const literals = this.ts.getLiterals(schema);
@@ -358,10 +357,6 @@ export class TemplateService {
     console.log('buildFileTree', data, this.formGroup);
   }
 
-
-
-
-
   /* build the tree of FileNodes*/
   initialize(formGroup: FormGroup, templateId: string):any {
     const id = Number.parseInt(templateId);
@@ -435,17 +430,29 @@ export class TemplateService {
     return result;
   }
 
+  getControlledLabel(labels, labelLocation): string[] {
+    let result = [];
+    for (let i = 0; i < labels.length; i++) {
+      result.push(labels[i][labelLocation]);
+    }
+    return result;
+  }
+
   getValues(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
+
     let result = [];
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
     if (this.it.isControlled(inputType)) {
-      result.push(this.getControlledValue(modelValue, valueLocation));
+      console.log('getValues', modelValue);
+      result = this.getControlledValue(modelValue, '@id');
+      //result.push(this.getControlledLabel(modelValue, 'rdfs:label'));
+
+
     } else if (this.it.isCheckbox(inputType)) {
       result.push(this.getCheckValue(modelValue, valueLocation));
     } else if (this.it.isDate(inputType)) {
-      console.log('isDate', this.ts.getTitle(schema));
       result = this.getDateValue(modelValue, valueLocation);
     } else {
       if (modelValue) {
@@ -480,6 +487,15 @@ export class TemplateService {
       }
     }
     console.log('getValues', this.ts.getTitle(schema), result);
+    return result;
+  }
+
+  getLabels(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
+    let result = [];
+    if (this.it.isControlled(inputType)) {
+      result = this.getControlledLabel(modelValue, 'rdfs:label');
+    }
+    console.log('getLabels', result);
     return result;
   }
 
@@ -527,6 +543,7 @@ export class TemplateService {
       'minLength': this.ts.getMinStringLength(schema),
       'maxLength': this.ts.getMaxStringLength(schema),
       'value': this.getValues(schema, inputType, modelValue),
+      'label': this.getLabels(schema, inputType, modelValue),
       'options': this.getOptions(schema, inputType, modelValue),
       'multipleChoice': this.ts.isMultiValue(schema),
       'required': this.ts.isRequired(schema),

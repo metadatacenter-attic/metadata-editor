@@ -24,6 +24,7 @@ export class ControlledComponent implements OnInit {
   @ViewChild('autocompleteInput') autocompleteInput: ElementRef;
   @ViewChild('chipList') chipList: ElementRef;
   @Output() onSelectedOption = new EventEmitter();
+  @Output() onRemovedOption = new EventEmitter();
   @Input() group: FormGroup;
   @Input() controlledGroup: FormGroup;
 
@@ -35,7 +36,6 @@ export class ControlledComponent implements OnInit {
   ngOnInit() {
     // get all the post
     this.ct.getPosts().subscribe(posts => {
-      console.log('posts',posts);
       this.allPosts = posts
     });
 
@@ -48,13 +48,7 @@ export class ControlledComponent implements OnInit {
 
   }
 
-  remove(index: number): void {
-    const chips = this.controlledGroup.get('chips') as FormArray;
 
-    if (index >= 0) {
-      chips.removeAt(index);
-    }
-  }
 
   add(event: MatChipInputEvent): void {
     let input = event.input;
@@ -73,21 +67,34 @@ export class ControlledComponent implements OnInit {
   }
 
 
-  selected(event: MatAutocompleteSelectedEvent, index:number): void {
+  changed(event:MatAutocompleteSelectedEvent) {
+    console.log('changed',event);
+  }
+
+  remove(index: number): void {
+    console.log('remove',index);
+    const chips = this.controlledGroup.get('chips') as FormArray;
+    const ids = this.controlledGroup.get('ids') as FormArray;
+
+    if (index >= 0) {
+      chips.removeAt(index);
+      ids.removeAt(index);
+    }
+    this.onRemovedOption.emit(index);
+  }
+
+  selected(event: MatAutocompleteSelectedEvent, value, label): void {
 
     this.autocompleteInput.nativeElement.value = '';
     this.autocompleteInput.nativeElement.focus();
-    const search = this.controlledGroup.get('search');
-    search.setValue(null);
+
+    const chips = this.controlledGroup.get('chips') as FormArray;
+    chips.push(this.fb.control(label.trim()));
+    const ids = this.controlledGroup.get('ids') as FormArray;
+    ids.push(this.fb.control(value.toString().trim()));
 
     // notify the parent component of the selection
     this.onSelectedOption.emit(event.option.value);
-
-    const value = event.option.value.title;
-    if ((value || '').trim()) {
-      const chips = this.controlledGroup.get('chips') as FormArray;
-      chips.push(this.fb.control(value.trim()));
-    }
   }
 
 

@@ -29,7 +29,9 @@
             "styles": [
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jsonld/dist/jsonld.js"
+            ]
           },
           "configurations": {
             "production": {

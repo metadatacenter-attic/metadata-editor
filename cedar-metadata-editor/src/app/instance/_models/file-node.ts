@@ -32,6 +32,7 @@ export interface FileNode {
 
   options?: any;
   value?: any[];
+  label?: any[];
 
   model?:any;
   valueLocation?:string;

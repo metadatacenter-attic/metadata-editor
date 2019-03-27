@@ -56,9 +56,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
     switch (this.node.type) {
       case InputType.controlled:
-        // TODO set initial values in chip array here?
+        console.log('ngOnInit', this.node, Array.isArray(this.node.value),this.node.value, Array.isArray(this.node.label),this.node.label);
         this.controlledGroup =  this._fb.group({
-          chips: this._fb.array([]),
+          chips: this._fb.array(this.node.label),
+          ids: this._fb.array(this.node.value),
           search: new FormControl()
         });
 
@@ -107,11 +108,15 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  protected onSelectedOption(e) {
-    console.log('onSelectedOption',this.node.key, e);
+  // controlled term was selected
+  protected onSelectedControlled(event) {
+    this._ts.addControlledValue(this.node.model, this.node.key, event.id, event.title);
   }
 
-
+  // controlled term was removed
+  protected onRemovedControlled(index) {
+    this._ts.removeControlledValue(this.node.model, this.node.key, index);
+  }
 
   allowsMultiple(type:InputType) {
     return this._it.allowsMultiple(type);
