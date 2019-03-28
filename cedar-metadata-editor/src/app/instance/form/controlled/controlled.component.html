@@ -1,8 +1,8 @@
-<mat-form-field class="example-full-width" style="width: 100%" >
+<mat-form-field class="full-width"  >
 
   <mat-chip-list #chipList  >
-    <mat-chip   style="margin-top:0.4em;"  *ngFor="let chip of controlledGroup.get('chips').controls; let i = index;"   (change)="onSelectedOption($event, i)"
-      [selectable]="selectable" [removable]="removable"  (removed)="remove(i)">
+    <mat-chip   class="chip"   *ngFor="let chip of controlledGroup.get('chips').controls; let i = index;"   (change)="onSelectedOption($event, i)"
+      [selectable]="selectable" [removable]="removable"  (removed)="remove(i)" >
 
       <span>{{chip.value}}</span>
 
@@ -19,4 +19,3 @@
 
 </mat-form-field>
 
-<pre>{{searchOption|json}}</pre>

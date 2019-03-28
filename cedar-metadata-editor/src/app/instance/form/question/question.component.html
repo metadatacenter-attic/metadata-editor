@@ -34,12 +34,12 @@
       <div *ngSwitchCase="'radio'">
         <mat-radio-group [formControl]="control" [labelPosition]="'after'"
           [value]="node.value[i]"
-          (change)="onRadioChange(node,  i, control.value)"
+          (valueChange) = "onRadioChange(node, i, node.value[i])"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
-            <mat-radio-button [value]="opt.value"
-              [aria-label]="opt.value"
+            <mat-radio-button [value]="opt.label"
+              [aria-label]="opt.label"
               style="padding-right:10px">
               {{opt.label}}
             </mat-radio-button>
@@ -50,7 +50,7 @@
 
       <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
         <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
-          (change)="onChange(node, i, control.value)"
+          (change)="onTextChange(node, i, control.value)"
           [value]="node.value[i]"
           [required]="node.required"
           [minlength]="node.minLength" [maxlength]="node.maxLength"
@@ -68,6 +68,9 @@
         </mat-error>
         <mat-error *ngIf="control.hasError('required')">
           Value is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="control.hasError('numeric')">
+          Value must be a <strong>number</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('decimal')">
           Value must have exactly
@@ -94,7 +97,7 @@
       <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.placeholder" [formControl]="control" type="text"
         [value]="node.value[i]"
-        (change)="onChange(node,  i, control.value)"
+        (change)="onTextChange(node,  i, control.value)"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
         <mat-hint>{{node.hint}}</mat-hint>
@@ -105,7 +108,7 @@
 
       <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
         <input matInput [matDatepicker]="picker"  [placeholder]="node.placeholder" [formControl]="control"
-          (dateChange)="onDateChange($event, node, i, control)"
+          (dateChange)="onDateChange($event, node, i)"
           [value]="control.value">
         <mat-hint>{{node.hint}}</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -114,20 +117,21 @@
 
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">
-          <mat-form-field  class="mat-form-field">
-            <mat-select [placeholder]="node.placeholder" [formControl]="control" multiple [(ngModel)]="node.value[i]"
+          <mat-form-field  class="mat-form-field" (change)="onTextChange(node,  i, control.value)">
+            <mat-select [placeholder]="node.placeholder" [formControl]="control" multiple
               [required]="node.required"
-              (change)="onChange(node,  i, control.value)">
-              <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
+              [(value)]="node.value[i]"
+              (valueChange) = "onListChange(node, i, node.value[i])">
+              <mat-option *ngFor="let opt of node.options" [value]="opt.label" >{{opt.label}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
         <div *ngIf="!node.multipleChoice">
           <mat-form-field class="mat-form-field">
             <mat-select matNativeControl [placeholder]="node.placeholder" [formControl]="control"
-              [value]="node.value[i]"
               [required]="node.required"
-              (change)="onChange(node,  i, control.value)">
+              [(value)]="node.value[i]"
+              (valueChange) = "onListChange(node, i, node.value[i])">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
             <mat-hint>{{node.hint}}</mat-hint>

@@ -445,11 +445,7 @@ export class TemplateService {
     const literals = this.ts.getLiterals(schema);
 
     if (this.it.isControlled(inputType)) {
-      console.log('getValues', modelValue);
       result = this.getControlledValue(modelValue, '@id');
-      //result.push(this.getControlledLabel(modelValue, 'rdfs:label'));
-
-
     } else if (this.it.isCheckbox(inputType)) {
       result.push(this.getCheckValue(modelValue, valueLocation));
     } else if (this.it.isDate(inputType)) {
@@ -486,7 +482,6 @@ export class TemplateService {
         }
       }
     }
-    console.log('getValues', this.ts.getTitle(schema), result);
     return result;
   }
 
@@ -495,7 +490,6 @@ export class TemplateService {
     if (this.it.isControlled(inputType)) {
       result = this.getControlledLabel(modelValue, 'rdfs:label');
     }
-    console.log('getLabels', result);
     return result;
   }
 

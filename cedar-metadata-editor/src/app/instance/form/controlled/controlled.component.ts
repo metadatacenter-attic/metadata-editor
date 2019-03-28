@@ -1,11 +1,8 @@
 import {Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input} from '@angular/core';
-import {FormControl, FormGroup, FormBuilder, FormArray} from '@angular/forms';
-import {Observable} from 'rxjs';
+import {FormGroup, FormBuilder, FormArray} from '@angular/forms';
 import {ControlledTermService} from '../../_service/controlled-terms.service';
 import {Post} from '../../_models/post';
-
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
-
 
 @Component({
   selector: 'controlled',
@@ -28,7 +25,7 @@ export class ControlledComponent implements OnInit {
   @Input() group: FormGroup;
   @Input() controlledGroup: FormGroup;
 
-  constructor(ct: ControlledTermService, fb:FormBuilder) {
+  constructor(ct: ControlledTermService, fb: FormBuilder) {
     this.ct = ct;
     this.fb = fb;
   }
@@ -48,8 +45,7 @@ export class ControlledComponent implements OnInit {
 
   }
 
-
-
+  // add chips
   add(event: MatChipInputEvent): void {
     let input = event.input;
     let value = event.value;
@@ -66,13 +62,12 @@ export class ControlledComponent implements OnInit {
     }
   }
 
-
-  changed(event:MatAutocompleteSelectedEvent) {
-    console.log('changed',event);
+  // chip selection changed
+  changed(event: MatAutocompleteSelectedEvent) {
   }
 
+  // chip was removed
   remove(index: number): void {
-    console.log('remove',index);
     const chips = this.controlledGroup.get('chips') as FormArray;
     const ids = this.controlledGroup.get('ids') as FormArray;
 
@@ -83,6 +78,7 @@ export class ControlledComponent implements OnInit {
     this.onRemovedOption.emit(index);
   }
 
+  // chip was selected
   selected(event: MatAutocompleteSelectedEvent, value, label): void {
 
     this.autocompleteInput.nativeElement.value = '';
@@ -97,34 +93,28 @@ export class ControlledComponent implements OnInit {
     this.onSelectedOption.emit(event.option.value);
   }
 
-
-    // filter the data by the search string
-    filterCategoryList(val)
-    {
-      var categoryList = []
-      if (typeof val != "string") {
-        return [];
-      }
-      if (val === '' || val === null) {
-        return [];
-      }
-      return val ? this.allPosts.filter(s => s.title.toLowerCase().indexOf(val.toLowerCase()) != -1)
-        : this.allPosts;
+  // filter the data by the search string
+  filterCategoryList(val) {
+    var categoryList = []
+    if (typeof val != "string") {
+      return [];
     }
-
-    // after you clicked an autosuggest option, this function will show the field you want to show in input
-    displayFn(post: Post) {
-      let k = post ? post.title : post;
-      return k;
+    if (val === '' || val === null) {
+      return [];
     }
-
-
-    // focus the input field and remove any unwanted text.
-    focusOnPlaceInput()
-    {
-      this.autocompleteInput.nativeElement.focus();
-      this.autocompleteInput.nativeElement.value = '';
-    }
-
-
+    return val ? this.allPosts.filter(s => s.title.toLowerCase().indexOf(val.toLowerCase()) != -1)
+      : this.allPosts;
   }
+
+  // after you clicked an autosuggest option, this function will show the field you want to show in input
+  displayFn(post: Post) {
+    let k = post ? post.title : post;
+    return k;
+  }
+
+  // focus the input field and remove any unwanted text.
+  focusOnPlaceInput() {
+    this.autocompleteInput.nativeElement.focus();
+    this.autocompleteInput.nativeElement.value = '';
+  }
+}

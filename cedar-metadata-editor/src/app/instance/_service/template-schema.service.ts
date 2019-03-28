@@ -58,6 +58,10 @@ export class TemplateSchemaService {
     return schema && schema._valueConstraints && schema._valueConstraints.decimalPlace;
   }
 
+  getNumeric(schema:TemplateSchema) {
+    return schema && schema._valueConstraints && schema._valueConstraints.numberType;
+  }
+
   getMinStringLength(schema:TemplateSchema) {
     return schema && schema._valueConstraints && schema._valueConstraints.minLength;
   }
@@ -126,6 +130,19 @@ export class TemplateSchemaService {
   setTextValue(model, key, index, valueLocation, val) {
     if (Array.isArray(model[key])) {
       model[key][index][valueLocation] = val;
+    } else {
+      model[key][valueLocation] = val;
+    }
+  }
+
+  setListValue(model, key, index, valueLocation, val) {
+    console.log('setListValue',model[key], val)
+    if (Array.isArray(model[key])) {
+      let arr = [];
+      for (let i=0;i<val.length;i++) {
+        arr.push({'@value': val[i]});
+      }
+      model[key] = arr;
     } else {
       model[key][valueLocation] = val;
     }

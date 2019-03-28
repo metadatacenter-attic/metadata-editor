@@ -36,12 +36,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // switch (this.node.type) {
-    //   case InputType.controlled:
-    //     // TODO set initial values in chip array here?
-    //     //this.controlled.setValue(this.node.value);
-    //     break;
-    // }
   }
 
   ngOnInit() {
@@ -56,13 +50,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
     switch (this.node.type) {
       case InputType.controlled:
-        console.log('ngOnInit', this.node, Array.isArray(this.node.value),this.node.value, Array.isArray(this.node.label),this.node.label);
         this.controlledGroup =  this._fb.group({
           chips: this._fb.array(this.node.label),
           ids: this._fb.array(this.node.value),
           search: new FormControl()
         });
-
         arr.push(this.controlledGroup);
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
@@ -136,6 +128,9 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     if (node.max !== null) {
       validators.push(Validators.max(node.max));
     }
+    if (node.subtype == InputType.numeric) {
+      validators.push(this.numericValidator());
+    }
     if (node.decimals) {
       validators.push(this.decimalValidator(node.decimals));
     }
@@ -155,6 +150,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return validators;
   }
 
+  // validator for min and max
   quantityRangeValidator(min: number, max: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: boolean } | null => {
       if (control.value !== undefined && (isNaN(control.value) || control.value < min || control.value > max)) {
@@ -164,11 +160,24 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     };
   }
 
+  // validator for URLs
+  numericValidator(): any {
+    return (control: AbstractControl): { [key: string]: boolean} | null => {
+      let result = null;
+      if (control.value) {
+        if (isNaN(Number(control.value))) {
+          result = { 'numeric': true };
+        }
+      }
+      return result;
+    };
+  }
+
+  // validator for precision of a number
   decimalValidator(precision: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: {actual:number,required:number} } | null => {
       let result = null;
-      if (control.value) {
-        console.log('control',control, precision);
+      if (control.value && (!isNaN(Number(control.value)))) {
         const actual = control.value.split(".")[1].length;
         if (precision !== actual){
           result = {
@@ -183,6 +192,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     };
   }
 
+  // validator for URLs
   urlValidator(url:FormControl): any {
     if (url.pristine) {
       return null;
@@ -197,23 +207,27 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     };
   }
 
-  dateFilter = (d: Date): boolean => {
-    const day = d.getDay();
-    // Prevent Saturday and Sunday from being selected.
-    return day !== 0 && day !== 6;
-  };
-
   get isValid() {
     let result = false;
 
     if (this.parentGroup && this.parentGroup.controls.hasOwnProperty(this.node.key)) {
       result = this.parentGroup.controls[this.node.key].valid;
     }
+    console.log('isValid',result)
     return result;
   }
 
-  onChange(node: FileNode,  index:number, val:any) {
+  // handles changes on text, paragraph, email, list...
+  onTextChange(node: FileNode,  index:number, val:any) {
     this._ts.setTextValue(node.model,node.key, index, node.valueLocation, val);
+  }
+
+  onListChange(node,index, value) {
+    this._ts.setListValue(node.model,node.key, index, node.valueLocation, value);
+  }
+
+  onRadioChange(node: FileNode,  index:number, val:any) {
+    this._ts.setRadioValue(node.model,node.key, index, node.valueLocation, node.options[val].label);
   }
 
   isChecked (node, label) {
@@ -229,14 +243,19 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     this._ts.setCheckValue(node.model,node.key, node.options, node.value[0]);
   };
 
-  onRadioChange(node: FileNode,  index:number, val:any) {
-    this._ts.setRadioValue(node.model,node.key, index, node.valueLocation, node.options[val].label);
-  }
 
-  public onDateChange(event: any,  node:FileNode,  i:number, control:FormControl): void {
-    let d = new Date(event.value);
-    node.value[i] = d;
-    this._ts.setDateValue(node.model,node.key, i, node.valueLocation, d.toISOString().substring(0,10));
+  // do you want to filter dates out of the calendar?
+  dateFilter = (d: Date): boolean => {
+    const day = d.getDay();
+    // Prevent Saturday and Sunday from being selected.
+    return day !== 0 && day !== 6;
+  };
+
+  // handle a change to the date
+  public onDateChange(event: any,  node:FileNode,  index:number): void {
+    const date = new Date(event.value);
+    const isoDate = date.toISOString().substring(0,10);
+    this._ts.setDateValue(node.model, node.key, index, node.valueLocation, isoDate);
   }
 
   addNewItem() {

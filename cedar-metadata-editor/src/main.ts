@@ -6,6 +6,9 @@ import { environment } from './environments/environment';
 import { DemoMaterialModule } from './material-module';
 import 'hammerjs';
 
+// needed for jsonld js library
+(window as any).global = window;
+
 if (environment.production) {
   enableProdMode();
 }

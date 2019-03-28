@@ -1,4 +1,6 @@
 import {Component, Injectable, OnInit} from '@angular/core';
+//import { NgModule } from '@angular/core';
+
 import {Subscription} from 'rxjs';
 import {FormArray, FormGroup, FormControl, AbstractControl} from '@angular/forms';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
@@ -10,6 +12,12 @@ import {UiService} from '../services/ui/ui.service';
 import {FileNode} from './_models/file-node';
 import {TemplateSchemaService} from './_service/template-schema.service';
 import {TemplateService} from './_service/template.service';
+import * as jsonld from 'jsonld';
+
+
+//var jsonld = jsonld;
+//(window as any).global = window;
+
 
 @Component({
   selector: 'app-instance',
@@ -18,6 +26,8 @@ import {TemplateService} from './_service/template.service';
   providers: [TemplateService, TemplateSchemaService]
 })
 
+
+
 export class InstanceComponent implements OnInit {
   treeControl: NestedTreeControl<FileNode>;
   dataSource: MatTreeNestedDataSource<FileNode>;
@@ -25,7 +35,7 @@ export class InstanceComponent implements OnInit {
   form: FormGroup;
   route: ActivatedRoute;
   payload: any;
-  jsonld: any;
+  jsonLD: any;
   rdf: any;
   id:number;
   formInvalid:boolean;
@@ -58,7 +68,13 @@ export class InstanceComponent implements OnInit {
   initialize(templateId:string) {
 
     this.form = new FormGroup({});
-    this.jsonld = this.database.initialize(this.form, templateId);
+    this.jsonLD = this.database.initialize(this.form, templateId);
+    var that = this;
+    jsonld.toRDF( this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+      console.log('err',err, nquads);
+      that.rdf = nquads;
+      return nquads;
+    });
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {
@@ -80,8 +96,14 @@ export class InstanceComponent implements OnInit {
     if (this.form) {
       this._subscription = this.form.valueChanges.subscribe(val => {
         this.payload = val;
-        this.jsonld = this.database.model;
-        console.log('onChanges',this.payload, this.jsonld);
+        this.jsonLD = this.database.model;
+        var that = this;
+        this.rdf = jsonld.toRDF( this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+          console.log('err',err, nquads);
+          that.rdf = nquads;
+          return nquads;
+        });
+        console.log('rdf',this.rdf)
 
         setTimeout(() => {
           this.formInvalid = !this.form.valid;
@@ -172,6 +194,41 @@ export class InstanceComponent implements OnInit {
   onSubmit(value: any,) {
     this.payload = this.form.value;
   }
+
+  copyToClipboard(elementId: string, buttonId:string ){
+
+    function copyToClip(str) {
+      function listener(e) {
+        e.clipboardData.setData("text/html", str);
+        e.clipboardData.setData("text/plain", str);
+        e.preventDefault();
+      }
+      document.addEventListener("copy", listener);
+      document.execCommand("copy");
+      document.removeEventListener("copy", listener);
+    };
+
+    let elm = document.getElementById(elementId);
+    let data = elm.innerHTML;
+    let selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = data;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    copyToClip(data);
+    document.body.removeChild(selBox);
+    document.getElementById( buttonId ).innerHTML = 'Copied';
+    setTimeout(() => {
+      document.getElementById( buttonId ).innerHTML = 'Copy';
+    }, 10000);
+
+  }
+
+
 
 
 }

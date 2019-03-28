@@ -26,16 +26,17 @@
                 <span [matTooltip]="node.help">{{node.name}}</span>
                 <span *ngIf="node.minItems" style="padding:0 5px">
                   ({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
-                  <button  mat-icon-button (click)="addNewItem(node)">
+                  <button mat-icon-button (click)="addNewItem(node)">
                     <mat-icon style="font-size:12px">add</mat-icon>
                   </button>
-                  <button  mat-icon-button (click)="deleteLastItem(node)">
+                  <button mat-icon-button (click)="deleteLastItem(node)">
                     <mat-icon style="font-size:12px">remove</mat-icon></button>
                 </span>
               </div>
 
               <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" *ngIf="treeControl.isExpanded(node)">
-                <app-element *ngIf="treeControl.isExpanded(node)" [node]="node" [parentGroup]="node.parentGroup" [formGroup]="node.formGroup"></app-element>
+                <app-element *ngIf="treeControl.isExpanded(node)" [node]="node" [parentGroup]="node.parentGroup"
+                  [formGroup]="node.formGroup"></app-element>
                 <ng-container matTreeNodeOutlet></ng-container>
               </ul>
 
@@ -45,24 +46,40 @@
       </form>
 
       <div>
-        <button   mat-raised-button color="primary" [disabled]="formInvalid" (click)="onSubmit(form.value)">Save
+        <button mat-raised-button color="primary" [disabled]="formInvalid" (click)="onSubmit(form.value)">Save
         </button>
       </div>
 
     </mat-tab>
     <mat-tab label="Value">
       <div *ngIf="payload">
-        <pre>value: <span class="value">{{ payload | json}}</span></pre>
+        <div style="display:flex;justify-content:space-between;">
+          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
+            Copy
+          </button>
+        </div>
+        <pre><span id="payload">{{ payload | json}}</span></pre>
+
       </div>
     </mat-tab>
     <mat-tab label="JSON-LD">
-      <div *ngIf="jsonld">
-        <pre>value: <span class="value">{{ jsonld | json}}</span></pre>
+      <div *ngIf="jsonLD">
+        <div style="display:flex;justify-content:space-between;">
+          <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
+            Copy
+          </button>
+        </div>
+        <pre><span id="jsonLD">{{ jsonLD | json}}</span></pre>
       </div>
     </mat-tab>
     <mat-tab label="RDF">
       <div *ngIf="rdf">
-        <pre>value: <span class="value">{{ rdf | json}}</span></pre>
+        <div style="display:flex;justify-content:space-between;">
+          <button id="rdfCopy" mat-raised-button color="accent" (click)="copyToClipboard('rdf', 'rdfCopy')">
+            Copy
+          </button>
+        </div>
+        <pre><div id="rdf">{{rdf}}</div></pre>
       </div>
     </mat-tab>
   </mat-tab-group>
