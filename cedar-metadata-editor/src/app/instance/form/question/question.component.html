@@ -19,8 +19,9 @@
 
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">
         <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
-          <label class="checkbox-label">
+          <label class="checkbox-label" >
             <mat-checkbox
+              [disabled]="disabled"
               [value]="opt.label"
               (change)="setChecked(node,opt.label);"
               [checked]="isChecked(node, opt.label)"
@@ -37,19 +38,22 @@
           (valueChange) = "onRadioChange(node, i, node.value[i])"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
-          <label class="radio-label">
-            <mat-radio-button [value]="opt.label"
+          <label class="radio-label" >
+            <mat-radio-button
+              [disabled]="disabled"
+              [checked]="isRadioChecked(node, i, opt.label)"
+              [value]="opt.label"
               [aria-label]="opt.label"
               style="padding-right:10px">
-              {{opt.label}}
+              <span >{{opt.label}}</span>
             </mat-radio-button>
           </label>
           </span>
         </mat-radio-group>
       </div>
 
-      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
-        <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
+      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field" >
+        <input matInput  [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
           (change)="onTextChange(node, i, control.value)"
           [value]="node.value[i]"
           [required]="node.required"

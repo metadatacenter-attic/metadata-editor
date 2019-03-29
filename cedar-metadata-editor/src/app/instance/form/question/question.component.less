@@ -1,4 +1,7 @@
 
+
+
+
   label.question-label {
     margin:10px 0 0 0;
     font-weight:bolder;
@@ -20,4 +23,51 @@
   .example-spacer {
     flex: 1 1 auto;
   }
+
+  :host ::ng-deep .mat-input-element:disabled {
+    color: currentColor;
+  }
+
+  :host ::ng-deep .mat-select-disabled .mat-select-value {
+    color: currentColor;
+  }
+
+
+
+  :host ::ng-deep .mat-radio-disabled {
+    .mat-radio-label-content {
+      color: currentColor;
+    }
+
+    .mat-radio-inner-circle {
+      background-color: currentColor;
+    }
+
+    .mat-radio-outer-circle {
+      border-color: currentColor !important;
+    }
+  }
+
+  :host ::ng-deep .mat-checkbox-disabled {
+    .mat-checkbox-label {
+      color: currentColor;
+    }
+
+    .mat-checkbox-frame {
+      border-color: currentColor;
+    }
+
+    .mat-checkbox-background {
+      background-color: currentColor;
+    }
+  }
+
+
+
+
+
+
+
+
+
 

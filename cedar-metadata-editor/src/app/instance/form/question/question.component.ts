@@ -17,6 +17,7 @@ import {ControlledComponent} from '../controlled/controlled.component';
 export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
+  @Input() disabled: boolean;
 
   formGroup: FormGroup;
   post: Post[];
@@ -53,7 +54,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.controlledGroup =  this._fb.group({
           chips: this._fb.array(this.node.label),
           ids: this._fb.array(this.node.value),
-          search: new FormControl()
+          search: new FormControl({disabled:this.disabled})
         });
         arr.push(this.controlledGroup);
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
@@ -62,8 +63,9 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       case InputType.textfield:
       case InputType.textarea:
       case InputType.list:
+        console.log('value',this.node.value);
         this.node.value.forEach((value, i) => {
-          const control = new FormControl(value, validators);
+          const control = new FormControl({value: value, disabled:this.disabled}, validators);
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
@@ -71,7 +73,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         break;
       case InputType.date:
         this.node.value.forEach((value, i) => {
-          const control = new FormControl(new Date(value), validators);
+          const control = new FormControl( {value: new Date(value), disabled:this.disabled}, validators);
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
@@ -81,7 +83,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.node.value.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value[index];
-          const control = new FormControl(this.node.value[index]);
+          const control = new FormControl( {value: this.node.value[index], disabled:this.disabled});
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
@@ -91,11 +93,13 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.node.value.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value[index];
-          const control = new FormControl(this.node.value[index]);
+          let control = new FormControl( {value: this.node.value[index], disabled:this.disabled});
+          control.disable();
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
+        console.log('checkbox',arr);
         break;
     }
   }
@@ -224,6 +228,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   onListChange(node,index, value) {
     this._ts.setListValue(node.model,node.key, index, node.valueLocation, value);
+  }
+
+  isRadioChecked (node, index, label) {
+    console.log('isRadioChecked', node.model, label);
+    return this._ts.getRadioValue(node.model, node.key, index, node.valueLocation) == label;
   }
 
   onRadioChange(node: FileNode,  index:number, val:any) {

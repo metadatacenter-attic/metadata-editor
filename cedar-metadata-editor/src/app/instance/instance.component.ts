@@ -2,7 +2,7 @@ import {Component, Injectable, OnInit} from '@angular/core';
 //import { NgModule } from '@angular/core';
 
 import {Subscription} from 'rxjs';
-import {FormArray, FormGroup, FormControl, AbstractControl} from '@angular/forms';
+import {FormGroup} from '@angular/forms';
 import {MatTreeNestedDataSource} from '@angular/material/tree';
 import {NestedTreeControl} from '@angular/cdk/tree';
 import {ActivatedRoute} from '@angular/router';
@@ -14,19 +14,12 @@ import {TemplateSchemaService} from './_service/template-schema.service';
 import {TemplateService} from './_service/template.service';
 import * as jsonld from 'jsonld';
 
-
-//var jsonld = jsonld;
-//(window as any).global = window;
-
-
 @Component({
   selector: 'app-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.less'],
   providers: [TemplateService, TemplateSchemaService]
 })
-
-
 
 export class InstanceComponent implements OnInit {
   treeControl: NestedTreeControl<FileNode>;
@@ -37,13 +30,14 @@ export class InstanceComponent implements OnInit {
   payload: any;
   jsonLD: any;
   rdf: any;
-  id:number;
-  formInvalid:boolean;
-
-  private _subscription: Subscription;
+  id: number;
+  formInvalid: boolean;
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
+
+  private _subscription: Subscription;
+  viewOnly: boolean = false;
 
   constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
     this.database = ts;
@@ -52,6 +46,7 @@ export class InstanceComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((val) => {
+      console.log('route params', val);
       // got a new route, initialize new template and model by id
       this.initialize(val.templateId);
     });
@@ -65,16 +60,11 @@ export class InstanceComponent implements OnInit {
 
   private _getChildren = (node: FileNode) => node.children;
 
-  initialize(templateId:string) {
+  initialize(templateId: string) {
 
     this.form = new FormGroup({});
     this.jsonLD = this.database.initialize(this.form, templateId);
-    var that = this;
-    jsonld.toRDF( this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-      console.log('err',err, nquads);
-      that.rdf = nquads;
-      return nquads;
-    });
+    this.getRDF();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {
@@ -87,6 +77,25 @@ export class InstanceComponent implements OnInit {
     }, 0);
   }
 
+  toggleDisabled() {
+    this.viewOnly =  !this.viewOnly;
+  }
+
+  isDisabled() {
+    return this.viewOnly;
+  }
+
+  private getRDF() {
+    let that = this;
+    jsonld.toRDF(this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+      if (err) {
+        console.log('err', err);
+      }
+      that.rdf = nquads;
+      return nquads;
+    });
+  }
+
   ngAfterViewInit() {
     this.onChanges();
   }
@@ -97,14 +106,7 @@ export class InstanceComponent implements OnInit {
       this._subscription = this.form.valueChanges.subscribe(val => {
         this.payload = val;
         this.jsonLD = this.database.model;
-        var that = this;
-        this.rdf = jsonld.toRDF( this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-          console.log('err',err, nquads);
-          that.rdf = nquads;
-          return nquads;
-        });
-        console.log('rdf',this.rdf)
-
+        this.getRDF();
         setTimeout(() => {
           this.formInvalid = !this.form.valid;
         }, 0);
@@ -195,7 +197,7 @@ export class InstanceComponent implements OnInit {
     this.payload = this.form.value;
   }
 
-  copyToClipboard(elementId: string, buttonId:string ){
+  copyToClipboard(elementId: string, buttonId: string) {
 
     function copyToClip(str) {
       function listener(e) {
@@ -209,26 +211,35 @@ export class InstanceComponent implements OnInit {
     };
 
     let elm = document.getElementById(elementId);
-    let data = elm.innerHTML;
-    let selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
-    selBox.value = data;
-    document.body.appendChild(selBox);
-    selBox.focus();
-    selBox.select();
-    copyToClip(data);
-    document.body.removeChild(selBox);
-    document.getElementById( buttonId ).innerHTML = 'Copied';
-    setTimeout(() => {
-      document.getElementById( buttonId ).innerHTML = 'Copy';
-    }, 10000);
+    let data = elm ? elm.innerHTML : null;
+    if (data) {
+
+      let selBox = document.createElement('textarea');
+      selBox.style.position = 'fixed';
+      selBox.style.left = '0';
+      selBox.style.top = '0';
+      selBox.style.opacity = '0';
+      selBox.value = data;
+      document.body.appendChild(selBox);
+      selBox.focus();
+      selBox.select();
+      copyToClip(data);
+      document.body.removeChild(selBox);
+
+      let btn = document.getElementById(buttonId);
+      if (btn) {
+        btn.innerHTML = 'Copied';
+        setTimeout(() => {
+          let btn = document.getElementById(buttonId);
+          if (btn) {
+            btn.innerHTML = 'Copy';
+          }
+        }, 10000);
+      }
+
+    }
 
   }
-
-
 
 
 }

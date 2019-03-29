@@ -14,7 +14,8 @@ export class AppComponent implements OnInit {
   showMenu = false;
   darkMode: boolean;
   title: string;
-  private _subscription: Subscription
+  private _subscription: Subscription;
+  disabled: boolean = false;
 
   constructor(public ui: UiService) {
     this.title = 'Cedar Metadata Editor';
@@ -27,6 +28,10 @@ export class AppComponent implements OnInit {
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
+  }
+
+  toggleDisabled() {
+    this.disabled = !this.disabled;
   }
 
   modeToggleSwitch() {

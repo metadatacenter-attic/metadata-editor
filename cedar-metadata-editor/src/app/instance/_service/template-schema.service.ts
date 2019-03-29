@@ -156,6 +156,14 @@ export class TemplateSchemaService {
     }
   }
 
+  getRadioValue(model, key, index, valueLocation) {
+    if (Array.isArray(model[key])) {
+      return model[key][index][valueLocation] ;
+    } else {
+      return model[key][valueLocation];
+    }
+  }
+
   addControlledValue(model:any, key:string, value:string, label:string) {
     let val = {'@id' : value, 'rdfs:label' : label};
     model[key].push(val);

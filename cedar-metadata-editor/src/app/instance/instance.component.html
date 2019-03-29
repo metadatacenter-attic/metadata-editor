@@ -3,6 +3,18 @@
   <mat-tab-group>
     <mat-tab label="Form">
 
+      <div class="tab-header">
+        <div class="mode-toggle__container">
+          <span *ngIf="viewOnly" class="mode-toggle__text">View</span>
+          <span *ngIf="!viewOnly" class="mode-toggle__text">Edit</span>
+          <label class="toggle-button__container">
+            <input (click)="toggleDisabled()" type="checkbox" class="mode-toggle__input"/>
+            <span [ngClass]="{'mode-toggle__bg-checked': viewOnly}" class="mode-toggle__bg"></span>
+            <span [ngClass]="{'mode-toggle__circle-checked': viewOnly}" class="mode-toggle__circle"></span>
+          </label>
+        </div>
+      </div>
+
       <h2>{{database.getTitle()}}</h2>
 
       <form [formGroup]="form" *ngIf="form" style="margin:10px">
@@ -10,7 +22,7 @@
           <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
             <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
               <button mat-icon-button disabled></button>
-              <app-question [node]="node" [parentGroup]="node.formGroup" style="width:100%"></app-question>
+              <app-question [disabled]="viewOnly" [node]="node" [parentGroup]="node.formGroup" style="width:100%"></app-question>
             </li>
           </mat-tree-node>
           <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
@@ -46,25 +58,24 @@
       </form>
 
       <div>
-        <button mat-raised-button color="primary" [disabled]="formInvalid" (click)="onSubmit(form.value)">Save
+        <button mat-raised-button color="primary" [disabled]="formInvalid || viewOnly" (click)="onSubmit(form.value)">Save
         </button>
       </div>
 
     </mat-tab>
     <mat-tab label="Value">
       <div *ngIf="payload">
-        <div style="display:flex;justify-content:space-between;">
+        <div class="tab-header" >
           <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
             Copy
           </button>
         </div>
         <pre><span id="payload">{{ payload | json}}</span></pre>
-
       </div>
     </mat-tab>
     <mat-tab label="JSON-LD">
       <div *ngIf="jsonLD">
-        <div style="display:flex;justify-content:space-between;">
+        <div class="tab-header" >
           <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
             Copy
           </button>
@@ -74,7 +85,7 @@
     </mat-tab>
     <mat-tab label="RDF">
       <div *ngIf="rdf">
-        <div style="display:flex;justify-content:space-between;">
+        <div class="tab-header" >
           <button id="rdfCopy" mat-raised-button color="accent" (click)="copyToClipboard('rdf', 'rdfCopy')">
             Copy
           </button>
