@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 
 import {TemplateSchema} from '../_models/template-schema';
 import {InputType} from "../_models/input-types";
+import {FileNode} from "../_models/file-node";
 
 
 @Injectable()
@@ -136,7 +137,7 @@ export class TemplateSchemaService {
   }
 
   setListValue(model, key, index, valueLocation, val) {
-    console.log('setListValue',model[key], val)
+    console.log('setListValue',model[key], val);
     if (Array.isArray(model[key])) {
       let arr = [];
       for (let i=0;i<val.length;i++) {
@@ -155,6 +156,71 @@ export class TemplateSchemaService {
       model[key][valueLocation] = val;
     }
   }
+
+  generateGUID = function () {
+    let d = Date.now();
+    const guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = (d + Math.random() * 16) % 16 | 0;
+      d = Math.floor(d / 16);
+      return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return guid;
+  };
+
+  // build the values
+  buildAttributeValues(model, key):any[] {
+    const itemCount = model[key].length;
+    const modelValue = (model && model[key]) ? model[key] : [];
+    let val = [];
+    for (let i = 0; i < itemCount; i++) {
+      const itemKey = modelValue[i];
+      const itemValue = model[itemKey]['@value'];
+      val.push({'@value': itemValue, 'rdfs:label': itemKey})
+    }
+    return val;
+  }
+
+
+
+
+  setAttributeValue(model, key, itemKey, valueLocation, val) {
+    if (valueLocation === '@value') {
+      // change the value
+      model[itemKey][valueLocation] = val;
+
+    } else {
+      // change the label
+      const itemValue =  model[itemKey]['@value'];
+      const index = model[key].indexOf(itemKey);
+      delete model[itemKey];
+      model['@context'][val] = model['@context'][itemKey];
+      delete model['@context'][itemKey];
+      model[key][index] = val;
+      model[val] = {'@value': itemValue}
+    }
+  }
+
+  copyAttributeValue(model, key, index) {
+    const oldKey = model[key][index];
+    const oldValue =  model[oldKey]['@value'];
+    let newKey = oldKey;
+    while(model.hasOwnProperty(newKey)) {
+      newKey = newKey + '1';
+    }
+
+    model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" +  this.generateGUID();
+    model[key].splice(index+1, 0, newKey );
+    model[newKey] = {'@value': oldValue};
+  };
+
+  removeAttributeValue(model, key, index) {
+    const oldKey = model[key][index];
+    delete model['@context'][oldKey]
+    model[key].splice(index, 1  );
+    delete model[oldKey]
+  };
+
+
 
   getRadioValue(model, key, index, valueLocation) {
     if (Array.isArray(model[key])) {

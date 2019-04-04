@@ -39,6 +39,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
+  console(obj:any) {
+    console.log('console',obj);
+  }
+
   ngOnInit() {
     this._ct.getPosts().subscribe(posts => {
       this.post = posts;
@@ -48,7 +52,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
     const arr = [];
-
     switch (this.node.type) {
       case InputType.controlled:
         this.controlledGroup =  this._fb.group({
@@ -63,7 +66,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       case InputType.textfield:
       case InputType.textarea:
       case InputType.list:
-        console.log('value',this.node.value);
         this.node.value.forEach((value, i) => {
           const control = new FormControl({value: value, disabled:this.disabled}, validators);
           arr.push(control);
@@ -75,6 +77,19 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.node.value.forEach((value, i) => {
           const control = new FormControl( {value: new Date(value), disabled:this.disabled}, validators);
           arr.push(control);
+        });
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+      case InputType.attributeValue:
+        this.node.value.forEach((value, i) => {
+          const items = [];
+          const controlValue = new FormControl({value: value['rdfs:label'], disabled:this.disabled}, validators);
+          items.push(controlValue);
+          const controlLabel = new FormControl({value: value['@value'], disabled:this.disabled}, validators);
+          items.push(controlLabel);
+          const fg = this._fb.group({values: this._fb.array(items)});
+          arr.push(fg);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
@@ -99,7 +114,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
-        console.log('checkbox',arr);
         break;
     }
   }
@@ -231,8 +245,38 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   isRadioChecked (node, index, label) {
-    console.log('isRadioChecked', node.model, label);
     return this._ts.getRadioValue(node.model, node.key, index, node.valueLocation) == label;
+  }
+
+  onAttributeValueChange(node: FileNode,  index:number, valueLocation:string, val:any) {
+    this._ts.setAttributeValue(node.model, node.key, node.model[node.key][index], valueLocation, val);
+  }
+
+  buildAttributeValueControls(val:any[], formGroup:FormGroup) {
+    const arr = [];
+    val.forEach((value, i) => {
+      const items = [];
+      const controlValue = new FormControl({value: value['rdfs:label'], disabled:this.disabled});
+      items.push(controlValue);
+      const controlLabel = new FormControl({value: value['@value'], disabled:this.disabled});
+      items.push(controlLabel);
+      const fg = this._fb.group({values: this._fb.array(items)});
+      arr.push(fg);
+    });
+    this.formGroup = this._fb.group({values: this._fb.array(arr)});
+    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+  }
+
+  copyAttributeValue(node: FileNode,  index:number) {
+    this._ts.copyAttributeValue(node.model, node.key, index);
+    const val = this._ts.buildAttributeValues(node.model, node.key);
+    this.buildAttributeValueControls(val, this.formGroup);
+  }
+
+  removeAttributeValue(node: FileNode,  index:number) {
+    this._ts.removeAttributeValue(node.model, node.key, index);
+    const val = this._ts.buildAttributeValues(node.model, node.key);
+    this.buildAttributeValueControls(val, this.formGroup);
   }
 
   onRadioChange(node: FileNode,  index:number, val:any) {
@@ -268,7 +312,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   addNewItem() {
-    console.log('addNewItem', this.node, this.node.model[this.node.key]);
 
     const value = '';
     this.node.value.push(value);
@@ -284,7 +327,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   deleteLastItem() {
-    console.log('deleteLastItem', this.node);
 
     const at = this.node.value.length - 1;
     this.node.value.splice(at, 1);

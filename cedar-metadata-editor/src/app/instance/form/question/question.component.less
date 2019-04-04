@@ -58,11 +58,27 @@
     }
 
     .mat-checkbox-background {
-      background-color: currentColor;
+      //background-color: currentColor;
+    }
+
+    .mat-checkbox-disabled.mat-checkbox-checked .mat-checkbox-background {
+      background-color: #b0b0b0;
     }
   }
 
+  :host ::ng-deep .mat-checkbox-disabled.mat-checkbox-checked {
+    .mat-checkbox-label {
+      color: currentColor;
+    }
 
+    .mat-checkbox-frame {
+      border-color: currentColor;
+    }
+
+    .mat-checkbox-background {
+      background-color: currentColor;
+    }
+  }
 
 
 

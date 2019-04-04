@@ -1,25 +1,61 @@
 <div [formGroup]="formGroup" class="form-group">
 
-  <label class="question-label" [attr.for]="node.filename" >  <!--[matTooltip]="node.help"-->
+  <label class="question-label" [attr.for]="node.filename">  <!--[matTooltip]="node.help"-->
     {{node.name}}
   </label>
+
+  <div *ngIf="node.type == 'attribute-value'">
+    <div *ngFor="let fg of formGroup.controls.values.controls;let j = index">
+      <div style="display:flex;">
+        <mat-form-field class="example-full-width mat-form-field" style="padding:10px">
+          <input matInput  [placeholder]="node.placeholder"
+            [formControl]="fg.controls.values.controls[0]"
+            [type]="node.subtype"
+            (change)="onAttributeValueChange(node,j,'rdfs:label',fg.controls.values.controls[0].value);">
+        </mat-form-field>
+        <mat-form-field class="example-full-width mat-form-field" style="padding:10px">
+          <input matInput  [placeholder]="node.placeholder"
+            [formControl]="fg.controls.values.controls[1]" [type]="text"
+            (change)="onAttributeValueChange(node,j,'@value',fg.controls.values.controls[1].value);">
+        </mat-form-field>
+
+        <button mat-icon-button *ngIf="!disabled" (click)="copyAttributeValue(node,j)">
+          <mat-icon [inline]="true"
+            style="font-size:14px">
+            add
+          </mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="!disabled" (click)="removeAttributeValue(node,j)">
+          <mat-icon [inline]="true"
+            style="font-size:14px">
+            remove
+          </mat-icon>
+        </button>
+
+      </div>
+    </div>
+  </div>
 
   <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
     <div *ngFor="let control of formGroup.controls.values.controls;index as i">
 
-      <span *ngIf="node.minItems && allowsMultiple(node.type)" >
+      <span *ngIf="node.minItems && allowsMultiple(node.type)">
         {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-        <button mat-icon-button (click)="addNewItem()"><mat-icon [inline]="true" style="font-size:14px">add</mat-icon></button>
-        <button mat-icon-button (click)="deleteLastItem()"><mat-icon [inline]="true" style="font-size:14px">remove</mat-icon></button>
+        <button mat-icon-button *ngIf="!disabled" (click)="addNewItem()"><mat-icon [inline]="true"
+          style="font-size:14px">add</mat-icon></button>
+        <button mat-icon-button *ngIf="!disabled" (click)="deleteLastItem()"><mat-icon [inline]="true"
+          style="font-size:14px">remove</mat-icon></button>
       </span>
 
       <div *ngSwitchCase="'controlled'">
-        <controlled [group]="formGroup"  [controlledGroup]="controlledGroup"   (onRemovedOption)="onRemovedControlled($event)" (onSelectedOption)="onSelectedControlled($event)"></controlled>
+        <controlled [group]="formGroup" [controlledGroup]="controlledGroup"
+          (onRemovedOption)="onRemovedControlled($event)"
+          (onSelectedOption)="onSelectedControlled($event)"></controlled>
       </div>
 
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">
         <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
-          <label class="checkbox-label" >
+          <label class="checkbox-label">
             <mat-checkbox
               [disabled]="disabled"
               [value]="opt.label"
@@ -35,25 +71,26 @@
       <div *ngSwitchCase="'radio'">
         <mat-radio-group [formControl]="control" [labelPosition]="'after'"
           [value]="node.value[i]"
-          (valueChange) = "onRadioChange(node, i, node.value[i])"
+          (valueChange)="onRadioChange(node, i, node.value[i])"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
-          <label class="radio-label" >
+          <label class="radio-label">
             <mat-radio-button
               [disabled]="disabled"
               [checked]="isRadioChecked(node, i, opt.label)"
               [value]="opt.label"
               [aria-label]="opt.label"
               style="padding-right:10px">
-              <span >{{opt.label}}</span>
+              <span>{{opt.label}}</span>
             </mat-radio-button>
           </label>
           </span>
         </mat-radio-group>
       </div>
 
-      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field" >
-        <input matInput  [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
+
+      <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
+        <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
           (change)="onTextChange(node, i, control.value)"
           [value]="node.value[i]"
           [required]="node.required"
@@ -83,10 +120,12 @@
           <strong>{{control.errors['decimal']['actual']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('min')">
-          Value {{control.errors['min']['actual']}} must be larger than <strong>{{control.errors['min']['min']}}</strong>
+          Value {{control.errors['min']['actual']}} must be larger than
+          <strong>{{control.errors['min']['min']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('max')">
-          Value {{control.errors['max']['actual']}} must be smaller than <strong>{{control.errors['max']['max']}}</strong>
+          Value {{control.errors['max']['actual']}} must be smaller than
+          <strong>{{control.errors['max']['max']}}</strong>
         </mat-error>
         <mat-error *ngIf="control.hasError('minlength')">
           Value length {{control.errors['minlength']['actualLength']}} is smaller than
@@ -111,7 +150,7 @@
       </mat-form-field>
 
       <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
-        <input matInput [matDatepicker]="picker"  [placeholder]="node.placeholder" [formControl]="control"
+        <input matInput [matDatepicker]="picker" [placeholder]="node.placeholder" [formControl]="control"
           (dateChange)="onDateChange($event, node, i)"
           [value]="control.value">
         <mat-hint>{{node.hint}}</mat-hint>
@@ -121,12 +160,12 @@
 
       <div *ngSwitchCase="'list'">
         <div *ngIf="node.multipleChoice">
-          <mat-form-field  class="mat-form-field" (change)="onTextChange(node,  i, control.value)">
+          <mat-form-field class="mat-form-field" (change)="onTextChange(node,  i, control.value)">
             <mat-select [placeholder]="node.placeholder" [formControl]="control" multiple
               [required]="node.required"
               [(value)]="node.value[i]"
-              (valueChange) = "onListChange(node, i, node.value[i])">
-              <mat-option *ngFor="let opt of node.options" [value]="opt.label" >{{opt.label}}</mat-option>
+              (valueChange)="onListChange(node, i, node.value[i])">
+              <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -135,7 +174,7 @@
             <mat-select matNativeControl [placeholder]="node.placeholder" [formControl]="control"
               [required]="node.required"
               [(value)]="node.value[i]"
-              (valueChange) = "onListChange(node, i, node.value[i])">
+              (valueChange)="onListChange(node, i, node.value[i])">
               <mat-option *ngFor="let opt of node.options" [value]="opt.label">{{opt.label}}</mat-option>
             </mat-select>
             <mat-hint>{{node.hint}}</mat-hint>

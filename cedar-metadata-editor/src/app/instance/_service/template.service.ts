@@ -1,5 +1,5 @@
 import {Inject, Injectable, Optional} from '@angular/core';
-import {FormGroup} from '@angular/forms';
+import {FormGroup, FormControl} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
 
 import {FileNode} from '../_models/file-node';
@@ -43,6 +43,10 @@ export class TemplateService {
 
   isContext(key) {
     return (key === '@context');
+  }
+
+  isAttributeValue(schema: TemplateSchema) {
+    return this.ts.getInputType(schema) === InputType.attributeValue;
   }
 
 
@@ -352,17 +356,17 @@ export class TemplateService {
     console.log('startParseForm', model, template);
 
 
-    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], model, 0, this.formGroup, null);
+    const data = this.buildFileTree(this.template['_ui']['order'], this.template['properties'], model, 0, this.formGroup, null);
     this.dataChange.next(data);
     console.log('buildFileTree', data, this.formGroup);
   }
 
   /* build the tree of FileNodes*/
-  initialize(formGroup: FormGroup, templateId: string):any {
+  initialize(formGroup: FormGroup, templateId: string): any {
     const id = Number.parseInt(templateId);
     this.template = this.td.templateData[id];
     this.model = this.td.modelData[id];
-    const data = this.buildFileTree(this.template['_ui']['order'],this.template['properties'], this.model, 0, formGroup, null);
+    const data = this.buildFileTree(this.template['_ui']['order'], this.template['properties'], this.model, 0, formGroup, null);
     this.dataChange.next(data);
     return this.model;
   }
@@ -410,12 +414,30 @@ export class TemplateService {
     return result;
   }
 
-  getDateValue(values, valueLocation): Date[] {
-    let result = values.length ? [] : [new Date('')];
-    for (let i = 0; i < values.length; i++) {
+  getTextValue(values, valueLocation): string[] {
 
+    let val = values;
+    if (Array.isArray(values) && Array.isArray(values[0])) {
+      val = values[0]
+    }
+
+    let result = [];
+    for (let i = 0; i < val.length; i++) {
+      result.push(val[i][valueLocation]);
+    }
+    return result;
+  }
+
+
+  getDateValue(values, valueLocation): Date[] {
+    let val = values;
+    if (Array.isArray(values) && Array.isArray(values[0])) {
+      val = values[0]
+    }
+    let result = []
+    for (let i = 0; i < val.length; i++) {
       // 'add' a timezone offset so we end up on the original date again
-      let dt = new Date(values[i][valueLocation]);
+      let dt = new Date(val[i][valueLocation]);
       dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
       result.push(dt);
     }
@@ -444,44 +466,40 @@ export class TemplateService {
     const valueLocation = this.getValueLocation(schema, inputType);
     const literals = this.ts.getLiterals(schema);
 
-    if (this.it.isControlled(inputType)) {
-      result = this.getControlledValue(modelValue, '@id');
-    } else if (this.it.isCheckbox(inputType)) {
-      result.push(this.getCheckValue(modelValue, valueLocation));
-    } else if (this.it.isDate(inputType)) {
-      result = this.getDateValue(modelValue, valueLocation);
-    } else {
-      if (modelValue) {
-        if (Array.isArray(modelValue)) {
-          if (this.it.isList(inputType)) {
-            if (this.ts.isMultiValue(schema)) {
-              result = this.getListMultipleValue(literals, modelValue, valueLocation);
-            } else {
-              result.push(this.getListSingleValue(literals, modelValue));
-            }
-            //
-          } else {
-            result = modelValue.map(value => {
-              if (inputType === 'radio' || inputType === 'checkbox') {
-                return this.getRadioValue(literals, value[valueLocation])
-              } else {
-                return value[valueLocation];
-              }
-            });
-          }
+    switch (inputType) {
+      case InputType.controlled:
+        result = this.getControlledValue(modelValue, '@id');
+        break;
+      case InputType.checkbox:
+        result.push(this.getCheckValue(modelValue, valueLocation));
+        break;
+      case InputType.radio:
+        result.push(this.getRadioValue(modelValue, valueLocation));
+        break;
+      case InputType.date:
+        result = this.getDateValue(modelValue, valueLocation);
+        break;
+      case InputType.list:
+        if (this.ts.isMultiValue(schema)) {
+          result = this.getListMultipleValue(literals, modelValue, valueLocation);
         } else {
-          if (modelValue.hasOwnProperty(valueLocation)) {
-            if (this.it.isRadio(inputType) || inputType === 'checkbox') {
-              result.push(this.getRadioValue(literals, modelValue[valueLocation]))
-            } else {
-              result.push(modelValue[valueLocation]);
-            }
-          } else {
-            result.push(modelValue);
-          }
+          result.push(this.getListSingleValue(literals, modelValue));
         }
-      }
+        break;
+      case InputType.textfield:
+      case InputType.email:
+      case InputType.link:
+      case InputType.phoneNumber:
+      case InputType.textarea:
+      case InputType.numeric:
+        result.push(this.getTextValue(modelValue, valueLocation));
+        break;
+      default:
+        console.log(inputType)
+
+
     }
+
     return result;
   }
 
@@ -516,11 +534,11 @@ export class TemplateService {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
-  fieldNode(schema: TemplateSchema, model:any, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
+  fieldNode(schema: TemplateSchema, model: any, inputType: InputType, minItems, maxItems, key, modelValue, formGroup: FormGroup, parent: FileNode): FileNode {
 
     const node = {
       'key': key,
-      'model':model,
+      'model': model,
       'valueLocation': this.getValueLocation(schema, inputType),
       'name': this.ts.getTitle(schema),
       'type': this.getNodeType(inputType),
@@ -549,10 +567,10 @@ export class TemplateService {
   }
 
 // generate a node for each element instance
-  elementNode(schema: TemplateSchema, model:any, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode):FileNode {
+  elementNode(schema: TemplateSchema, model: any, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode): FileNode {
     const node = {
       'key': key,
-      'model':model,
+      'model': model,
       'name': this.ts.getTitle(schema),
       'help': this.ts.getHelp(schema),
       'placeholder': this.ts.getPlaceholder(schema),
@@ -566,8 +584,36 @@ export class TemplateService {
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
-      node['children'] = this.buildFileTree(schema['_ui']['order'],schema.properties, modelValue[i], level + 1, node.formGroup, node);
+      node['children'] = this.buildFileTree(schema['_ui']['order'], schema.properties, modelValue[i], level + 1, node.formGroup, node);
     }
+    return node;
+  }
+
+  attributeValueNode(schema: TemplateSchema, model: any, key: string, modelValue: any, formGroup: FormGroup, parent: FileNode): FileNode {
+
+    const node = {
+
+      'min': this.ts.getMin(schema),
+      'max': this.ts.getMax(schema),
+      'required': this.ts.isRequired(schema),
+      'key': key,
+      'model': model,
+      'valueLocation': '@value',
+      'name': this.ts.getTitle(schema),
+      'type': InputType.attributeValue,
+      'subtype': InputType.attributeValue,
+      'minItems': 1,
+      'maxItems': 5,
+      'itemCount': 0,
+      'formGroup': formGroup,
+      'parentGroup': parent ? parent.formGroup : null,
+      'parent': parent,
+      'value': modelValue,
+      'label': this.ts.getTitle(schema),
+      'help': this.ts.getHelp(schema),
+      'placeholder': this.ts.getPlaceholder(schema),
+      'hint': this.ts.getHint(schema)
+    };
     return node;
   }
 
@@ -598,25 +644,38 @@ export class TemplateService {
 
   }
 
-  buildFileTree(order: string[],obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
+  buildFileTree(order: string[], obj: { [key: string]: any }, model: any, level: number, formGroup: FormGroup, parent: FileNode): FileNode[] {
     return order.reduce<FileNode[]>((accumulator, key) => {
       if (!this.isSpecialKey(key)) {
         const value = obj[key];
-        const modelValue = (model && model[key]) ? model[key] : [];
         const schema: TemplateSchema = this.ts.schemaOf(value);
+        const modelValue = (model && model[key]) ? model[key] : [];
+
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
+        const name = this.ts.getTitle(schema);
         if (this.ts.isField(schema)) {
-          let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
 
-          accumulator = accumulator.concat(node);
-        } else if (this.ts.isElement(schema)) {
+          if (this.isAttributeValue(schema)) {
+            const items = this.ts.buildAttributeValues(model, key);
+            let node = this.attributeValueNode(schema, model, key, items, formGroup, parent);
+            accumulator = accumulator.concat(node);
+
+          } else {
+            let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, [modelValue], formGroup, parent);
+            accumulator = accumulator.concat(node);
+            console.log('node',modelValue,node.value)
+          }
+        }
+        if (this.ts.isElement(schema)) {
           const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
           for (let i = 0; i < itemCount; i++) {
-            let node = this.elementNode(schema, model,minItems, maxItems, i, key, level, modelValue, formGroup, parent);
+            let node = this.elementNode(schema, model, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
             accumulator = accumulator.concat(node);
           }
         }
+
+
       }
       return accumulator;
 

@@ -264,7 +264,7 @@ export class InputTypeService {
   }
 
   isNotTextInput(t:string) {
-    return t === InputType.controlled || t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
+    return t === InputType.attributeValue || t === InputType.controlled || t === InputType.list || t === InputType.radio  || t === InputType.checkbox || t === InputType.date  || t === InputType.textarea;
   }
 
   isRadioCheckList(t:string) {
@@ -273,6 +273,10 @@ export class InputTypeService {
 
   isCheckbox(t: string) {
     return t === InputType.checkbox;
+  }
+
+  isTextfield(t: string) {
+    return t === InputType.textfield;
   }
 
   isRadio(t: string) {
@@ -289,6 +293,10 @@ export class InputTypeService {
 
   isControlled(t: string) {
     return t === InputType.controlled;
+  }
+
+  isAttributeValue(t: string) {
+    return t === InputType.attributeValue;
   }
 
 
