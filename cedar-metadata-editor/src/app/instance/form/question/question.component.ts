@@ -1,11 +1,11 @@
 import {Component, Input, OnInit, AfterViewInit} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractControl, ValidatorFn} from '@angular/forms';
 
-import {FileNode} from '../../_models/file-node';
-import {ControlledTermService} from '../../_service/controlled-terms.service';
-import {TemplateSchemaService} from '../../_service/template-schema.service';
-import {InputType, InputTypeService} from '../../_models/input-types';
-import {Post} from "../../_models/post";
+import {FileNode} from '../_models/file-node';
+import {ControlledTermService} from '../service/controlled-terms.service';
+import {TemplateSchemaService} from '../service/template-schema.service';
+import {InputType, InputTypeService} from '../_models/input-types';
+import {Post} from "../_models/post";
 import {ControlledComponent} from '../controlled/controlled.component';
 
 

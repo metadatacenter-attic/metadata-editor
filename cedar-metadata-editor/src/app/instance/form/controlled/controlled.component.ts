@@ -1,8 +1,11 @@
 import {Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray} from '@angular/forms';
-import {ControlledTermService} from '../../_service/controlled-terms.service';
-import {Post} from '../../_models/post';
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+
+import {ControlledTermService} from '../service/controlled-terms.service';
+import {Post} from '../_models/post';
+
+
 
 @Component({
   selector: 'controlled',
