@@ -1,5 +1,26 @@
+import {InputType} from './input-types';
+
+export interface SchemaProperties {
+  'properties': { [key: string]: any }
+}
+
 export interface TemplateSchema {
-  properties?: any;
-  _ui?: any;
-  _valueConstraints?: any;
+  '@id': string,
+  '@type': string,
+  '@context': object
+  'type': string,
+  'title': string,
+  'description': string,
+  '_ui': {
+    "pages": [],
+    "order": string[],
+    "propertyLabels": object,
+    "propertyDescriptions": object,
+    'inputType':InputType
+  },
+  "properties": SchemaProperties,
+  "pav:version": string,
+  "bibo:status": string,
+  "$schema": string,
+  '_valueConstraints'?: any;
 }

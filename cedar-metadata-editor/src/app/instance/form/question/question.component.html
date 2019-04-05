@@ -1,11 +1,12 @@
 <div [formGroup]="formGroup" class="form-group">
 
-  <label class="question-label" [attr.for]="node.filename">  <!--[matTooltip]="node.help"-->
+  <label class="question-label" [attr.for]="node.name">  <!--[matTooltip]="node.help"-->
     {{node.name}}
   </label>
 
+  <!-- attribute-value -->
   <div *ngIf="node.type == 'attribute-value'">
-    <div *ngFor="let fg of formGroup.controls.values.controls;let j = index">
+    <div *ngFor="let fg of formGroup.controls['values']['controls'];let j = index">
       <div style="display:flex;">
         <mat-form-field class="example-full-width mat-form-field" style="padding:10px">
           <input matInput  [placeholder]="node.placeholder"
@@ -37,7 +38,7 @@
   </div>
 
   <div *ngIf="node.type !== 'element'" [ngSwitch]="node.type" style="margin:10px 0;">
-    <div *ngFor="let control of formGroup.controls.values.controls;index as i">
+    <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
 
       <span *ngIf="node.minItems && allowsMultiple(node.type)">
         {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
@@ -47,12 +48,14 @@
           style="font-size:14px">remove</mat-icon></button>
       </span>
 
+      <!-- controlled -->
       <div *ngSwitchCase="'controlled'">
         <controlled [group]="formGroup" [controlledGroup]="controlledGroup"
           (onRemovedOption)="onRemovedControlled($event)"
           (onSelectedOption)="onSelectedControlled($event)"></controlled>
       </div>
 
+      <!-- checkbox -->
       <div *ngSwitchCase="'checkbox'" class="mat-form-field">
         <span *ngFor="let opt of node.options;let j = index" style="padding-right:10px">
           <label class="checkbox-label">
@@ -68,17 +71,16 @@
         </span>
       </div>
 
+      <!-- radio -->
       <div *ngSwitchCase="'radio'">
         <mat-radio-group [formControl]="control" [labelPosition]="'after'"
-          [value]="node.value[i]"
-          (valueChange)="onRadioChange(node, i, node.value[i])"
           class="mat-form-field">
           <span *ngFor="let opt of node.options; let j = index" style="padding-right:10px">
           <label class="radio-label">
             <mat-radio-button
               [disabled]="disabled"
-              [checked]="isRadioChecked(node, i, opt.label)"
-              [value]="opt.label"
+              (click)="onRadioChange(node, i, j)"
+              [value]="j"
               [aria-label]="opt.label"
               style="padding-right:10px">
               <span>{{opt.label}}</span>
@@ -88,11 +90,11 @@
         </mat-radio-group>
       </div>
 
-
+      <!-- textfield -->
       <mat-form-field *ngSwitchCase="'textfield'" class="example-full-width mat-form-field">
         <input matInput [placeholder]="node.placeholder" [formControl]="control" [type]="node.subtype"
-          (change)="onTextChange(node, i, control.value)"
           [value]="node.value[i]"
+          (change)="onTextChange(node, i, control.value)"
           [required]="node.required"
           [minlength]="node.minLength" [maxlength]="node.maxLength"
           [min]="node.min" [max]="node.max"
@@ -137,9 +139,9 @@
         </mat-error>
       </mat-form-field>
 
+      <!-- textarea -->
       <mat-form-field *ngSwitchCase="'textarea'" class="example-full-width mat-form-field">
       <textarea matInput [placeholder]="node.placeholder" [formControl]="control" type="text"
-        [value]="node.value[i]"
         (change)="onTextChange(node,  i, control.value)"
         [required]="node.required"
         [errorStateMatcher]="matcher"></textarea>
@@ -149,6 +151,7 @@
         </mat-error>
       </mat-form-field>
 
+      <!-- date -->
       <mat-form-field *ngSwitchCase="'date'" class="mat-form-field">
         <input matInput [matDatepicker]="picker" [placeholder]="node.placeholder" [formControl]="control"
           (dateChange)="onDateChange($event, node, i)"

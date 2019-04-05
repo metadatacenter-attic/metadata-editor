@@ -1,6 +1,7 @@
 import {FormGroup} from '@angular/forms';
 
 import {InputType} from './input-types';
+import {MetadataModel} from './metadata-model';
 
 
 export interface FileNode {
@@ -34,6 +35,6 @@ export interface FileNode {
   value?: any[];
   label?: any[];
 
-  model?:any;
+  model?:MetadataModel;
   valueLocation?:string;
 }

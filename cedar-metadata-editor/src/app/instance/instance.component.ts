@@ -79,6 +79,7 @@ export class InstanceComponent implements OnInit {
 
   toggleDisabled() {
     this.viewOnly =  !this.viewOnly;
+    this.ngOnInit();
   }
 
   isDisabled() {
@@ -115,38 +116,6 @@ export class InstanceComponent implements OnInit {
   }
 
   // not in use at this time
-  // cloneAbstractControl(control: AbstractControl) {
-  //   let newControl: AbstractControl;
-  //
-  //   if (control instanceof FormGroup) {
-  //     const formGroup = new FormGroup({}, control.validator, control.asyncValidator);
-  //     const controls = control.controls;
-  //
-  //     Object.keys(controls).forEach(key => {
-  //       formGroup.addControl(key, this.cloneAbstractControl(controls[key]));
-  //     });
-  //
-  //     newControl = formGroup;
-  //   } else if (control instanceof FormArray) {
-  //     const formArray = new FormArray([], control.validator, control.asyncValidator);
-  //
-  //     control.controls.forEach(formControl => formArray.push(this.cloneAbstractControl(formControl)))
-  //
-  //     newControl = formArray;
-  //   } else if (control instanceof FormControl) {
-  //     newControl = new FormControl(control.value, control.validator, control.asyncValidator);
-  //   } else {
-  //     throw 'Error: unexpected control value';
-  //   }
-  //
-  //   if (control.disabled) {
-  //     newControl.disable({emitEvent: false});
-  //   }
-  //
-  //   return newControl;
-  // }
-
-  // not in use at this time
   walkTree(node: FileNode, formGroup: FormGroup, parent: FileNode) {
 
     if (node.children) {
@@ -165,7 +134,6 @@ export class InstanceComponent implements OnInit {
 
   // add new element to form
   addNewItem(node: FileNode) {
-    console.log('addNewItem', node);
 
     const clonedObject: FileNode = cloneDeep(node);
     clonedObject.itemCount++;
@@ -184,7 +152,6 @@ export class InstanceComponent implements OnInit {
 
   // delete last element in node array
   deleteLastItem(node: FileNode) {
-    console.log('deleteLastItem', node);
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index, 1);

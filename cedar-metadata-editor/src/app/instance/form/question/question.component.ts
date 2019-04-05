@@ -29,7 +29,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   _ts: TemplateSchemaService;
   _ct: ControlledTermService;
 
-  constructor( fb: FormBuilder, ct: ControlledTermService, ts:TemplateSchemaService) {
+  constructor(fb: FormBuilder, ct: ControlledTermService, ts: TemplateSchemaService) {
     this._fb = fb;
     this._ct = ct;
     this._ts = ts;
@@ -39,8 +39,8 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
-  console(obj:any) {
-    console.log('console',obj);
+  console(obj: any) {
+    console.log('console', obj);
   }
 
   ngOnInit() {
@@ -53,40 +53,52 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     const validators = this.getValidators(this.node);
     const arr = [];
     switch (this.node.type) {
+
       case InputType.controlled:
-        this.controlledGroup =  this._fb.group({
+        this.controlledGroup = this._fb.group({
           chips: this._fb.array(this.node.label),
           ids: this._fb.array(this.node.value),
-          search: new FormControl({disabled:this.disabled})
+          search: new FormControl({disabled: this.disabled})
         });
         arr.push(this.controlledGroup);
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
-      case InputType.textfield:
-      case InputType.textarea:
-      case InputType.list:
-        this.node.value.forEach((value, i) => {
-          const control = new FormControl({value: value, disabled:this.disabled}, validators);
-          arr.push(control);
-        });
-        this.formGroup = this._fb.group({values: this._fb.array(arr)});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
-        break;
+
       case InputType.date:
         this.node.value.forEach((value, i) => {
-          const control = new FormControl( {value: new Date(value), disabled:this.disabled}, validators);
+          const control = new FormControl({value: new Date(value), disabled: this.disabled}, validators);
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
+
+      case InputType.textfield:
+      case InputType.textarea:
+        this.node.value.forEach((value, i) => {
+          const control = new FormControl({value: value, disabled: this.disabled}, validators);
+          arr.push(control);
+        });
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+
+      case InputType.list:
+        this.node.value.forEach((value, i) => {
+          const control = new FormControl({value: value, disabled: this.disabled}, validators);
+          arr.push(control);
+        });
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+
       case InputType.attributeValue:
         this.node.value.forEach((value, i) => {
           const items = [];
-          const controlValue = new FormControl({value: value['rdfs:label'], disabled:this.disabled}, validators);
+          const controlValue = new FormControl({value: value['rdfs:label'], disabled: this.disabled}, validators);
           items.push(controlValue);
-          const controlLabel = new FormControl({value: value['@value'], disabled:this.disabled}, validators);
+          const controlLabel = new FormControl({value: value['@value'], disabled: this.disabled}, validators);
           items.push(controlLabel);
           const fg = this._fb.group({values: this._fb.array(items)});
           arr.push(fg);
@@ -94,21 +106,23 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
+
       case InputType.radio:
         this.node.value.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value[index];
-          const control = new FormControl( {value: this.node.value[index], disabled:this.disabled});
+          const control = new FormControl({value: this.node.value[index], disabled: this.disabled});
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
+
       case InputType.checkbox:
         this.node.value.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value[index];
-          let control = new FormControl( {value: this.node.value[index], disabled:this.disabled});
+          let control = new FormControl({value: this.node.value[index], disabled: this.disabled});
           control.disable();
           arr.push(control);
         });
@@ -128,7 +142,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     this._ts.removeControlledValue(this.node.model, this.node.key, index);
   }
 
-  allowsMultiple(type:InputType) {
+  allowsMultiple(type: InputType) {
     return this._it.allowsMultiple(type);
   }
 
@@ -172,7 +186,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   quantityRangeValidator(min: number, max: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: boolean } | null => {
       if (control.value !== undefined && (isNaN(control.value) || control.value < min || control.value > max)) {
-        return { 'quantityRange': true };
+        return {'quantityRange': true};
       }
       return null;
     };
@@ -180,11 +194,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   // validator for URLs
   numericValidator(): any {
-    return (control: AbstractControl): { [key: string]: boolean} | null => {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
       let result = null;
       if (control.value) {
         if (isNaN(Number(control.value))) {
-          result = { 'numeric': true };
+          result = {'numeric': true};
         }
       }
       return result;
@@ -193,15 +207,15 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   // validator for precision of a number
   decimalValidator(precision: number): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: {actual:number,required:number} } | null => {
+    return (control: AbstractControl): { [key: string]: { actual: number, required: number } } | null => {
       let result = null;
       if (control.value && (!isNaN(Number(control.value)))) {
         const actual = control.value.split(".")[1].length;
-        if (precision !== actual){
+        if (precision !== actual) {
           result = {
             decimal: {
-              actual:actual,
-              required:precision
+              actual: actual,
+              required: precision
             }
           };
         }
@@ -211,7 +225,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   // validator for URLs
-  urlValidator(url:FormControl): any {
+  urlValidator(url: FormControl): any {
     if (url.pristine) {
       return null;
     }
@@ -231,34 +245,34 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     if (this.parentGroup && this.parentGroup.controls.hasOwnProperty(this.node.key)) {
       result = this.parentGroup.controls[this.node.key].valid;
     }
-    console.log('isValid',result)
+    console.log('isValid', result)
     return result;
   }
 
   // handles changes on text, paragraph, email, list...
-  onTextChange(node: FileNode,  index:number, val:any) {
-    this._ts.setTextValue(node.model,node.key, index, node.valueLocation, val);
+  onTextChange(node: FileNode, index: number, val: any) {
+    this._ts.setTextValue(node.model, node.key, index, node.valueLocation, val);
   }
 
-  onListChange(node,index, value) {
-    this._ts.setListValue(node.model,node.key, index, node.valueLocation, value);
+  onListChange(node, index, value) {
+    this._ts.setListValue(node.model, node.key, index, node.valueLocation, value);
   }
 
-  isRadioChecked (node, index, label) {
+  isRadioChecked(node, index, label) {
     return this._ts.getRadioValue(node.model, node.key, index, node.valueLocation) == label;
   }
 
-  onAttributeValueChange(node: FileNode,  index:number, valueLocation:string, val:any) {
+  onAttributeValueChange(node: FileNode, index: number, valueLocation: string, val: any) {
     this._ts.setAttributeValue(node.model, node.key, node.model[node.key][index], valueLocation, val);
   }
 
-  buildAttributeValueControls(val:any[], formGroup:FormGroup) {
+  buildAttributeValueControls(val: any[], formGroup: FormGroup) {
     const arr = [];
     val.forEach((value, i) => {
       const items = [];
-      const controlValue = new FormControl({value: value['rdfs:label'], disabled:this.disabled});
+      const controlValue = new FormControl({value: value['rdfs:label'], disabled: this.disabled});
       items.push(controlValue);
-      const controlLabel = new FormControl({value: value['@value'], disabled:this.disabled});
+      const controlLabel = new FormControl({value: value['@value'], disabled: this.disabled});
       items.push(controlLabel);
       const fg = this._fb.group({values: this._fb.array(items)});
       arr.push(fg);
@@ -267,33 +281,33 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
-  copyAttributeValue(node: FileNode,  index:number) {
+  copyAttributeValue(node: FileNode, index: number) {
     this._ts.copyAttributeValue(node.model, node.key, index);
     const val = this._ts.buildAttributeValues(node.model, node.key);
     this.buildAttributeValueControls(val, this.formGroup);
   }
 
-  removeAttributeValue(node: FileNode,  index:number) {
+  removeAttributeValue(node: FileNode, index: number) {
     this._ts.removeAttributeValue(node.model, node.key, index);
     const val = this._ts.buildAttributeValues(node.model, node.key);
     this.buildAttributeValueControls(val, this.formGroup);
   }
 
-  onRadioChange(node: FileNode,  index:number, val:any) {
-    this._ts.setRadioValue(node.model,node.key, index, node.valueLocation, node.options[val].label);
+  onRadioChange(node: FileNode, i: number, j: number) {
+    this._ts.setRadioValue(node.model, node.key, i, node.valueLocation, node.options[j].label);
   }
 
-  isChecked (node, label) {
+  isChecked(node, label) {
     return node.value[0].indexOf(label) !== -1;
   }
 
   setChecked(node, label) {
-    if (this.isChecked(node,label)) {
+    if (this.isChecked(node, label)) {
       node.value[0].splice(node.value[0].indexOf(label), 1);
     } else {
       node.value[0].push(label);
     }
-    this._ts.setCheckValue(node.model,node.key, node.options, node.value[0]);
+    this._ts.setCheckValue(node.model, node.key, node.options, node.value[0]);
   };
 
 
@@ -305,9 +319,9 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   };
 
   // handle a change to the date
-  public onDateChange(event: any,  node:FileNode,  index:number): void {
+  public onDateChange(event: any, node: FileNode, index: number): void {
     const date = new Date(event.value);
-    const isoDate = date.toISOString().substring(0,10);
+    const isoDate = date.toISOString().substring(0, 10);
     this._ts.setDateValue(node.model, node.key, index, node.valueLocation, isoDate);
   }
 
