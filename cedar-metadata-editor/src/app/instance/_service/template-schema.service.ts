@@ -1,14 +1,17 @@
 import {Injectable} from "@angular/core";
 
 import {TemplateSchema} from '../_models/template-schema';
-import {InputType} from "../_models/input-types";
-import {FileNode} from "../_models/file-node";
+import {InputType, InputTypeService} from '../_models/input-types';
+
 
 
 @Injectable()
 export class TemplateSchemaService {
 
+  it: InputTypeService;
+
   constructor() {
+    this.it = new InputTypeService();
   }
 
   /* parsing Template object */
@@ -22,6 +25,11 @@ export class TemplateSchemaService {
 
   propertiesOf(schema: TemplateSchema) {
     return schema.properties;
+  }
+
+  isSpecialKey(key) {
+    const specialKeyPattern = /(^@)|(^_)|(^schema:)|(^pav:)|(^rdfs:)|(^oslc:)/i;
+    return specialKeyPattern.test(key);
   }
 
   // get the value constraint literal values
@@ -91,8 +99,48 @@ export class TemplateSchemaService {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateElement');
   }
 
+  // does this field have a value constraint?
+  hasControlledTermValue(schema: TemplateSchema) {
+    let result = false;
+    const vcst = schema._valueConstraints;
+    if (vcst) {
+      const hasOntologies = vcst.ontologies && vcst.ontologies.length > 0;
+      const hasValueSets = vcst.valueSets && vcst.valueSets.length > 0;
+      const hasClasses = vcst.classes && vcst.classes.length > 0;
+      const hasBranches = vcst.branches && vcst.branches.length > 0;
+      result = hasOntologies || hasValueSets || hasClasses || hasBranches;
+    }
+    return result;
+  }
+
+  // get the controlled terms list for field types
+  getFieldControlledTerms(schema: TemplateSchema, inputType: InputType) {
+    if (!this.it.isStatic(inputType) && inputType !== InputType.attributeValue) {
+      const properties = this.propertiesOf(schema);
+      if (properties['@type'] && properties['@type'].oneOf && properties['@type'].oneOf[1]) {
+        return properties['@type'].oneOf[1].items['enum'];
+      }
+    }
+  }
+
+  // where is the value of this field, @id or @value?
+  getValueLocation(schema: TemplateSchema, inputType: InputType) {
+    const ct = this.getFieldControlledTerms(schema, inputType);
+    const ctv = this.hasControlledTermValue(schema);
+    const link = inputType === InputType.link;
+    return (ct || ctv || link) ? '@id' : '@value';
+  }
+
   isField(schema: TemplateSchema) {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateField');
+  }
+
+  getOrder(schema: TemplateSchema) {
+    return schema['_ui']['order'];
+  }
+
+  getProperties(schema: TemplateSchema) {
+    return schema['properties'];
   }
 
   getInputType(schema: TemplateSchema): InputType {
@@ -180,9 +228,6 @@ export class TemplateSchemaService {
     return val;
   }
 
-
-
-
   setAttributeValue(model, key, itemKey, valueLocation, val) {
     if (valueLocation === '@value') {
       // change the value
@@ -219,8 +264,6 @@ export class TemplateSchemaService {
     model[key].splice(index, 1  );
     delete model[oldKey]
   };
-
-
 
   getRadioValue(model, key, index, valueLocation) {
     if (Array.isArray(model[key])) {
