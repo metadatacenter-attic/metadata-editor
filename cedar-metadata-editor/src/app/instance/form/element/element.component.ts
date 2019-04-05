@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 
 import {ElementService} from './service/element.service'
 import {UiService} from "../../../services/ui/ui.service";
-import {FileNode} from "../../_models/file-node";
+import {FileNode} from "../_models/file-node";
 
 
 @Component({

@@ -1,54 +1,40 @@
-import {Component, Injectable, OnInit} from '@angular/core';
-//import { NgModule } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 import {Subscription} from 'rxjs';
 import {FormGroup} from '@angular/forms';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {NestedTreeControl} from '@angular/cdk/tree';
 import {ActivatedRoute} from '@angular/router';
-import * as cloneDeep from 'lodash/cloneDeep';
-
-import {UiService} from '../services/ui/ui.service';
-import {FileNode} from './_models/file-node';
-import {TemplateSchemaService} from './_service/template-schema.service';
-import {TemplateService} from './_service/template.service';
-import * as jsonld from 'jsonld';
+import {UiService} from "../services/ui/ui.service";
 
 @Component({
   selector: 'app-instance',
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.less'],
-  providers: [TemplateService, TemplateSchemaService]
+  providers: []
 })
 
 export class InstanceComponent implements OnInit {
-  treeControl: NestedTreeControl<FileNode>;
-  dataSource: MatTreeNestedDataSource<FileNode>;
-  database: TemplateService;
   form: FormGroup;
   route: ActivatedRoute;
   payload: any;
   jsonLD: any;
   rdf: any;
-  id: number;
-  formInvalid: boolean;
+  id: string;
+  formValid: boolean;
+  viewOnly: boolean = false;
+  ui: UiService;
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  private _subscription: Subscription;
-  viewOnly: boolean = false;
 
-  constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
-    this.database = ts;
+  constructor(ui: UiService, route: ActivatedRoute) {
     this.route = route;
+    this.ui = ui;
   }
 
   ngOnInit() {
     this.route.params.subscribe((val) => {
-      console.log('route params', val);
-      // got a new route, initialize new template and model by id
-      this.initialize(val.templateId);
+      this.id = val.templateId;
     });
 
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
@@ -56,114 +42,25 @@ export class InstanceComponent implements OnInit {
     });
   }
 
-  private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
-
-  private _getChildren = (node: FileNode) => node.children;
-
-  initialize(templateId: string) {
-
-    this.form = new FormGroup({});
-    this.jsonLD = this.database.initialize(this.form, templateId);
-    this.getRDF();
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
-    });
-
+  // form changed, update tab contents and submit button status
+  protected onChanged(event) {
+    const e = event;
     setTimeout(() => {
-      this.payload = this.form.value;
-      this.formInvalid = !this.form.valid
+      this.payload = e.payload;
+      this.jsonLD = e.jsonLD;
+      this.rdf = e.rdf;
+      this.formValid = e.formValid;
+      //TODO debug rdf change delay
+      //console.log('777',JSON.stringify(this.rdf).indexOf('777'));
     }, 0);
   }
 
+  // toggle edit/view button
   toggleDisabled() {
-    this.viewOnly =  !this.viewOnly;
-    this.ngOnInit();
+    this.viewOnly = !this.viewOnly;
   }
 
-  isDisabled() {
-    return this.viewOnly;
-  }
-
-  private getRDF() {
-    let that = this;
-    jsonld.toRDF(this.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-      if (err) {
-        console.log('err', err);
-      }
-      that.rdf = nquads;
-      return nquads;
-    });
-  }
-
-  ngAfterViewInit() {
-    this.onChanges();
-  }
-
-  // keep up-to-date on changes in the form
-  onChanges(): void {
-    if (this.form) {
-      this._subscription = this.form.valueChanges.subscribe(val => {
-        this.payload = val;
-        this.jsonLD = this.database.model;
-        this.getRDF();
-        setTimeout(() => {
-          this.formInvalid = !this.form.valid;
-        }, 0);
-      });
-    }
-  }
-
-  // not in use at this time
-  walkTree(node: FileNode, formGroup: FormGroup, parent: FileNode) {
-
-    if (node.children) {
-      console.log('key', node.key, 'element', node.formGroup);
-      node.children.forEach((item, index) => {
-        item.parent = node;
-        item.name += index;
-        item.formGroup = formGroup;
-        this.walkTree(item, item.formGroup, node);
-      });
-    } else {
-      node.parent = parent;
-      console.log('key', node.key, 'formGroup', node.formGroup, 'parent', node.parent);
-    }
-  }
-
-  // add new element to form
-  addNewItem(node: FileNode) {
-
-    const clonedObject: FileNode = cloneDeep(node);
-    clonedObject.itemCount++;
-    clonedObject.key += clonedObject.itemCount;
-    const siblings = node.parent ? node.parent.children : this.database.data;
-    const index = siblings.indexOf(node);
-    siblings.splice(index + 1, 0, clonedObject);
-
-    clonedObject.parentGroup = node.parentGroup;
-    const parent = node.parentGroup || this.form;
-    parent.addControl(clonedObject.key, clonedObject.formGroup);
-
-    this.database.dataChange.next(this.database.data);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  }
-
-  // delete last element in node array
-  deleteLastItem(node: FileNode) {
-    const siblings = node.parent ? node.parent.children : this.database.data;
-    const index = siblings.indexOf(node);
-    siblings.splice(index, 1);
-    this.database.dataChange.next(this.database.data);
-    node.parentGroup.removeControl(node.key);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  }
-
-  onSubmit(value: any,) {
-    this.payload = this.form.value;
-  }
-
+  // copy stuff in tabs to browser's clipboard
   copyToClipboard(elementId: string, buttonId: string) {
 
     function copyToClip(str) {
@@ -172,10 +69,11 @@ export class InstanceComponent implements OnInit {
         e.clipboardData.setData("text/plain", str);
         e.preventDefault();
       }
+
       document.addEventListener("copy", listener);
       document.execCommand("copy");
       document.removeEventListener("copy", listener);
-    };
+    }
 
     let elm = document.getElementById(elementId);
     let data = elm ? elm.innerHTML : null;
@@ -203,9 +101,11 @@ export class InstanceComponent implements OnInit {
           }
         }, 10000);
       }
-
     }
+  }
 
+  onSubmit() {
+    console.log('onSubmit')
   }
 
 

@@ -4,10 +4,10 @@ import {BehaviorSubject} from 'rxjs';
 
 import {FileNode} from '../_models/file-node';
 import {MetadataModel, MetadataSnip} from '../_models/metadata-model';
-import {TemplateDataService} from '../_service/template-data.service';
+import {TemplateDataService} from './template-data.service';
 import {InputType, InputTypeService} from '../_models/input-types';
 import {TemplateSchema, SchemaProperties} from '../_models/template-schema';
-import {TemplateSchemaService} from '../_service/template-schema.service';
+import {TemplateSchemaService} from './template-schema.service';
 import {Meta} from "@angular/platform-browser";
 
 

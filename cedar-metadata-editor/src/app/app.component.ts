@@ -23,7 +23,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() { this._subscription = this.ui.darkModeState$.subscribe(res => {
     this.darkMode = res;
-    console.log('received', res);
   })}
 
   toggleMenu() {
