@@ -50,8 +50,11 @@ export class InstanceComponent implements OnInit {
       this.jsonLD = e.jsonLD;
       this.rdf = e.rdf;
       this.formValid = e.formValid;
-      //TODO debug rdf change delay
-      //console.log('777',JSON.stringify(this.rdf).indexOf('777'));
+      // //TODO debug rdf change delay
+      // if (e.rdf) {
+      //   console.log('rdf 777', JSON.stringify(e.rdf).indexOf('777'));
+      // }
+
     }, 0);
   }
 

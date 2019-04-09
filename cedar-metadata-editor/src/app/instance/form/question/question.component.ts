@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, AfterViewInit} from '@angular/core';
+import {Component, Input, OnInit, AfterViewInit, Output, EventEmitter} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractControl, ValidatorFn} from '@angular/forms';
 
 import {FileNode} from '../_models/file-node';
@@ -18,6 +18,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
   @Input() disabled: boolean;
+  @Output() changed = new EventEmitter<any>();
 
   formGroup: FormGroup;
   post: Post[];
@@ -119,11 +120,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         break;
 
       case InputType.checkbox:
+        console.log('checkbox', this.node.value, this.node.model[this.node.key]);
         this.node.value.forEach((item, index) => {
           const obj = {};
           obj[this.node.key + index] = this.node.value[index];
           let control = new FormControl({value: this.node.value[index], disabled: this.disabled});
-          control.disable();
           arr.push(control);
         });
         this.formGroup = this._fb.group({values: this._fb.array(arr)});
@@ -249,21 +250,28 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return result;
   }
 
-  // handles changes on text, paragraph, email, list...
-  onTextChange(node: FileNode, index: number, val: any) {
-    this._ts.setTextValue(node.model, node.key, index, node.valueLocation, val);
+  onChanges(node: FileNode, index: number, value: any) {
+    this.changed.emit({'type': node.type, 'subtype': node.subtype,'model':node.model,'key':node.key, 'index':index,'location': node.valueLocation, 'value':value});
   }
 
-  onListChange(node, index, value) {
-    this._ts.setListValue(node.model, node.key, index, node.valueLocation, value);
+  isChecked(node, index, label) {
+    return node.value[index].indexOf(label) !== -1;
   }
 
-  isRadioChecked(node, index, label) {
-    return this._ts.getRadioValue(node.model, node.key, index, node.valueLocation) == label;
-  }
+  toggleChecked(node, index,label) {
+    if (this.isChecked(node, index,label)) {
+      node.value[index].splice(node.value[index].indexOf(label), 1);
+    } else {
+      node.value[index].push(label);
+    }
+  };
 
-  onAttributeValueChange(node: FileNode, index: number, valueLocation: string, val: any) {
-    this._ts.setAttributeValue(node.model, node.key, node.model[node.key][index], valueLocation, val);
+  onAVLabelChanges(node: FileNode, index: number, valueLocation: string, value: any) {
+    this.changed.emit({'type': 'attribute-value', 'subtype': '','model':node.model,'key':node.key, 'index':index,'location': valueLocation, 'value':value});
+ }
+
+  onAVValueChanges(node: FileNode, index: number, valueLocation: string, value: any) {
+    this.changed.emit({'type': 'textfield', 'subtype': '','model':node.model,'key':node.model[node.key][index], 'index':index,'location': '@value', 'value':value});
   }
 
   buildAttributeValueControls(val: any[], formGroup: FormGroup) {
@@ -293,37 +301,12 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     this.buildAttributeValueControls(val, this.formGroup);
   }
 
-  onRadioChange(node: FileNode, i: number, j: number) {
-    this._ts.setRadioValue(node.model, node.key, i, node.valueLocation, node.options[j].label);
-  }
-
-  isChecked(node, label) {
-    return node.value[0].indexOf(label) !== -1;
-  }
-
-  setChecked(node, label) {
-    if (this.isChecked(node, label)) {
-      node.value[0].splice(node.value[0].indexOf(label), 1);
-    } else {
-      node.value[0].push(label);
-    }
-    this._ts.setCheckValue(node.model, node.key, node.options, node.value[0]);
-  };
-
-
   // do you want to filter dates out of the calendar?
   dateFilter = (d: Date): boolean => {
     const day = d.getDay();
     // Prevent Saturday and Sunday from being selected.
     return day !== 0 && day !== 6;
   };
-
-  // handle a change to the date
-  public onDateChange(event: any, node: FileNode, index: number): void {
-    const date = new Date(event.value);
-    const isoDate = date.toISOString().substring(0, 10);
-    this._ts.setDateValue(node.model, node.key, index, node.valueLocation, isoDate);
-  }
 
   addNewItem() {
 
@@ -341,7 +324,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   deleteLastItem() {
-
     const at = this.node.value.length - 1;
     this.node.value.splice(at, 1);
     const fa = this.formGroup.controls.values as FormArray;

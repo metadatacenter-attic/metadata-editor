@@ -182,6 +182,7 @@ export class TemplateSchemaService {
     } else {
       model[key][valueLocation] = val;
     }
+    console.log('setTextValue',model);
   }
 
   setListValue(model, key, index, valueLocation, val) {
@@ -283,12 +284,16 @@ export class TemplateSchemaService {
     model[key].splice(index, 1);
   }
 
-  setCheckValue(model:any, key:string,  options, val) {
+
+  setCheckValue(model:any, key:string,  index:number, location:string,  val:string[]) {
     let arr = [];
-    for (const v in val) {
-      arr.push({'@value': options[v].label})
+    for (let i=0;i<val[index].length;i++ ) {
+      let obj = {};
+      obj[location] =  val[index][i];
+      arr.push(obj);
     }
     model[key] = arr;
+    console.log('setCheckValue', val, location, arr);
   }
 
   setDateValue(model:any, key:string, index:number, valueLocation, val) {

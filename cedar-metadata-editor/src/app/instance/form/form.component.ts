@@ -4,6 +4,7 @@ import {FormGroup} from '@angular/forms';
 import {TemplateService} from './service/template.service';
 import {TemplateSchemaService} from './service/template-schema.service';
 import {ElementService} from './element/service/element.service';
+import {InputType, InputTypeService} from './_models/input-types';
 
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {FileNode} from "./_models/file-node";
@@ -18,7 +19,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
   selector: 'cedar-metadata-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.less'],
-  providers: [TemplateService, TemplateSchemaService, ElementService]
+  providers: [TemplateService, TemplateSchemaService, ElementService, InputTypeService]
 })
 
 export class FormComponent implements OnChanges {
@@ -32,7 +33,9 @@ export class FormComponent implements OnChanges {
   dataSource: MatTreeNestedDataSource<FileNode>;
   database: TemplateService;
   route: ActivatedRoute;
-  response:any = {payload:null, jsonLD: null, rdf:null, formValid:false};
+  response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
+  _ts: TemplateSchemaService;
+  _it: InputTypeService;
 
 
   darkMode: boolean;
@@ -40,14 +43,62 @@ export class FormComponent implements OnChanges {
 
   private _subscription: Subscription;
 
-  constructor(private ui: UiService, ts: TemplateService, route: ActivatedRoute) {
-    this.database = ts;
+  constructor(private ui: UiService, database: TemplateService, route: ActivatedRoute, ts:TemplateSchemaService, it:InputTypeService) {
+    this.database = database;
     this.route = route;
+    this._ts = ts;
+    this._it = it;
   }
 
   changeLog: string[] = [];
 
-  ngOnChanges(changes: {[propKey: string]: SimpleChange}) {
+  onFormChanges() {
+    this.response.payload = this.form.value;
+    this.response.jsonLD = this.database.model;
+    this.response.formValid = this.form.valid;
+    let that = this;
+    jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+      that.response.rdf = err ? err : nquads;
+      that.changed.emit(that.response);
+    });
+  }
+
+  onQuestionChanges(event) {
+    switch (event.type) {
+      case InputType.textfield:
+        this._ts.setTextValue(event.model, event.key, event.index, event.location, event.value);
+        break;
+      case InputType.list:
+        this._ts.setListValue(event.model, event.key, event.index, event.location, event.value);
+        break;
+      case InputType.date:
+        const date = new Date(event.value);
+        const isoDate = date.toISOString().substring(0, 10);
+        this._ts.setDateValue(event.model, event.key, event.index, event.location, isoDate);
+        break;
+      case InputType.radio:
+        this._ts.setRadioValue(event.model, event.key, event.index, event.location, event.value);
+        break;
+      case InputType.checkbox:
+        this._ts.setCheckValue(event.model, event.key, event.index, event.location, event.value);
+        break;
+      case InputType.attributeValue:
+        this._ts.setAttributeValue(event.model, event.key, event.model[event.key][event.index], event.lLocation, event.value);
+        break;
+    }
+    this.onFormChanges();
+  }
+
+  // keep up-to-date on changes in the form
+  onChanges(): void {
+    if (this.form) {
+      this._subscription = this.form.valueChanges.subscribe(val => {
+        this.onFormChanges();
+      });
+    }
+  }
+
+  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
     let log: string[] = [];
     for (let propName in changes) {
       let changedProp = changes[propName];
@@ -79,20 +130,7 @@ export class FormComponent implements OnChanges {
       this.dataSource.data = data;
     });
 
-    this.response.payload = this.form.value;
-    this.response.jsonLD = this.database.model;
-    this.response.formValid = this.form.valid;
-
-    // get the rdf before you return everything to parent
-    let that = this;
-    jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-      if (err) {
-        that.response.rdf = err;
-      }  else {
-        that.response.rdf = nquads;
-      }
-      that.changed.emit(that.response);
-    });
+    this.onFormChanges();
   }
 
   getTitle() {
@@ -106,31 +144,7 @@ export class FormComponent implements OnChanges {
   ngAfterViewInit() {
     this.onChanges();
   }
-
-  // keep up-to-date on changes in the form
-  onChanges(): void {
-    if (this.form) {
-      this._subscription = this.form.valueChanges.subscribe(val => {
-        this.response.payload = val;
-        this.response.jsonLD = this.database.model;
-        this.response.formValid = this.form.valid;
-
-        // get the rdf before you return everything to parent
-        let that = this;
-        // TODO debug delayed jsonLD and RDF changes
-        console.log('json 777',JSON.stringify(this.response.jsonLD).indexOf('777'));
-        jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-          that.response.rdf = err ? err : nquads;
-          console.log('rdf 777',JSON.stringify(that.response.rdf).indexOf('777'));
-          setTimeout(() => {
-            that.changed.emit(that.response);
-          }, 0);
-
-        });
-      });
-    }
-  }
-
+  
   // add new element to form
   addNewItem(node: FileNode) {
 
