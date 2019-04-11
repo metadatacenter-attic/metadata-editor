@@ -144,7 +144,7 @@ export class FormComponent implements OnChanges {
   ngAfterViewInit() {
     this.onChanges();
   }
-  
+
   // add new element to form
   addNewItem(node: FileNode) {
 

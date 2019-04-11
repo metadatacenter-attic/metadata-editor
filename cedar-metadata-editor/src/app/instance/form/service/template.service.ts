@@ -203,6 +203,27 @@ export class TemplateService {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
+  staticNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key:string, modelValue:MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
+
+    const node = {
+      'key': key,
+      'model': model,
+      'minItems': 0,
+      'maxItems': 0,
+      'itemCount': 0,
+      'name': this.ts.getTitle(schema),
+      'type': InputType.static,
+      'subtype': inputType,
+      'formGroup': formGroup,
+      'parentGroup': parent ? parent.formGroup : null,
+      'parent': parent,
+      'value': this.ts.getContent(schema),
+      'size': this.ts.getSize(schema)
+
+    };
+    return node;
+  }
+
   fieldNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key:string, modelValue:MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
 
     const node = {
@@ -296,16 +317,19 @@ export class TemplateService {
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
         const name:string = this.ts.getTitle(schema);
+        console.log(' node',key, this.ts.getInputType(schema),this.ts.isField(schema) == this.it.isStatic(this.ts.getInputType(schema)))
         if (this.ts.isField(schema)) {
           if (this.it.isAttributeValue(this.ts.getInputType(schema))) {
             const items = this.ts.buildAttributeValues(model, key);
             let node = this.attributeValueNode(schema, model, key, items, formGroup, parent);
             accumulator = accumulator.concat(node);
-
           } else {
             let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
             accumulator = accumulator.concat(node);
           }
+        } else if (this.it.isStatic(this.ts.getInputType(schema))) {
+          let node = this.staticNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+          accumulator = accumulator.concat(node);
         }
         if (this.ts.isElement(schema)) {
           const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;

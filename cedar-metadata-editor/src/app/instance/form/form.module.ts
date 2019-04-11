@@ -3,6 +3,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
 
 import {FormComponent} from './form.component';
 import {TemplateService} from './service/template.service';
@@ -25,7 +26,8 @@ import {DemoMaterialModule} from '../../../material-module';
     ReactiveFormsModule,
     CommonModule,
     NgbModule,
-    DemoMaterialModule
+    DemoMaterialModule,
+    NgxYoutubePlayerModule.forRoot()
   ],
   exports: [
     FormComponent

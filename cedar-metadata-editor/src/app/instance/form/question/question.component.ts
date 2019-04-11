@@ -1,5 +1,8 @@
 import {Component, Input, OnInit, AfterViewInit, Output, EventEmitter} from '@angular/core';
 import {FormGroup, FormBuilder, FormArray, Validators, FormControl, AbstractControl, ValidatorFn} from '@angular/forms';
+import { NgxYoutubePlayerModule } from 'ngx-youtube-player';
+
+
 
 import {FileNode} from '../_models/file-node';
 import {ControlledTermService} from '../service/controlled-terms.service';
@@ -25,16 +28,24 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   controlled: ControlledComponent;
   controlledGroup: FormGroup;
 
+
+
   _fb: FormBuilder;
   _it: InputTypeService;
   _ts: TemplateSchemaService;
   _ct: ControlledTermService;
+  _yt;
+  player;
+  //private id: string = 'mw816POGRrk';
 
-  constructor(fb: FormBuilder, ct: ControlledTermService, ts: TemplateSchemaService) {
+
+  constructor(fb: FormBuilder, ct: ControlledTermService, ts: TemplateSchemaService, yt: NgxYoutubePlayerModule) {
     this._fb = fb;
     this._ct = ct;
     this._ts = ts;
     this._it = new InputTypeService();
+    this._yt = new NgxYoutubePlayerModule();
+    this.player = this._yt.Player;
   }
 
   ngAfterViewInit() {
@@ -42,6 +53,14 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   console(obj: any) {
     console.log('console', obj);
+  }
+
+  savePlayer(player) {
+    this.player = player;
+    console.log('player instance', player);
+  }
+  onStateChange(event) {
+    console.log('player state', event.data);
   }
 
   ngOnInit() {
@@ -54,6 +73,15 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     const validators = this.getValidators(this.node);
     const arr = [];
     switch (this.node.type) {
+
+      case InputType.youTube:
+      case InputType.image:
+      case InputType.sectionBreak:
+      case InputType.pageBreak:
+      case InputType.richText:
+        this.formGroup = this._fb.group({values: this._fb.array(arr)});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
 
       case InputType.controlled:
         this.controlledGroup = this._fb.group({
@@ -335,6 +363,32 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   loadForm(key, form) {
     console.log('load the form with key', key, form);
   }
+
+  getYouTubeEmbedFrame(node:FileNode) {
+    var width = 560;
+    var height = 315;
+    var content:string = node.value[0];
+    if (content) {
+      content = content.replace(/<(?:.|\n)*?>/gm, '');
+    }
+
+    //var size = dms.getSize(field);
+    let size;
+
+    if (size && size.width && Number.isInteger(size.width)) {
+      width = size.width;
+    }
+    if (size && size.height && Number.isInteger(size.height)) {
+      height = size.height;
+    }
+
+    // if I say trust as html, then better make sure it is safe first
+    if (content) {
+      return
+        '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + content + '" frameborder="0" allowfullscreen></iframe>';
+    }
+  };
+
 
 }
 
