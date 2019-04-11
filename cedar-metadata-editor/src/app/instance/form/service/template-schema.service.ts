@@ -147,6 +147,14 @@ export class TemplateSchemaService {
     return (schema && schema._ui && schema._ui.inputType) ? schema._ui.inputType : null;
   }
 
+  getContent(schema: TemplateSchema): any {
+    return (schema && schema._ui && schema._ui['_content']) ? schema._ui['_content'] : null;
+  }
+
+  getSize(schema:TemplateSchema):any {
+    return (schema && schema._ui && schema._ui['_size']) ? schema._ui['_size'] : null;
+  }
+
   // has multiple choice value constraints?
   isMultiValue(schema: TemplateSchema) {
     return schema._valueConstraints && schema._valueConstraints.multipleChoice;

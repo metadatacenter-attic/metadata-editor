@@ -18,7 +18,8 @@ export enum InputType {
   sectionBreak = 'section-break',
   richText = 'richtext',
   image = 'image',
-  youTube = 'youtube'
+  youTube = 'youtube',
+  static = 'static'
 }
 
 const INPUT_TYPES = JSON.stringify({
