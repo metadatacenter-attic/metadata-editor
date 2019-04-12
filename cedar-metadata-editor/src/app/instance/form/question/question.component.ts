@@ -364,6 +364,22 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     console.log('load the form with key', key, form);
   }
 
+  getImageWidth(node:FileNode) {
+    let width = 367;
+    if (node.size && node.size.width && Number.isInteger(node.size.width)) {
+       width=node.size.width;
+    }
+    return width;
+  }
+
+  getImageHeight(node:FileNode) {
+    let height = 270;
+    if (node.size && node.size.height && Number.isInteger(node.size.height)) {
+      height=node.size.height;
+    }
+    return height;
+  }
+
   getYouTubeEmbedFrame(node:FileNode) {
     var width = 560;
     var height = 315;

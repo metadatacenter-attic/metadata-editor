@@ -135,12 +135,55 @@ export class TemplateSchemaService {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateField');
   }
 
+  isStaticField(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/StaticTemplateField');
+  }
+
   getOrder(schema: TemplateSchema) {
     return schema['_ui']['order'];
   }
 
   getProperties(schema: TemplateSchema) {
     return schema['properties'];
+  }
+
+  getPageCount(schema: TemplateSchema) {
+    const properties = this.getProperties(schema);
+    let currentPage = 0;
+    let that = this;
+    this.getOrder(schema).forEach(function(key) {
+      let prop:TemplateSchema = properties[key];
+      let type:InputType = that.getInputType(prop);
+      if (that.it.isPageBreak(type)) {
+        currentPage++;
+      }
+    });
+    return currentPage + 1;
+  }
+
+  // build an order array for a particular page
+  getOrderofPage(schema: TemplateSchema, page:number) {
+    const p = page || 0;
+    const properties = this.getProperties(schema);
+    const order = this.getOrder(schema);
+    let currentPage = 0;
+    let pageOrder = [];
+    let that = this;
+    order.forEach(function(key) {
+
+      let prop:TemplateSchema = properties[key];
+
+        let type:InputType = that.getInputType(prop);
+        if (that.it.isPageBreak(type)) {
+          currentPage++;
+        } else {
+          if (currentPage === p) {
+            pageOrder.push(key);
+          }
+        }
+
+    });
+    return pageOrder;
   }
 
   getInputType(schema: TemplateSchema): InputType {

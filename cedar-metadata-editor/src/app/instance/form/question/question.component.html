@@ -1,25 +1,22 @@
-<ng-container *ngIf="node.type == 'static';else notStaticType">
-  <!-- youtube -->
-  <div *ngIf="node.subtype == 'youtube'">
 
+<ng-container *ngIf="node.type == 'static';else notStaticType">
+
+  <!-- youtube -->
+  <div class="static-video" *ngIf="node.subtype == 'youtube'" [ngStyle]="{'max-width.px': getImageWidth(node)}">
     <youtube-player
       [videoId]="node.value"
-      [height] = "node['size'] ? node['size']['height'] : null"
-      [width] = "node['size'] ? node['size']['width'] : null"
+      [height] = "getImageHeight(node)"
+      [width] = "getImageWidth(node)"
       (ready)="savePlayer($event)"
-      (change)="onStateChange($event)"
-    ></youtube-player>
-
+      (change)="onStateChange($event)"></youtube-player>
+      <div class="caption"><label >{{node.name}}</label></div>
   </div>
 
   <!-- image -->
-  <div *ngIf="node.subtype == 'image'">
-    <figure>
-      <img [src]="node.value"  alt="{{node.label}}"
-        type="image/png" />
-      <figcaption><label>{{node.label}}</label></figcaption>
-    </figure>
-  </div>
+  <figure class="static-image" *ngIf="node.subtype == 'image'" [ngStyle]="{'max-width.px': getImageWidth(node)}">
+      <img class="image" src="{{node.value}}"   width="{{getImageWidth(node)}}"   alt="{{node.name}}"/>
+      <figcaption class="caption"><label >{{node.name}}</label></figcaption>
+  </figure>
 
   <!-- richtext -->
   <div *ngIf="node.subtype == 'richtext'">
@@ -53,7 +50,6 @@
         <div *ngFor="let fg of formGroup.controls['values']['controls'];let j = index">
           <div style="display:flex;">
             <mat-form-field class="example-full-width mat-form-field" style="padding:10px">
-              {{node.type}}
               <input matInput  [placeholder]="node.placeholder"
                 [formControl]="fg['controls']['values']['controls'][0]"
                 [type]="node.subtype"
