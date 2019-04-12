@@ -34,6 +34,7 @@ export interface FileNode {
   options?: any;
   value?: any[];
   label?: any[];
+  size?:any;
 
   model?:MetadataModel;
   valueLocation?:string;

@@ -23,16 +23,7 @@
       </div>
 
     </mat-tab>
-    <mat-tab label="Value">
-      <div *ngIf="payload">
-        <div class="tab-header" >
-          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
-            Copy
-          </button>
-        </div>
-        <pre><span id="payload">{{ payload | json}}</span></pre>
-      </div>
-    </mat-tab>
+
     <mat-tab label="JSON-LD">
       <div *ngIf="jsonLD">
         <div class="tab-header" >
@@ -51,6 +42,17 @@
           </button>
         </div>
         <pre><div id="rdf">{{rdf}}</div></pre>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Value">
+      <div *ngIf="payload">
+        <div class="tab-header" >
+          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
+            Copy
+          </button>
+        </div>
+        <pre><span id="payload">{{ payload | json}}</span></pre>
       </div>
     </mat-tab>
   </mat-tab-group>

@@ -1,5 +1,6 @@
 import {Component, Input, EventEmitter, Output, OnChanges, SimpleChange} from '@angular/core';
 import {FormGroup} from '@angular/forms';
+import {PageEvent} from '@angular/material';
 
 import {TemplateService} from './service/template.service';
 import {TemplateSchemaService} from './service/template-schema.service';
@@ -14,6 +15,8 @@ import {Subscription} from "rxjs";
 import {UiService} from "../../services/ui/ui.service";
 import * as jsonld from 'jsonld';
 import * as cloneDeep from 'lodash/cloneDeep';
+
+
 
 @Component({
   selector: 'cedar-metadata-form',
@@ -34,9 +37,11 @@ export class FormComponent implements OnChanges {
   database: TemplateService;
   route: ActivatedRoute;
   response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
+  pageEvent: PageEvent;
+  templateId;
+
   _ts: TemplateSchemaService;
   _it: InputTypeService;
-
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
@@ -51,6 +56,18 @@ export class FormComponent implements OnChanges {
   }
 
   changeLog: string[] = [];
+
+  onPageChange(event) {
+    this.pageEvent = event;
+    const page = this.pageEvent.pageIndex;
+    this.response.jsonLD = this.database.initialize(this.form, this.templateId, page, this.database.model);
+    this.pageEvent.length =  this._ts.getPageCount(this.database.template);
+    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.dataSource = new MatTreeNestedDataSource();
+    this.database.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
+  }
 
   onFormChanges() {
     this.response.payload = this.form.value;
@@ -119,17 +136,17 @@ export class FormComponent implements OnChanges {
   private _getChildren = (node: FileNode) => node.children;
 
   initialize(templateId: string) {
-
+    this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
+    this.templateId = templateId;
     this.form = new FormGroup({});
-    this.onChanges();
     this.response.jsonLD = this.database.initialize(this.form, templateId);
-
+    this.pageEvent.length =  this._ts.getPageCount(this.database.template);
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {
       this.dataSource.data = data;
     });
-
+    this.onChanges();
     this.onFormChanges();
   }
 
@@ -142,7 +159,7 @@ export class FormComponent implements OnChanges {
   }
 
   ngAfterViewInit() {
-    this.onChanges();
+    //this.onChanges();
   }
 
   // add new element to form

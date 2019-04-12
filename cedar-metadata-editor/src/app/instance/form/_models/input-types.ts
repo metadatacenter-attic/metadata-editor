@@ -276,6 +276,10 @@ export class InputTypeService {
     return t === InputType.checkbox;
   }
 
+  isPageBreak(t:string) {
+    return t === InputType.pageBreak;
+  }
+
   isTextfield(t: string) {
     return t === InputType.textfield;
   }

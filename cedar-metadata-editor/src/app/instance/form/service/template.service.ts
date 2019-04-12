@@ -9,6 +9,7 @@ import {InputType, InputTypeService} from '../_models/input-types';
 import {TemplateSchema, SchemaProperties} from '../_models/template-schema';
 import {TemplateSchemaService} from './template-schema.service';
 import {Meta} from "@angular/platform-browser";
+import {isNullOrUndefined} from "util";
 
 
 @Injectable()
@@ -37,11 +38,17 @@ export class TemplateService {
     return this.ts.getTitle(this.template);
   }
 
-  initialize(formGroup: FormGroup, templateId: string): any {
+  initialize(formGroup: FormGroup, templateId: string, pageIndex?:number, model?:MetadataModel): any {
     const id = Number.parseInt(templateId);
+    let data;
     this.template = this.td.templateData[id] as TemplateSchema;
-    this.model = this.td.modelData[id] as MetadataModel;
-    const data = this.buildFileTree(this.ts.getOrder(this.template), this.ts.getProperties(this.template), this.model, 0, formGroup, null);
+    this.model = model ? model : this.td.modelData[id] as MetadataModel;
+    data = this.buildFileTree(this.ts.getOrder(this.template), this.ts.getProperties(this.template), this.model, 0, formGroup, null);
+
+    if (this.ts.getPageCount(this.template)) {
+      const page = pageIndex ? pageIndex : 0;
+      data = this.buildFileTree(this.ts.getOrderofPage(this.template, pageIndex), this.ts.getProperties(this.template), this.model, 0, formGroup, null);
+    }
     this.dataChange.next(data);
     return this.model;
   }
@@ -317,27 +324,27 @@ export class TemplateService {
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
         const name:string = this.ts.getTitle(schema);
-        console.log(' node',key, this.ts.getInputType(schema),this.ts.isField(schema) == this.it.isStatic(this.ts.getInputType(schema)))
-        if (this.ts.isField(schema)) {
-          if (this.it.isAttributeValue(this.ts.getInputType(schema))) {
-            const items = this.ts.buildAttributeValues(model, key);
-            let node = this.attributeValueNode(schema, model, key, items, formGroup, parent);
-            accumulator = accumulator.concat(node);
-          } else {
-            let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
-            accumulator = accumulator.concat(node);
-          }
-        } else if (this.it.isStatic(this.ts.getInputType(schema))) {
-          let node = this.staticNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
-          accumulator = accumulator.concat(node);
-        }
         if (this.ts.isElement(schema)) {
           const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
           for (let i = 0; i < itemCount; i++) {
             let node = this.elementNode(schema, model, minItems, maxItems, i, key, level, modelValue, formGroup, parent);
             accumulator = accumulator.concat(node);
           }
+        } else if (this.ts.isStaticField(schema)) {
+          let node = this.staticNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+          accumulator = accumulator.concat(node);
+        } else if (this.ts.isField(schema)) {
+          if (this.it.isAttributeValue(this.ts.getInputType(schema))) {
+            const items = this.ts.buildAttributeValues(model, key);
+            let node = this.attributeValueNode(schema, model, key, items, formGroup, parent);
+            accumulator = accumulator.concat(node);
+
+          } else {
+            let node = this.fieldNode(schema, model, this.ts.getInputType(schema), minItems, maxItems, key, modelValue, formGroup, parent);
+            accumulator = accumulator.concat(node);
+          }
         }
+
       }
       return accumulator;
 

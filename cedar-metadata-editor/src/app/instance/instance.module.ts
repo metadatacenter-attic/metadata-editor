@@ -4,8 +4,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
-
-
 import {InstanceRoutingModule} from './instance-routing.module';
 import {InstanceComponent} from './instance.component';
 import {FormModule} from './form/form.module';
