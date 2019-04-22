@@ -48,7 +48,7 @@ export class TemplateSchemaService {
   }
 
   getHint(schema:TemplateSchema) {
-    return 'hint text';
+    return ' ';
   }
 
   isRequired(schema:TemplateSchema) {

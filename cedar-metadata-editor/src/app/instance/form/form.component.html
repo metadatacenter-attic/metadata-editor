@@ -34,13 +34,14 @@
             </mat-icon>
           </button>
           <span [matTooltip]="node.help">{{node.name}}</span>
-          <span *ngIf="node.minItems" style="padding:0 5px">
+          <span *ngIf="node.minItems" style="color:#222">
                   ({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
-                  <button mat-icon-button (click)="addNewItem(node)">
-                    <mat-icon style="font-size:12px">add</mat-icon>
+                  <button *ngIf="!viewOnly" mat-icon-button  (click)="addNewItem(node)">
+                    <mat-icon >add</mat-icon>
                   </button>
-                  <button mat-icon-button (click)="deleteLastItem(node)">
-                    <mat-icon style="font-size:12px">remove</mat-icon></button>
+                  <button *ngIf="!viewOnly" mat-icon-button   (click)="deleteLastItem(node)">
+                    <mat-icon >clear</mat-icon></button>
+
                 </span>
         </div>
 

@@ -10,12 +10,15 @@ import {TemplateSchemaService} from '../service/template-schema.service';
 import {InputType, InputTypeService} from '../_models/input-types';
 import {Post} from "../_models/post";
 import {ControlledComponent} from '../controlled/controlled.component';
+import {TemplateService} from "../service/template.service";
+import {ElementService} from "../element/service/element.service";
 
 
 @Component({
   selector: 'app-question',
   templateUrl: './question.component.html',
   styleUrls: ['./question.component.less'],
+  providers: []
 })
 export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() node: FileNode;
@@ -27,6 +30,8 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   post: Post[];
   controlled: ControlledComponent;
   controlledGroup: FormGroup;
+  copy:string="Copy";
+  remove:string="Remove";
 
 
 
