@@ -167,12 +167,12 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   // controlled term was selected
-  protected onSelectedControlled(event) {
+   onSelectedControlled(event) {
     this._ts.addControlledValue(this.node.model, this.node.key, event.id, event.title);
   }
 
   // controlled term was removed
-  protected onRemovedControlled(index) {
+   onRemovedControlled(index) {
     this._ts.removeControlledValue(this.node.model, this.node.key, index);
   }
 
