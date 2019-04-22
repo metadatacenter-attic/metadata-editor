@@ -39,6 +39,8 @@ export class FormComponent implements OnChanges {
   response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
   pageEvent: PageEvent;
   templateId;
+  copy:string="Copy";
+  remove:string="Remove";
 
   _ts: TemplateSchemaService;
   _it: InputTypeService;
