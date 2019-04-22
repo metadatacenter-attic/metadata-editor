@@ -1,11 +1,26 @@
 
-
-
-
   label.question-label {
     margin:10px 0 0 0;
     font-weight:bolder;
     width:100%;
+    vertical-align: middle;
+  }
+
+  button.mat-icon-button.help-text-button {
+    padding: 0;
+    width: 2em;
+    height: 2em;
+    width: 2em;
+    vertical-align: middle;
+    mat-icon {
+      height:1em;
+      width:1em;
+      font-size:1em;
+      line-height: 1em;
+      padding-top:.5em;
+      vertical-align: top;
+      color: rgba(0, 0, 0, .54)
+    }
   }
   .mat-form-field {
     margin-bottom:10px;
@@ -80,13 +95,25 @@
     }
   }
 
+  :host ::ng-deep .mat-form-field-infix {
+    padding-top:0;
+  }
+
+  :host ::ng-deep .mat-form-field {
+    padding: 5px 0;
+  }
+
+  .mat-form-field-radio, .mat-form-field-checkbox {
+    padding:15px 0 20px 0;
+  }
+
+
   .section-break  {
     color:#bbb;
     font-size: 2.5vw;
     width: 100%;
     border-bottom: solid #bbb 1px;
     margin:20px 0;
-
   }
 
   .static-image {
@@ -104,6 +131,42 @@
       padding:10px;font-style:italic;text-align:center;
     }
   }
+
+
+
+  //:host ::ng-deep .mat-icon.help-text{
+  //  height:1em;
+  //  width:1em;
+  //  font-size:14px;
+  //  line-height: 14px;
+  //  vertical-align: text-top;
+  //  color: rgba(0, 0, 0, .54)
+  //}
+
+  button.mat-icon-button.node-add, button.mat-icon-button.node-remove {
+    padding: 0;
+    min-width: 0;
+    width: 2em;
+    height: 2em;
+    flex-shrink: 0;
+    width: 2em;
+    vertical-align: middle;
+    border-radius: 50%;
+    mat-icon {
+      height:1em;
+      width:1em;
+      font-size:1em;
+      line-height: 1em;
+      padding-top:.5em;
+      vertical-align: top;
+      color: rgba(0, 0, 0, .54)
+    }
+  }
+
+  
+
+
+
 
 
 
