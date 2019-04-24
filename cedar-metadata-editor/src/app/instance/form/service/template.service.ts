@@ -1,5 +1,5 @@
 import {Inject, Injectable, Optional} from '@angular/core';
-import {FormGroup, FormControl} from '@angular/forms';
+import {FormGroup} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
 
 import {FileNode} from '../_models/file-node';
@@ -10,12 +10,24 @@ import {TemplateSchema, SchemaProperties} from '../_models/template-schema';
 import {TemplateSchemaService} from './template-schema.service';
 import {Meta} from "@angular/platform-browser";
 import {isNullOrUndefined} from "util";
+import {LocalSettingsService} from "../../../services/local-settings.service";
+import {TranslateService} from "@ngx-translate/core";
+import {SnotifyService} from "ng-snotify";
+import {ActivatedRoute, Router} from "@angular/router";
+import {DataStoreService} from "../../../services/data-store.service";
+import {DataHandlerService} from "../../../services/data-handler.service";
+import {DataHandlerDataId} from '../../../modules/shared/model/data-handler-data-id.model';
+import {DataHandlerDataStatus} from '../../../modules/shared/model/data-handler-data-status.model';
+
+
+import {environment} from '../../../../environments/environment';
 
 
 @Injectable()
 export class TemplateService {
 
   formGroup: FormGroup;
+  pageIndex: number;
   dataChange = new BehaviorSubject<FileNode[]>([]);
   model: MetadataModel;
   template: TemplateSchema;
@@ -23,11 +35,27 @@ export class TemplateService {
   td: TemplateDataService;
   it: InputTypeService;
   ts: TemplateSchemaService;
+  dh: DataHandlerService;
+  ds: DataStoreService;
+  artifactStatus: number = null;
+  cedarLink: string = null;
 
-  constructor(@Inject('templateId') @Optional() public templateId?: string) {
+  constructor(dataHandler: DataHandlerService,
+              dataStore: DataStoreService, @Inject('templateId') @Optional() public templateId?: string,) {
     this.td = new TemplateDataService();
     this.it = new InputTypeService();
     this.ts = new TemplateSchemaService();
+    this.dh = dataHandler;
+    this.ds = dataStore;
+  }
+
+  protected initDataHandler(): DataHandlerService {
+    this.dh.reset();
+    this.dh.setPreCallback(() => this.preDataIsLoaded());
+    return this.dh;
+  }
+
+  private preDataIsLoaded() {
   }
 
   get data(): FileNode[] {
@@ -35,23 +63,47 @@ export class TemplateService {
   }
 
   getTitle() {
-    return this.ts.getTitle(this.template);
+    return this.template ? this.ts.getTitle(this.template) : "";
   }
 
-  initialize(formGroup: FormGroup, templateId: string, pageIndex?:number, model?:MetadataModel): any {
-    const id = Number.parseInt(templateId);
-    let data;
-    this.template = this.td.templateData[id] as TemplateSchema;
-    this.model = model ? model : this.td.modelData[id] as MetadataModel;
-    data = this.buildFileTree(this.ts.getOrder(this.template), this.ts.getProperties(this.template), this.model, 0, formGroup, null);
+  initialize(formGroup: FormGroup, instanceId: string, pageIndex?: number, model?: MetadataModel): any {
 
-    if (this.ts.getPageCount(this.template)) {
-      const page = pageIndex ? pageIndex : 0;
-      data = this.buildFileTree(this.ts.getOrderofPage(this.template, pageIndex), this.ts.getProperties(this.template), this.model, 0, formGroup, null);
-    }
-    this.dataChange.next(data);
-    return this.model;
+    this.formGroup = formGroup;
+    this.pageIndex = pageIndex;
+
+    // load the instance
+    this.initDataHandler();
+    this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
+    this.dh
+      .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
+      .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+
   }
+
+  private instanceLoadedCallback(instanceId) {
+    const templateInstance = this.ds.getTemplateInstance(instanceId);
+    const templateId = this.ts.isBasedOn(templateInstance);
+    this.model = templateInstance as MetadataModel;
+
+    // load the template it is based on
+    this.dh
+      .requireId(DataHandlerDataId.TEMPLATE, templateId)
+      .load(() => this.templateLoadedCallback(templateId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+  }
+
+  private templateLoadedCallback(templateId) {
+    const template = this.ds.getTemplate(templateId);
+    this.template = template as TemplateSchema;
+
+    // build the tree
+    this.dataChange.next(this.buildFileTree(this.ts.getOrder(this.template), this.ts.getProperties(this.template), this.model, 0, this.formGroup, null));
+  }
+
+  private dataErrorCallback(error: any, dataStatus: DataHandlerDataStatus) {
+    this.artifactStatus = error.status;
+    console.log('dataErrorCallback', error)
+  }
+
 
   getValues(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
     function getListSingleValue(literals, value, valueLocation): string {
@@ -79,7 +131,7 @@ export class TemplateService {
       return result;
     }
 
-    function  getRadioValue(literals, value, valueLocation): number {
+    function getRadioValue(literals, value, valueLocation): number {
       let map = literals
         .map(function (literal) {
             return literal.label;
@@ -88,7 +140,7 @@ export class TemplateService {
       return map.indexOf(value[valueLocation]);
     }
 
-    function  getCheckValue(value: [], valueLocation): string[] {
+    function getCheckValue(value: [], valueLocation): string[] {
       let result = [];
       for (let i = 0; i < value.length; i++) {
         result.push(value[i][valueLocation]);
@@ -96,7 +148,7 @@ export class TemplateService {
       return result;
     }
 
-    function  getTextValue(value, valueLocation): string[] {
+    function getTextValue(value, valueLocation): string[] {
       let result = [];
       if (Array.isArray(value)) {
         for (let i = 0; i < value.length; i++) {
@@ -108,7 +160,7 @@ export class TemplateService {
       return result;
     }
 
-    function  getDateValue(value, valueLocation): Date[] {
+    function getDateValue(value, valueLocation): Date[] {
       function parseDate(val) {
         // 'add' a timezone offset so we end up on the original date again
         let dt = new Date(val);
@@ -127,7 +179,7 @@ export class TemplateService {
       return result;
     }
 
-    function  getControlledValue(values, valueLocation): string[] {
+    function getControlledValue(values, valueLocation): string[] {
       let result = [];
       for (let i = 0; i < values.length; i++) {
         result.push(values[i][valueLocation]);
@@ -173,13 +225,14 @@ export class TemplateService {
   }
 
   getLabels(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
-    function  getControlledLabel(labels, labelLocation): string[] {
+    function getControlledLabel(labels, labelLocation): string[] {
       let result = [];
       for (let i = 0; i < labels.length; i++) {
         result.push(labels[i][labelLocation]);
       }
       return result;
     }
+
     let result = [];
     if (this.it.isControlled(inputType)) {
       result = getControlledLabel(modelValue, 'rdfs:label');
@@ -210,7 +263,7 @@ export class TemplateService {
     return this.it.isNotTextInput(inputType) ? '' : inputType;
   }
 
-  staticNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key:string, modelValue:MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
+  staticNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key: string, modelValue: MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
 
     const node = {
       'key': key,
@@ -231,7 +284,7 @@ export class TemplateService {
     return node;
   }
 
-  fieldNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key:string, modelValue:MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
+  fieldNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key: string, modelValue: MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
 
     const node = {
       'key': key,
@@ -323,7 +376,7 @@ export class TemplateService {
 
         const maxItems = value['maxItems'];
         const minItems = value['minItems'] || 0;
-        const name:string = this.ts.getTitle(schema);
+        const name: string = this.ts.getTitle(schema);
         if (this.ts.isElement(schema)) {
           const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
           for (let i = 0; i < itemCount; i++) {

@@ -32,8 +32,8 @@ export class FormComponent implements OnChanges {
   @Output() changed = new EventEmitter<any>();
 
   form: FormGroup;
-  treeControl: NestedTreeControl<FileNode>;
   dataSource: MatTreeNestedDataSource<FileNode>;
+  treeControl:NestedTreeControl<FileNode>;
   database: TemplateService;
   route: ActivatedRoute;
   response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
@@ -52,6 +52,8 @@ export class FormComponent implements OnChanges {
 
   constructor(private ui: UiService, database: TemplateService, route: ActivatedRoute, ts:TemplateSchemaService, it:InputTypeService) {
     this.database = database;
+    this.dataSource = new MatTreeNestedDataSource();
+    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
     this._ts = ts;
     this._it = it;
@@ -141,12 +143,21 @@ export class FormComponent implements OnChanges {
     this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
     this.templateId = templateId;
     this.form = new FormGroup({});
-    this.response.jsonLD = this.database.initialize(this.form, templateId);
-    this.pageEvent.length =  this._ts.getPageCount(this.database.template);
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
+    this.database.initialize(this.form, templateId);
+    // this.pageEvent.length =  this._ts.getPageCount(this.database.template);
+    // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    // this.dataSource = new MatTreeNestedDataSource();
     this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
+
+
+      if (data && data.length > 0) {
+        this.dataSource = new MatTreeNestedDataSource();
+        this.dataSource.data = data;
+        this.pageEvent.length =  this._ts.getPageCount(this.database.template);
+        this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+
+      }
+
     });
     this.onChanges();
     this.onFormChanges();
@@ -161,7 +172,6 @@ export class FormComponent implements OnChanges {
   }
 
   ngAfterViewInit() {
-    //this.onChanges();
   }
 
   // add new element to form

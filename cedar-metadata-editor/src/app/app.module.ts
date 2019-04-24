@@ -3,15 +3,26 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ReactiveFormsModule} from '@angular/forms';
 import {LOCALE_ID, NgModule} from '@angular/core';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {SnotifyModule, SnotifyService, ToastDefaults} from 'ng-snotify';
+import {SharedModule} from './modules/shared';
+import {ResourcesModule} from './modules/resources/resources.module';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {UiService} from './services/ui/ui.service';
 import {DemoMaterialModule} from '../material-module';
-import {HttpClientModule} from "@angular/common/http";
+
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 
-
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
 @NgModule({
   declarations: [
     AppComponent
@@ -21,13 +32,25 @@ import {FlexLayoutModule} from '@angular/flex-layout';
     ReactiveFormsModule,
     AppRoutingModule,
     NgbModule,
+    SnotifyModule,
+    SharedModule,
+    ResourcesModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     DemoMaterialModule,
     HttpClientModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
   ],
-  providers: [{provide: LOCALE_ID, useValue: 'en-US'}, UiService],
+  providers: [{provide: LOCALE_ID, useValue: 'en-US'}, UiService,SnotifyService,
+    {provide: 'SnotifyToastConfig', useValue: ToastDefaults},],
+
   bootstrap: [AppComponent],
   exports: []
 })

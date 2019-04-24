@@ -27,6 +27,10 @@ export class TemplateSchemaService {
     return schema.properties;
   }
 
+  isBasedOn(instance:any) {
+    return instance['schema:isBasedOn'];
+  }
+
   isSpecialKey(key) {
     const specialKeyPattern = /(^@)|(^_)|(^schema:)|(^pav:)|(^rdfs:)|(^oslc:)/i;
     return specialKeyPattern.test(key);

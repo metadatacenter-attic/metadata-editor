@@ -4,6 +4,12 @@ import { UiService } from './services/ui/ui.service';
 import { Subscription } from 'rxjs';
 
 
+import {environment} from '../environments/environment';
+import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
+import {Title} from '@angular/platform-browser';
+import {LocalSettingsService} from './services/local-settings.service';
+
+
 
 @Component({
   selector: 'app-root',
@@ -17,9 +23,27 @@ export class AppComponent implements OnInit {
   private _subscription: Subscription;
   disabled: boolean = false;
 
-  constructor(public ui: UiService) {
+  constructor(public ui: UiService, localSettings: LocalSettingsService,
+              translate: TranslateService,
+              titleService: Title) {
     this.title = 'Cedar Metadata Editor';
+    // this language will be used as a fallback when a translation isn't found in the current language
+    translate.setDefaultLang(environment.fallbackLanguage);
+
+    // the lang to use, if the lang isn't available, it will use the current loader to get them
+    let currentLanguage = localSettings.getLanguage();
+    if (currentLanguage == null) {
+      currentLanguage = environment.defaultLanguage;
+    }
+    translate.use(currentLanguage);
+
+    translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      translate.get('App.WindowTitle').subscribe((res: string) => {
+        titleService.setTitle(res);
+      });
+    });
   }
+
 
   ngOnInit() { this._subscription = this.ui.darkModeState$.subscribe(res => {
     this.darkMode = res;
