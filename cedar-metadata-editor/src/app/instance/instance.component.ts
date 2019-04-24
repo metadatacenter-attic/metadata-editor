@@ -1,9 +1,11 @@
 import {Component, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
 import {Subscription} from 'rxjs';
 import {FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {UiService} from "../services/ui/ui.service";
+import {LocalSettingsService} from "../services/local-settings.service";
 
 @Component({
   selector: 'app-instance',
@@ -22,14 +24,18 @@ export class InstanceComponent implements OnInit {
   formValid: boolean;
   viewOnly: boolean = false;
   ui: UiService;
+  _tr:TranslateService;
+  _ls:LocalSettingsService;
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
 
-  constructor(ui: UiService, route: ActivatedRoute) {
+  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService) {
     this.route = route;
     this.ui = ui;
+    this._tr = tr;
+    this._ls = ls;
   }
 
   ngOnInit() {

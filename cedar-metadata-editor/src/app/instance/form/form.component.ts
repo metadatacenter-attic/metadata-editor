@@ -6,6 +6,7 @@ import {TemplateService} from './service/template.service';
 import {TemplateSchemaService} from './service/template-schema.service';
 import {ElementService} from './element/service/element.service';
 import {InputType, InputTypeService} from './_models/input-types';
+import { TranslateService } from '@ngx-translate/core';
 
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {FileNode} from "./_models/file-node";
@@ -44,19 +45,21 @@ export class FormComponent implements OnChanges {
 
   _ts: TemplateSchemaService;
   _it: InputTypeService;
+  _t:TranslateService;
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
   private _subscription: Subscription;
 
-  constructor(private ui: UiService, database: TemplateService, route: ActivatedRoute, ts:TemplateSchemaService, it:InputTypeService) {
+  constructor(private ui: UiService, database: TemplateService, route: ActivatedRoute, ts:TemplateSchemaService, it:InputTypeService, t:TranslateService) {
     this.database = database;
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
     this._ts = ts;
     this._it = it;
+    this._t = t;
   }
 
   changeLog: string[] = [];

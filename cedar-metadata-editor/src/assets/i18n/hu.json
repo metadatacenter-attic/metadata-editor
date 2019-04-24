@@ -1,10 +1,23 @@
 {
   "App": {
-    "NavTitle": "CEDAR Open Metadata",
-    "WindowTitle": "CEDAR Open Metadata"
+    "NavTitle": "CEDAR Metadata Editor",
+    "WindowTitle": "CEDAR Metadata Editor",
+    "SelectPage": "Select Page",
+    "Home": "Home",
+    "Language": "Language",
+    "View": "View",
+    "Edit": "Edit",
+    "Form": "Form",
+    "Copy": "Copy",
+    "JSONLD": "JSON-LD",
+    "RDF": "RDF",
+    "Save": "Save",
+    "Value": "Value"
   },
   "Generic": {
-    "Loading": "Adatbetöltés..."
+    "Loading": "Adatbetöltés...",
+    "Light": "Light",
+    "Dark": "Dark"
   },
   "error": {
     "resourceNotPublic": "A hivatkozott erőforrás nem érhető el publikusan"

@@ -17,7 +17,6 @@ import {UiService} from './services/ui/ui.service';
 import {DemoMaterialModule} from '../material-module';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -56,3 +55,5 @@ export function HttpLoaderFactory(http: HttpClient) {
 })
 export class AppModule {
 }
+
+

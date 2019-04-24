@@ -1,14 +1,11 @@
-
-import { Component, OnInit } from '@angular/core';
-import { UiService } from './services/ui/ui.service';
-import { Subscription } from 'rxjs';
-
+import {Component, OnInit} from '@angular/core';
+import {UiService} from './services/ui/ui.service';
+import {Subscription} from 'rxjs';
 
 import {environment} from '../environments/environment';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
 import {LocalSettingsService} from './services/local-settings.service';
-
 
 
 @Component({
@@ -20,34 +17,44 @@ export class AppComponent implements OnInit {
   showMenu = false;
   darkMode: boolean;
   title: string;
-  private _subscription: Subscription;
   disabled: boolean = false;
+  languages = {
+    selected: "en",
+    options: [{ value: 'en', viewValue: 'en' }, { value: 'hu', viewValue: 'hu' }]
+  };
+  _tr: TranslateService;
+  _ls: LocalSettingsService;
+  private _subscription: Subscription;
 
-  constructor(public ui: UiService, localSettings: LocalSettingsService,
-              translate: TranslateService,
+
+
+  constructor(public ui: UiService, ls: LocalSettingsService,
+              tr: TranslateService,
               titleService: Title) {
-    this.title = 'Cedar Metadata Editor';
+    this._tr = tr;
+    this._ls = ls;
+
     // this language will be used as a fallback when a translation isn't found in the current language
-    translate.setDefaultLang(environment.fallbackLanguage);
+    this._tr.setDefaultLang(environment.fallbackLanguage);
 
     // the lang to use, if the lang isn't available, it will use the current loader to get them
-    let currentLanguage = localSettings.getLanguage();
-    if (currentLanguage == null) {
-      currentLanguage = environment.defaultLanguage;
-    }
-    translate.use(currentLanguage);
+    const currentLanguage = this._ls.getLanguage() || environment.defaultLanguage;
+    this._tr.use(currentLanguage);
+    this.languages.selected = currentLanguage;
 
-    translate.onLangChange.subscribe((event: LangChangeEvent) => {
-      translate.get('App.WindowTitle').subscribe((res: string) => {
+    this._tr.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.switchLanguage(event.lang);
+      this._tr.get('App.WindowTitle').subscribe((res: string) => {
         titleService.setTitle(res);
       });
     });
   }
 
-
-  ngOnInit() { this._subscription = this.ui.darkModeState$.subscribe(res => {
-    this.darkMode = res;
-  })}
+  ngOnInit() {
+    this._subscription = this.ui.darkModeState$.subscribe(res => {
+      this.darkMode = res;
+    })
+  }
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -62,6 +69,14 @@ export class AppComponent implements OnInit {
     // this.ui.darkModeState.next(!this.darkModeActive);
   }
 
+  getCurrentLanguageCode() {
+    return this._tr.currentLang;
+  }
+
+  switchLanguage(language: string) {
+    this._tr.use(language);
+    this._ls.setLanguage(language);
+  }
 
 
 }

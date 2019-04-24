@@ -2,84 +2,80 @@
 <aside class="side-menu__container" [ngClass]="{'side-menu__container-active': showMenu}" (click)="toggleMenu()">
   <nav class="slide-menu" [ngClass]="{'slide-menu-active': showMenu}" (click)="$event.stopImmediatePropagation();">
     <section class="menu-header">
-      <span class="greeting__text">Select Page</span>
+      <span class="greeting__text">{{'App.SelectPage' | translate}} </span>
     </section>
     <section class="menu-body">
       <div class="menu__container">
         <mat-toolbar>
           <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="">Home</button>
+            <button style="text-align:left;width:100%" mat-button routerLink="">{{'App.Home' | translate}}</button>
           </mat-toolbar-row>
 
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/0">
-              multiple elements
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/0">-->
+<!--              multiple elements-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/1">
-              multiple fields
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/1">-->
+<!--              multiple fields-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/2">
-              fieldtypes
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/2">-->
+<!--              fieldtypes-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/3">
-             date email number
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/3">-->
+<!--             date email number-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/4">
-              link radio checkbox list
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/4">-->
+<!--              link radio checkbox list-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/5">
-              controlled
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/5">-->
+<!--              controlled-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/6">
-              AIRR
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/6">-->
+<!--              AIRR-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/7">
-              Static fields
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/7">-->
+<!--              Static fields-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/8">
-              Static section break
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/8">-->
+<!--              Static section break-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
-          <mat-toolbar-row>
-            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/9">
-              Paging
-            </button>
-          </mat-toolbar-row>
+<!--          <mat-toolbar-row>-->
+<!--            <button style="text-align:left;width:100%" mat-button routerLink="instances/create/9">-->
+<!--              Paging-->
+<!--            </button>-->
+<!--          </mat-toolbar-row>-->
 
         </mat-toolbar>
-
-
-
       </div>
     </section>
     <section class="menu-footer">
-
     </section>
   </nav>
 </aside>
@@ -116,20 +112,27 @@
 
     </div>
 
-    <h3 class="date__text">Cedar</h3>
+    <h3 class="date__text">{{'App.NavTitle' | translate}}</h3>
 
-    <div class="mode-toggle__container">
-      <span class="mode-toggle__text">Light</span>
+    <mat-form-field class="language-selector" >
+      <mat-label>{{'App.Language' | translate}}</mat-label>
+      <mat-select matNativeControl required  [(value)]="languages.selected"
+        (valueChange)="switchLanguage(languages.selected)" >
+        <mat-option *ngFor="let language of languages.options" [value]="language.value">
+          {{language.viewValue}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-      <label class="toggle-button__container">
-        <input (click)="modeToggleSwitch()" type="checkbox" class="mode-toggle__input"/>
-        <span [ngClass]="{'mode-toggle__bg-checked': darkMode}" class="mode-toggle__bg"></span>
-        <span [ngClass]="{'mode-toggle__circle-checked': darkMode}" class="mode-toggle__circle"></span>
-      </label>
-
-
-      <span class="mode-toggle__text">Dark</span>
-    </div>
+<!--    <div class="mode-toggle__container">-->
+<!--      <span class="mode-toggle__text">{{'Generic.Light' | translate}}</span>-->
+<!--      <label class="toggle-button__container">-->
+<!--        <input (click)="modeToggleSwitch()" type="checkbox" class="mode-toggle__input"/>-->
+<!--        <span [ngClass]="{'mode-toggle__bg-checked': darkMode}" class="mode-toggle__bg"></span>-->
+<!--        <span [ngClass]="{'mode-toggle__circle-checked': darkMode}" class="mode-toggle__circle"></span>-->
+<!--      </label>-->
+<!--      <span class="mode-toggle__text">{{'Generic.Dark' | translate}}</span>-->
+<!--    </div>-->
 
   </header>
 

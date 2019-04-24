@@ -3,6 +3,7 @@ import {Routes, RouterModule} from '@angular/router';
 
 
 const routes: Routes = [
+  {path: 'templates/:templateId', loadChildren: './instance/instance.module#InstanceModule'},
   {path: 'template-instances/:templateId', loadChildren: './instance/instance.module#InstanceModule'},
   {path: 'instances/edit/:id', loadChildren: './instance/instance.module#InstanceModule'},
   {path: 'instances/create/:templateId', loadChildren: './instance/instance.module#InstanceModule'},
