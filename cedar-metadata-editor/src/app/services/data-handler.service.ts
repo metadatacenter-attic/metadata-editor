@@ -6,7 +6,9 @@ import {DataHandlerDataId} from '../modules/shared/model/data-handler-data-id.mo
 import {SpinnerService} from './spinner.service';
 import {TemplateService} from './load-data/template.service';
 import {Template} from '../shared/model/template.model';
+import {ControlledOntology} from '../shared/model/controlled-ontology.model';
 import {TemplateElement} from '../shared/model/template-element.model';
+import {ControlledService} from './load-data/controlled.service';
 import {TemplateFieldService} from './load-data/template-field.service';
 import {TemplateElementService} from './load-data/template-element.service';
 import {TemplateInstance} from '../shared/model/template-instance.model';
@@ -28,6 +30,7 @@ export class DataHandlerService {
     public dataStore: DataStoreService,
     public spinner: SpinnerService,
     private translateService: TranslateService,
+    private controlledService: ControlledService,
     private templateFieldService: TemplateFieldService,
     private templateElementService: TemplateElementService,
     private templateService: TemplateService,
@@ -58,7 +61,6 @@ export class DataHandlerService {
 
   requireId(dataId: DataHandlerDataId, id: string): DataHandlerService {
     const status: DataHandlerDataStatus = DataHandlerDataStatus.forDataIdAndId(dataId, id);
-    console.log('DataHandler.requireId:' + status.getKey());
     this.dataIdMap.set(status.getKey(), status);
     return this;
   }
@@ -94,6 +96,9 @@ export class DataHandlerService {
       case DataHandlerDataId.TEMPLATE_INSTANCE:
         this.loadTemplateInstance(dataStatus);
         break;
+      case DataHandlerDataId.ONTOLOGY_CLASSES:
+        this.loadOntology(dataStatus);
+        break;
     }
   }
 
@@ -101,6 +106,16 @@ export class DataHandlerService {
     if (this.errorCallback != null) {
       this.errorCallback(error, dataStatus);
     }
+  }
+
+  private loadOntology(dataStatus: DataHandlerDataStatus) {
+    // this.controlledService.getOntologyRootClasses(dataStatus.id, (error) => {
+    //   this.handleLoadError(error, dataStatus);
+    // })
+    //   .subscribe(ontology => {
+    //     this.dataStore.setOntologyRootClasses(dataStatus.id, Object.assign(new ControlledOntology(), ontology));
+    //     this.dataWasLoaded(dataStatus);
+    //   });
   }
 
   private loadTemplateField(dataStatus: DataHandlerDataStatus) {

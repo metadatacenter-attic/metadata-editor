@@ -1,0 +1,50 @@
+<div class="field-root" style="position:relative">
+
+  <div *ngIf="formService.isStaticType(field); else elseBlock">
+
+    <div [ngSwitch]="formService.getInputType(field)">
+<!--      <app-section *ngSwitchCase="'section-break'" [field]="field" [parent]="parent" [key]="key"></app-section>-->
+<!--      <app-richtext *ngSwitchCase="'richtext'" [field]="field" [parent]="parent" [key]="key"></app-richtext>-->
+<!--      <app-image *ngSwitchCase="'image'" [field]="field" [parent]="parent" [key]="key"></app-image>-->
+<!--      <app-youtube *ngSwitchCase="'youtube'" [field]="field" [parent]="parent" [key]="key"></app-youtube>-->
+    </div>
+
+  </div>
+
+  <ng-template #elseBlock>
+
+    <div class="question">
+      <div ng-click="toggleActive(index)" class="title field isInactive"
+        ng-class="{'isInactive':!isActive(index), 'required':isRequired()}">
+        {{ formService.getTitle(field) }}<span ng-if="isRequired()" style="color:red">*</span>
+      </div>
+    </div>
+
+    <div  *ngFor="let valueElement of valueArray">
+      <div>
+
+        <div class="answer">
+          <div class="flex " style="min-height:2em;padding:5px 0;">
+            <div></div> <!--title-->
+            <!--<field-toolbar values="valueArray" min="pageMin"-->
+            <!--max="pageMax" select="selectPage" paging="isMultiple()"-->
+            <!--range="pageRange" model="model" field="field" index="index"-->
+            <!--remove="removeInput" add="addMoreInput" copy="copyField" set-active="setActive" expand-all="expandAll"-->
+            <!--get-locator="getLocator" view-state="viewState" get-help="getHelp" has-help="hasHelp">-->
+            <!--</field-toolbar>-->
+          </div>
+
+          <div [ngSwitch]="formService.getInputType(field)">
+<!--            <app-textfield *ngSwitchCase="'textfield'" [field]="field" [parent]="parent" [key]="key"></app-textfield>-->
+<!--            <app-number *ngSwitchCase="'numeric'" [field]="field" [parent]="parent" [key]="key"></app-number>-->
+<!--            <app-list *ngSwitchCase="'list'" [field]="field" [parent]="parent" [key]="key"></app-list>-->
+<!--            <app-date *ngSwitchCase="'date'" [field]="field" [parent]="parent" [key]="key"></app-date>-->
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </ng-template>
+
+</div>
