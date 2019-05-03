@@ -94,8 +94,9 @@
 
         <!-- controlled -->
         <div *ngSwitchCase="'controlled'">
-          controlled inputType
           <controlled [group]="formGroup" [controlledGroup]="controlledGroup"
+            [classLoader]="classLoader"
+            [valueConstraints] = "node.valueConstraints"
             (onRemovedOption)="onRemovedControlled($event)"
             (onSelectedOption)="onSelectedControlled($event)"></controlled>
         </div>

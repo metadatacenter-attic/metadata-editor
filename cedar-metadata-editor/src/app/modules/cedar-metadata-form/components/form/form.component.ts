@@ -12,6 +12,7 @@ import {UiService} from "../../../../services/ui/ui.service";
 import {TemplateSchemaService} from "../../services/template-schema.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
+import {MetadataModel} from "../../models/metadata-model";
 
 
 @Component({
@@ -24,21 +25,25 @@ import {FileNode} from "../../models/file-node";
 
 export class FormComponent implements OnChanges {
 
-  @Input() id: string;
+  //@Input() id: string;
+  @Input() instance: any;
+  @Input() template: any;
+  @Input() controlledTermsCallback: any;
   @Input() viewOnly: boolean;
+  @Input() classLoader: any;
   @Output() changed = new EventEmitter<any>();
 
   form: FormGroup;
+  title:string;
   dataSource: MatTreeNestedDataSource<FileNode>;
   treeControl: NestedTreeControl<FileNode>;
   database: TemplateParserService;
   route: ActivatedRoute;
   response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
   pageEvent: PageEvent;
-  templateId;
   copy: string = "Copy";
   remove: string = "Remove";
-  
+
 
   darkMode: boolean;
   private _darkModeSub: Subscription;
@@ -50,26 +55,29 @@ export class FormComponent implements OnChanges {
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
+    this.title = 'loading'
 
   }
 
   changeLog: string[] = [];
 
   onPageChange(event) {
-    this.pageEvent = event;
-    const page = this.pageEvent.pageIndex;
-    this.response.jsonLD = this.database.initialize(this.form, this.templateId, page, this.database.model);
-    this.pageEvent.length = TemplateSchemaService.getPageCount(this.database.template);
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
-    });
+    if (this.instance && this.template) {
+      this.pageEvent = event;
+      const page = this.pageEvent.pageIndex;
+      this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, page);
+      this.pageEvent.length = TemplateSchemaService.getPageCount(this.database.template);
+      this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+      this.dataSource = new MatTreeNestedDataSource();
+      this.database.dataChange.subscribe(data => {
+        this.dataSource.data = data;
+      });
+    }
   }
 
   onFormChanges() {
     this.response.payload = this.form.value;
-    this.response.jsonLD = this.database.model;
+    this.response.jsonLD = this.database.instanceModel;
     this.response.formValid = this.form.valid;
     let that = this;
     jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
@@ -126,40 +134,48 @@ export class FormComponent implements OnChanges {
       }
     }
     this.changeLog.push(log.join(', '));
-    this.initialize(this.id);
+
+    if (this.instance && this.template) {
+      this.initialize();
+    }
   }
 
   private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
 
   private _getChildren = (node: FileNode) => node.children;
 
-  initialize(templateId: string) {
-    this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
-    this.templateId = templateId;
-    this.form = new FormGroup({});
-    this.database.initialize(this.form, templateId);
-    // this.pageEvent.length =  TemplateSchemaService.getPageCount(this.database.template);
-    // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    // this.dataSource = new MatTreeNestedDataSource();
-    this.database.dataChange.subscribe(data => {
+  initialize() {
+
+    if (this.instance && this.template) {
+
+      this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
+      this.form = new FormGroup({});
+      this.database.initialize(this.form, this.instance, this.template);
+      this.title = this.database.getTitle();
+      // this.pageEvent.length =  TemplateSchemaService.getPageCount(this.database.template);
+      // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+      // this.dataSource = new MatTreeNestedDataSource();
+      this.database.dataChange.subscribe(data => {
 
 
-      if (data && data.length > 0) {
-        this.dataSource = new MatTreeNestedDataSource();
-        this.dataSource.data = data;
-        this.pageEvent.length = TemplateSchemaService.getPageCount(this.database.template);
-        this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+        if (data && data.length > 0) {
+          this.dataSource = new MatTreeNestedDataSource();
+          this.dataSource.data = data;
+          this.pageEvent.length = this.database.template ? TemplateSchemaService.getPageCount(this.database.template) : 0;
+          this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
 
-      }
+        }
 
-    });
-    this.onChanges();
-    this.onFormChanges();
+      });
+      this.onChanges();
+      this.onFormChanges();
+
+    }
   }
 
-  getTitle() {
-    return this.database.getTitle();
-  }
+  // getTitle() {
+  //   return this.template ? this.database.getTitle() : "loading...";
+  // }
 
   isDisabled() {
     return this.viewOnly;

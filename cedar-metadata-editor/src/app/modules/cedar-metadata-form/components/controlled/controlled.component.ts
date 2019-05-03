@@ -1,10 +1,13 @@
-import {Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input} from '@angular/core';
-import {FormGroup, FormBuilder, FormArray} from '@angular/forms';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 
 import {ControlledTermService} from '../../services/controlled-terms.service';
 import {Post} from '../../models/post';
-
+import {debounceTime, finalize} from "rxjs/operators";
+import {tap} from "rxjs/internal/operators/tap";
+import {switchMap} from "rxjs/internal/operators";
+import {forkJoin} from 'rxjs';
 
 
 @Component({
@@ -15,11 +18,9 @@ import {Post} from '../../models/post';
 export class ControlledComponent implements OnInit {
 
   allPosts: Post[];
-  autoCompleteList: any[];
-  ct: ControlledTermService;
-  fb: FormBuilder;
   selectable = true;
   removable = true;
+  isLoading = false;
 
   @ViewChild('autocompleteInput') autocompleteInput: ElementRef;
   @ViewChild('chipList') chipList: ElementRef;
@@ -27,26 +28,52 @@ export class ControlledComponent implements OnInit {
   @Output() onRemovedOption = new EventEmitter();
   @Input() group: FormGroup;
   @Input() controlledGroup: FormGroup;
+  @Input() classLoader: any;
+  @Input() valueConstraints: any;
 
-  constructor(ct: ControlledTermService, fb: FormBuilder) {
-    this.ct = ct;
-    this.fb = fb;
+  constructor(private ct: ControlledTermService, private fb: FormBuilder) {
   }
 
   ngOnInit() {
-    // get all the post
-    this.ct.getPosts('NCIT').subscribe(posts => {
-      console.log('NCIT',posts);
-      this.allPosts = posts
-    });
-
     // when user types something in input, the value changes will come through this
-    const search = this.controlledGroup.get('search');
-    search.valueChanges.subscribe(userInput => {
-      let categoryList = this.filterCategoryList(userInput);
-      this.autoCompleteList = categoryList;
-    });
+    this.controlledGroup.get('search').valueChanges.pipe(
+      debounceTime(300),
+      tap(() => this.isLoading = true),
+      switchMap(() =>
+        forkJoin(
+          this.ct.getPosts(this.controlledGroup.get('search').value, this.classLoader, this.valueConstraints)
+        ).pipe(
+          finalize(() => this.isLoading = false),
+        )
+      )
+    ).subscribe(posts => {
 
+      // still need to filter on the search term because valueSets don't filter
+      let term = this.controlledGroup.get('search').value.toLowerCase();
+      let hasSearchTerm = function(element, index, array) {
+        return ( element.prefLabel.toLowerCase().indexOf(term) >= 0);
+      };
+
+      this.allPosts = [];
+      for (let i = 0; i < posts.length; i++) {
+        this.allPosts = this.allPosts.concat(posts[i]['collection']);
+      }
+
+      // and still need to filter and sort
+      this.allPosts = this.allPosts.filter(hasSearchTerm).sort((leftSide,rightSide):number => {
+        if (leftSide.prefLabel < rightSide.prefLabel) return -1;
+        if (leftSide.prefLabel > rightSide.prefLabel) return 1;
+        return 0;
+      });
+
+    });
+  }
+
+  // after you clicked an autosuggest option, this function will show the field you want to show in input
+  displayFn(post: Post) {
+    if (post) {
+      return post.prefLabel;
+    }
   }
 
   // add chips
@@ -84,7 +111,6 @@ export class ControlledComponent implements OnInit {
 
   // chip was selected
   selected(event: MatAutocompleteSelectedEvent, value, label): void {
-
     this.autocompleteInput.nativeElement.value = '';
     this.autocompleteInput.nativeElement.focus();
 
@@ -95,6 +121,7 @@ export class ControlledComponent implements OnInit {
 
     // notify the parent component of the selection
     this.onSelectedOption.emit(event.option.value);
+    this.controlledGroup.get('search').setValue('');
   }
 
   // filter the data by the search string
@@ -110,11 +137,6 @@ export class ControlledComponent implements OnInit {
       : this.allPosts;
   }
 
-  // after you clicked an autosuggest option, this function will show the field you want to show in input
-  displayFn(post: Post) {
-    let k = post ? post.title : post;
-    return k;
-  }
 
   // focus the input field and remove any unwanted text.
   focusOnPlaceInput() {

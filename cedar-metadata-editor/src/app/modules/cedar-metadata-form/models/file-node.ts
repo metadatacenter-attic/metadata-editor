@@ -40,4 +40,5 @@ export interface FileNode {
 
   model?:MetadataModel;
   valueLocation?:string;
+  valueConstraints?:any;
 }

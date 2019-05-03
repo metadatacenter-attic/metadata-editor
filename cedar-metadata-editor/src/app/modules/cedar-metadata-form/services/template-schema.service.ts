@@ -41,6 +41,12 @@ export class TemplateSchemaService {
     }
   }
 
+  static getValueConstraints(schema: TemplateSchema) {
+    if (schema._valueConstraints) {
+      return schema._valueConstraints;
+    }
+  }
+
   static getHelp(schema: TemplateSchema) {
     return schema['schema:description'];
   }
@@ -241,11 +247,9 @@ export class TemplateSchemaService {
     } else {
       model[key][valueLocation] = val;
     }
-    console.log('setTextValue', model);
   }
 
   static setListValue(model, key, index, valueLocation, val) {
-    console.log('setListValue', model[key], val);
     if (Array.isArray(model[key])) {
       let arr = [];
       for (let i = 0; i < val.length; i++) {
@@ -335,8 +339,8 @@ export class TemplateSchemaService {
 
   static addControlledValue(model: any, key: string, value: string, label: string) {
     let val = {'@id': value, 'rdfs:label': label};
+    model[key] = Array.isArray(model[key]) ? model[key] : [model[key]];
     model[key].push(val);
-    console.log('setControlledValue', value, label, model[key]);
   }
 
   static removeControlledValue(model: any, key: string, index: number) {
@@ -352,7 +356,6 @@ export class TemplateSchemaService {
       arr.push(obj);
     }
     model[key] = arr;
-    console.log('setCheckValue', val, location, arr);
   }
 
   static setDateValue(model: any, key: string, index: number, valueLocation, val) {

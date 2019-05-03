@@ -2,20 +2,12 @@ import {Inject, Injectable, Optional} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
 
-
-
-
-import {environment} from '../../../../environments/environment';
 import {SchemaProperties, TemplateSchema} from "../models/template-schema";
-import {DataHandlerDataId} from "../../shared/model/data-handler-data-id.model";
 import {MetadataModel, MetadataSnip} from "../models/metadata-model";
-import {DataHandlerService} from "../../../services/data-handler.service";
-import {DataStoreService} from "../../../services/data-store.service";
 import {InputTypeService} from "./input-type.service";
 import {InputType} from "../models/input-type";
 
 import {TemplateSchemaService} from "./template-schema.service";
-import {DataHandlerDataStatus} from "../../shared/model/data-handler-data-status.model";
 import {FileNode} from "../models/file-node";
 
 
@@ -25,29 +17,12 @@ export class TemplateParserService {
   formGroup: FormGroup;
   pageIndex: number;
   dataChange = new BehaviorSubject<FileNode[]>([]);
-  model: MetadataModel;
-  template: TemplateSchema;
+  instanceModel: MetadataModel;
+  templateSchema: TemplateSchema;
 
-
-  dh: DataHandlerService;
-  ds: DataStoreService;
-  artifactStatus: number = null;
-  cedarLink: string = null;
-
-  constructor(dataHandler: DataHandlerService,
-              dataStore: DataStoreService, @Inject('templateId') @Optional() public templateId?: string,) {
-    
-    this.dh = dataHandler;
-    this.ds = dataStore;
-  }
-
-  protected initDataHandler(): DataHandlerService {
-    this.dh.reset();
-    this.dh.setPreCallback(() => this.preDataIsLoaded());
-    return this.dh;
-  }
-
-  private preDataIsLoaded() {
+  constructor(@Inject('instance') @Optional() public instance?: any, @Inject('template') @Optional() public template?: any) {
+    this.templateSchema = template as TemplateSchema;
+    this.instanceModel = instance as MetadataModel;
   }
 
   get data(): FileNode[] {
@@ -58,43 +33,47 @@ export class TemplateParserService {
     return this.template ? TemplateSchemaService.getTitle(this.template) : "";
   }
 
-  initialize(formGroup: FormGroup, instanceId: string, pageIndex?: number, model?: MetadataModel): any {
-
+  initialize(formGroup: FormGroup, instance: any, template:any, pageIndex?: number): any {
+    this.templateSchema = template as TemplateSchema;
+    this.instanceModel = instance as MetadataModel;
     this.formGroup = formGroup;
-    this.pageIndex = pageIndex;
+    this.pageIndex = 0;
 
-    // load the instance
-    this.initDataHandler();
-    this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
-    this.dh
-      .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
-      .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+    this.dataChange.next(this.buildFileTree(TemplateSchemaService.getOrder(this.templateSchema), TemplateSchemaService.getProperties(this.templateSchema), this.instanceModel, 0, this.formGroup, null));
+
+    //
+    // // load the instance
+    // this.initDataHandler();
+    // this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
+    // this.dh
+    //   .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
+    //   .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
 
   }
 
-  private instanceLoadedCallback(instanceId) {
-    const templateInstance = this.ds.getTemplateInstance(instanceId);
-    const templateId = TemplateSchemaService.isBasedOn(templateInstance);
-    this.model = templateInstance as MetadataModel;
-
-    // load the template it is based on
-    this.dh
-      .requireId(DataHandlerDataId.TEMPLATE, templateId)
-      .load(() => this.templateLoadedCallback(templateId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
-  }
-
-  private templateLoadedCallback(templateId) {
-    const template = this.ds.getTemplate(templateId);
-    this.template = template as TemplateSchema;
-
-    // build the tree
-    this.dataChange.next(this.buildFileTree(TemplateSchemaService.getOrder(this.template), TemplateSchemaService.getProperties(this.template), this.model, 0, this.formGroup, null));
-  }
-
-  private dataErrorCallback(error: any, dataStatus: DataHandlerDataStatus) {
-    this.artifactStatus = error.status;
-    console.log('dataErrorCallback', error)
-  }
+  // private instanceLoadedCallback(instanceId) {
+  //   const templateInstance = this.ds.getTemplateInstance(instanceId);
+  //   const templateId = TemplateSchemaService.isBasedOn(templateInstance);
+  //   this.model = templateInstance as MetadataModel;
+  //
+  //   // load the template it is based on
+  //   this.dh
+  //     .requireId(DataHandlerDataId.TEMPLATE, templateId)
+  //     .load(() => this.templateLoadedCallback(templateId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+  // }
+  //
+  // private templateLoadedCallback(templateId) {
+  //   const template = this.ds.getTemplate(templateId);
+  //   this.template = template as TemplateSchema;
+  //
+  //   // build the tree
+  //   this.dataChange.next(this.buildFileTree(TemplateSchemaService.getOrder(this.template), TemplateSchemaService.getProperties(this.template), this.model, 0, this.formGroup, null));
+  // }
+  //
+  // private dataErrorCallback(error: any, dataStatus: DataHandlerDataStatus) {
+  //   this.artifactStatus = error.status;
+  //   console.log('dataErrorCallback', error)
+  // }
 
 
   getValues(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
@@ -173,7 +152,7 @@ export class TemplateParserService {
 
     function getControlledValue(values, valueLocation): string[] {
       let result = [];
-      let source =   Array.isArray(values) ? values : [values];
+      let source = Array.isArray(values) ? values : [values];
       for (let i = 0; i < source.length; i++) {
         result.push(source[i][valueLocation]);
       }
@@ -220,7 +199,7 @@ export class TemplateParserService {
   getLabels(schema: TemplateSchema, inputType: InputType, modelValue): any[] {
     function getControlledLabel(labels, labelLocation): string[] {
       let result = [];
-      let source =   Array.isArray(labels) ? labels : [labels];
+      let source = Array.isArray(labels) ? labels : [labels];
       for (let i = 0; i < source.length; i++) {
         result.push(source[i][labelLocation]);
       }
@@ -249,7 +228,7 @@ export class TemplateParserService {
     return options;
   }
 
-  static getNodeType(schema: TemplateSchema,inputType: InputType): InputType {
+  static getNodeType(schema: TemplateSchema, inputType: InputType): InputType {
     return TemplateSchemaService.getInputType(schema);
   }
 
@@ -259,7 +238,7 @@ export class TemplateParserService {
 
   static staticNode(schema: TemplateSchema, model: MetadataModel, inputType: InputType, minItems, maxItems, key: string, modelValue: MetadataSnip, formGroup: FormGroup, parent: FileNode): FileNode {
 
-    return  {
+    return {
       'key': key,
       'model': model,
       'minItems': 0,
@@ -307,7 +286,8 @@ export class TemplateParserService {
       'required': TemplateSchemaService.isRequired(schema),
       'help': TemplateSchemaService.getHelp(schema),
       'placeholder': TemplateSchemaService.getPlaceholder(schema),
-      'hint': TemplateSchemaService.getHint(schema)
+      'hint': TemplateSchemaService.getHint(schema),
+      'valueConstraints': TemplateSchemaService.getValueConstraints(schema)
     };
   }
 
