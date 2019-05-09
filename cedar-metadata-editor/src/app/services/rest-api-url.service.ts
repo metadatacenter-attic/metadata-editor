@@ -7,12 +7,17 @@ import {environment} from '../../environments/environment';
 export class RestApiUrlService {
 
   API_URL: string = environment.apiUrl;
+  TERMINOLOGY_URL: string = environment.terminologyUrl;
 
   constructor() {
   }
 
   private base() {
     return `${this.API_URL}`;
+  }
+
+  private terminology() {
+      return `${this.TERMINOLOGY_URL}`;
   }
 
   private templateFields() {
@@ -46,6 +51,11 @@ export class RestApiUrlService {
   templateInstance(id: string) {
     return `${this.templateInstances()}/${encodeURIComponent(id)}`;
   }
+
+  getOntologyRootClasses(id: string) {
+    return `${this.terminology()}bioportal/ontologies/${encodeURIComponent(id)}/classes/roots`;
+  }
+
 
 
 }

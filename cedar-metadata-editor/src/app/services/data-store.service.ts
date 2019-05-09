@@ -5,6 +5,7 @@ import {Template} from '../shared/model/template.model';
 import {TemplateField} from '../shared/model/template-field.model';
 import {TemplateElement} from '../shared/model/template-element.model';
 import {TemplateInstance} from '../shared/model/template-instance.model';
+import {ControlledOntology} from "../shared/model/controlled-ontology.model";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class DataStoreService {
   private readonly templateElementMap: Map<string, TemplateElement>;
   private readonly templateMap: Map<string, Template>;
   private readonly templateInstanceMap: Map<string, TemplateInstance>;
+  private readonly ontologyRootClassesMap: Map<string, ControlledOntology>;
 
   constructor(
     private localSettings: LocalSettingsService
@@ -25,6 +27,7 @@ export class DataStoreService {
     this.templateElementMap = new Map<string, TemplateElement>();
     this.templateMap = new Map<string, Template>();
     this.templateInstanceMap = new Map<string, TemplateInstance>();
+    this.ontologyRootClassesMap = new Map<string, ControlledOntology>();
   }
 
   public static getCedarClientSessionId() {
@@ -61,6 +64,14 @@ export class DataStoreService {
 
   getTemplateInstance(templateInstanceId: string): TemplateInstance {
     return this.templateInstanceMap[templateInstanceId];
+  }
+
+  getOntologyRootClasses(ontologyId: string): ControlledOntology {
+    return this.ontologyRootClassesMap[ontologyId];
+  }
+
+  setOntologyRootClasses(ontologyId: string, ontology: ControlledOntology) {
+    this.ontologyRootClassesMap[ontologyId] = ontology;
   }
 
 }
