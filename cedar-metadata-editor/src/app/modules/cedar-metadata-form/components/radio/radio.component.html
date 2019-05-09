@@ -1,0 +1,20 @@
+<mat-radio-group [formGroup]="formGroup" [formControlName]="node.key" (change)="onChanges(node,0, formGroup)" class="mat-form-field mat-form-field-radio">
+  {{node.model[node.key] | json}}
+
+
+            <mat-radio-button
+              *ngFor="let control of formGroup['controls']['values']['controls']; let i=index"
+              [name]="node.key"
+              [formControlName]="node.key"
+              [formControl]='control'
+              [value]="node.options[i]['label']"
+              [aria-label]="node.options[i]['label']">
+              {{node.options[i]['label']}}  {{control['value']}}
+            </mat-radio-button>
+
+
+</mat-radio-group>
+
+<!--<mat-radio-group *ngIf="currentQuestion == i" class="example-radio-group" [formControlName]="ctrl">-->
+<!--  <mat-radio-button *ngFor="let answer of answers[currentQuestion]" [value]="answer.id">{{answer.label}}</mat-radio-button>-->
+<!--</mat-radio-group>-->

@@ -86,13 +86,15 @@ export class FormComponent implements OnChanges {
     });
   }
 
+  // listening to changed emitter from each question
   onQuestionChanges(event) {
     switch (event.type) {
+      case InputType.textarea:
       case InputType.textfield:
-        TemplateSchemaService.setTextValue(event.model, event.key, event.index, event.location, event.value);
+        //TemplateSchemaService.setTextValue(event.model, event.key, event.index, event.location, event.value);
         break;
       case InputType.list:
-        TemplateSchemaService.setListValue(event.model, event.key, event.index, event.location, event.value);
+        //TemplateSchemaService.setListValue(event.model, event.key, event.index, event.location, event.value);
         break;
       case InputType.date:
         const date = new Date(event.value);
@@ -103,10 +105,7 @@ export class FormComponent implements OnChanges {
         TemplateSchemaService.setRadioValue(event.model, event.key, event.index, event.location, event.value);
         break;
       case InputType.checkbox:
-        TemplateSchemaService.setCheckValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.attributeValue:
-        TemplateSchemaService.setAttributeValue(event.model, event.key, event.model[event.key][event.index], event.lLocation, event.value);
+        //TemplateSchemaService.setCheckValue(event.model, event.key, event.index, event.location, event.value);
         break;
     }
     this.onFormChanges();

@@ -9,9 +9,10 @@ import {InputType} from "../models/input-type";
 export interface FileNode {
   key: string;
   name: string;
-  minItems: number;
-  maxItems: number;
-  itemCount: number;
+
+  minItems?: number;
+  maxItems?: number;
+  itemCount?: number;
 
   type?: InputType;
   subtype?: InputType;

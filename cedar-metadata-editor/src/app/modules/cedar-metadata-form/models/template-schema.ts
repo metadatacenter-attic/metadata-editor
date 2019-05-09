@@ -15,8 +15,8 @@ export interface TemplateSchema {
   '_ui': {
     "pages": [],
     "order": string[],
-    "propertyLabels": object,
-    "propertyDescriptions": object,
+    "propertyLabels": string[],
+    "propertyDescriptions": string[],
     'inputType': InputType
   },
   "properties": SchemaProperties,

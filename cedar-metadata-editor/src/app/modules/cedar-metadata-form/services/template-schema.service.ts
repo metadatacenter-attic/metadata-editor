@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {InputTypeService} from "./input-type.service";
 import {TemplateSchema} from "../models/template-schema";
 import {InputType} from "../models/input-type";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Injectable()
 export class TemplateSchemaService {
@@ -99,8 +100,8 @@ export class TemplateSchemaService {
     return schema['skos:prefLabel'];
   }
 
-  static getTitle(schema: TemplateSchema) {
-    return TemplateSchemaService.getPrefLabel(schema) || TemplateSchemaService.getName(schema);
+  static getTitle(schema: TemplateSchema, label?: string) {
+    return  TemplateSchemaService.getPrefLabel(schema) || label || TemplateSchemaService.getName(schema);
   }
 
   static isElement(schema: TemplateSchema) {
@@ -132,10 +133,10 @@ export class TemplateSchemaService {
   }
 
   // where is the value of this field, @id or @value?
-  static getValueLocation(schema: TemplateSchema, inputType: InputType) {
-    const ct = TemplateSchemaService.getFieldControlledTerms(schema, inputType);
+  static getValueLocation(schema: TemplateSchema, nodeType: InputType, nodeSubtype: InputType) {
+    const ct = TemplateSchemaService.getFieldControlledTerms(schema, nodeType);
     const ctv = TemplateSchemaService.hasControlledTermValue(schema);
-    const link = inputType === InputType.link;
+    const link = nodeSubtype === InputType.url;
     return (ct || ctv || link) ? '@id' : '@value';
   }
 
@@ -153,6 +154,14 @@ export class TemplateSchemaService {
 
   static getProperties(schema: TemplateSchema) {
     return schema['properties'];
+  }
+
+  static getLabels(schema: TemplateSchema) {
+    return schema['_ui']['propertyLabels'];
+  }
+
+  static getDescriptions(schema: TemplateSchema) {
+    return schema['_ui']['propertyDescriptions'];
   }
 
   static getPageCount(schema: TemplateSchema) {
@@ -279,36 +288,56 @@ export class TemplateSchemaService {
     return guid;
   };
 
-  // build the values
-  static buildAttributeValues(model, key): any[] {
+  // build the form value for the attribute value field
+  static buildAttributeValue(model, key): any[] {
     const itemCount = model[key].length;
     const modelValue = (model && model[key]) ? model[key] : [];
     let val = [];
-    for (let i = 0; i < itemCount; i++) {
-      const itemKey = modelValue[i];
-      const itemValue = model[itemKey]['@value'];
-      val.push({'@value': itemValue, 'rdfs:label': itemKey})
+    if (itemCount == 0) {
+      val.push({'@value': null, 'rdfs:label': null})
+    } else {
+      for (let i = 0; i < itemCount; i++) {
+        const itemKey = modelValue[i];
+        const itemValue = model[itemKey]['@value'];
+        val.push({'@value': itemValue, 'rdfs:label': itemKey})
+      }
     }
     return val;
   }
 
-  static setAttributeValue(model, key, itemKey, valueLocation, val) {
-    if (valueLocation === '@value') {
-      // change the value
-      model[itemKey][valueLocation] = val;
+  // set the form values for the attribute value field into the model
+  static setAttributeValue(model, key, index, location, val) {
+    let itemKey = model[key][index];
+    if (itemKey) {
 
+      if (location === 'value') {
+        // change the value
+        model[itemKey]['@value'] = val;
+
+      } else {
+        // change the label
+        const itemValue = model[itemKey]['@value'];
+        const index = model[key].indexOf(itemKey);
+        delete model[itemKey];
+        model['@context'][val] = model['@context'][itemKey];
+        delete model['@context'][itemKey];
+        model[key][index] = val;
+        model[val] = {'@value': itemValue}
+      }
     } else {
-      // change the label
-      const itemValue = model[itemKey]['@value'];
-      const index = model[key].indexOf(itemKey);
-      delete model[itemKey];
-      model['@context'][val] = model['@context'][itemKey];
-      delete model['@context'][itemKey];
-      model[key][index] = val;
-      model[val] = {'@value': itemValue}
+      // initialize attribute value field with this itemKey
+      let newKey = val;
+      while (model.hasOwnProperty(newKey)) {
+        newKey = newKey + '1';
+      }
+      model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + this.generateGUID();
+      model[key] = [newKey];
+      model[newKey] = {'@value': val};
     }
   }
 
+
+  // copy the attribute value field pair at index to a new index
   static copyAttributeValue(model, key, index) {
     const oldKey = model[key][index];
     const oldValue = model[oldKey]['@value'];
@@ -316,12 +345,12 @@ export class TemplateSchemaService {
     while (model.hasOwnProperty(newKey)) {
       newKey = newKey + '1';
     }
-
     model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + this.generateGUID();
     model[key].splice(index + 1, 0, newKey);
     model[newKey] = {'@value': oldValue};
   };
 
+  // remove the attribute value field pair at index
   static removeAttributeValue(model, key, index) {
     const oldKey = model[key][index];
     delete model['@context'][oldKey];

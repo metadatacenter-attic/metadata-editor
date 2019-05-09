@@ -221,6 +221,7 @@ export const constants = {
       'hasInstanceTerm': false,
       'allowsRequired': false
     }
-  }
+  },
+  labels: {'copy': 'Copy', "remove":"Remove"}
 
 };

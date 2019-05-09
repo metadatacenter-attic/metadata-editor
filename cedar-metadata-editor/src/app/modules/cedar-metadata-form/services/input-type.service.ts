@@ -51,5 +51,17 @@ export class InputTypeService {
     return t === InputType.attributeValue;
   }
 
+  static isTel(t: string) {
+    return t === InputType.tel;
+  }
+
+  static isUrl(t: string) {
+    return t === InputType.url;
+  }
+
+  static isNumber(t: string) {
+    return t === InputType.number;
+  }
+
 
 }
