@@ -1,5 +1,6 @@
 <mat-form-field class="mat-form-field">
   <input matInput
+    [required]="node.required"
     [matDatepicker]="picker"
     [formControl]="control">
   <mat-hint>{{node.hint}}</mat-hint>

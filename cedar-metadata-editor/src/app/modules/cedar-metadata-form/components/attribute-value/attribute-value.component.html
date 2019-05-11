@@ -1,11 +1,12 @@
 <div *ngFor="let fg of formGroup.controls['values']['controls'];let j = index">
+<!--  {{node.model[node.key][j] | json}} {{node.model[node.model[node.key][j]] | json}}-->
   <div style="display:flex;">
+
     <div class="example-full-width mat-form-field" style="padding-right:10px">
       <mat-form-field class="example-full-width mat-form-field">
         <input matInput
           [formControl]="fg['controls']['values']['controls'][0]"
-          [type]="node.type"
-          (change)="onAVChanges(node, j,'label',fg['controls']['values']['controls'][0]['value']);">
+          [type]="node.type">
         <mat-hint>Name</mat-hint>
       </mat-form-field>
     </div>
@@ -14,18 +15,17 @@
       <mat-form-field class="example-full-width mat-form-field">
         <input matInput
           [formControl]="fg['controls']['values']['controls'][1]"
-          [type]="node.type"
-          (change)="onAVChanges(node, j,'value',fg['controls']['values']['controls'][1]['value']);">
+          [type]="node.type">
         <mat-hint>Value</mat-hint>
       </mat-form-field>
     </div>
 
-    <button mat-icon-button color="primary" *ngIf="!disabled" (click)="copyAV(node,j)">
+    <button mat-icon-button color="primary" *ngIf="!disabled" (click)="copy(node,j)">
       <mat-icon aria-label="Add attribute value">
         file_copy
       </mat-icon>
     </button>
-    <button mat-icon-button color="warn" *ngIf="!disabled" (click)="removeAV(node,j)">
+    <button mat-icon-button color="warn" *ngIf="!disabled" (click)="remove(node,j)">
       <mat-icon aria-label="Remove attribute value">
         delete_forever
       </mat-icon>

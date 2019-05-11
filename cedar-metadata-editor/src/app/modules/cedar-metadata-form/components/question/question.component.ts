@@ -423,13 +423,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   // build the av form controls
   private buildAV(node: FileNode, disabled: boolean): any[] {
-    console.log('buildAV', node);
     const arr = [];
     node.model[node.key].forEach((value) => {
-      console.log('buildAV', value, node.model[value['rdfs:label']]);
       const items = [];
-      items.push(new FormControl({value: value['rdfs:label'], disabled: disabled}));
-      items.push(new FormControl({value: node.model[value['rdfs:label']]['@value'], disabled: disabled}));
+      items.push(new FormControl({value: '', disabled: disabled}));
+      items.push(new FormControl({value: '', disabled: disabled}));
       const group = this.fb.group({values: this.fb.array(items)});
       arr.push(group);
     });
@@ -439,7 +437,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   onChange(event) {
     this.broadcastChanges(event);
   }
-  
+
   broadcastChanges(event) {
     this.changed.emit({
       'type': event.type,

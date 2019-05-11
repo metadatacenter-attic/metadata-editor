@@ -22,6 +22,7 @@ export class TextfieldComponent implements OnInit {
   @Input() control: FormControl;
   @Input() node: FileNode;
   @Input() index: number;
+  @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
 
   matcher = new MyErrorStateMatcher();

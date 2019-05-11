@@ -49,11 +49,10 @@
             (onSelectedOption)="onSelectedControlled($event)"></controlled>
 
           <cedar-textfield *ngSwitchCase="'textfield'" [formGroup]="formGroup" [control]="control" [node]="node"
-            [index]="i" (changed)="onChange($event)"></cedar-textfield>
+            [index]="i" [disabled]="disabled" (changed)="onChange($event)"></cedar-textfield>
 
           <cedar-textarea *ngSwitchCase="'textarea'" [formGroup]="formGroup" [control]="control" [node]="node"
-            [index]="i"
-            (changed)="onChange($event)"></cedar-textarea>
+            [index]="i" (changed)="onChange($event)"></cedar-textarea>
 
           <cedar-date *ngSwitchCase="'date'" [formGroup]="formGroup" [control]="control" [node]="node" [index]="i"
             (changed)="onChange($event)"></cedar-date>

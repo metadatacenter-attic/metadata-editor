@@ -31,6 +31,7 @@ export class ControlledComponent implements OnInit {
   @Input() classLoader: any;
   @Input() valueConstraints: any;
 
+
   constructor(private ct: ControlledTermService, private fb: FormBuilder) {
   }
 
