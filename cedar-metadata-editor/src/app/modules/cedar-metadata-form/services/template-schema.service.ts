@@ -165,11 +165,13 @@ export class TemplateSchemaService {
   }
 
   static getPageCount(schema: TemplateSchema) {
+    console.log('getPageCount', schema)
     const properties = this.getProperties(schema);
     let currentPage = 0;
     this.getOrder(schema).forEach(function (key) {
       let prop: TemplateSchema = properties[key];
       let type: InputType = TemplateSchemaService.getInputType(prop);
+      console.log('type',type)
       if (InputTypeService.isPageBreak(type)) {
         currentPage++;
       }
@@ -387,10 +389,6 @@ export class TemplateSchemaService {
     model[key] = arr;
   }
 
-  static setDateValue(model: any, key: string, index: number, valueLocation, val) {
-    let obj = Array.isArray(model[key]) ? model[key][index] : model[key];
-    obj[valueLocation] = val;
-    obj['@type'] = 'xsd:date';
-  }
+
 
 }

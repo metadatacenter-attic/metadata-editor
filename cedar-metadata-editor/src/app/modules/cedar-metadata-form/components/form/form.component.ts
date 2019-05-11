@@ -13,6 +13,8 @@ import {TemplateSchemaService} from "../../services/template-schema.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
 import {MetadataModel} from "../../models/metadata-model";
+import {TemplateSchema} from "../../models/template-schema";
+import {InputTypeService} from "../../services/input-type.service";
 
 
 @Component({
@@ -44,78 +46,50 @@ export class FormComponent implements OnChanges {
   copy: string = "Copy";
   remove: string = "Remove";
 
-
   darkMode: boolean;
   private _darkModeSub: Subscription;
-
-  private _subscription: Subscription;
+  private formChanges: Subscription;
 
   constructor(private ui: UiService, database: TemplateParserService, route: ActivatedRoute) {
+    this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
     this.database = database;
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
     this.title = 'loading'
-
   }
 
   changeLog: string[] = [];
 
   onPageChange(event) {
-    if (this.instance && this.template) {
-      this.pageEvent = event;
-      const page = this.pageEvent.pageIndex;
-      this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, page);
-      this.pageEvent.length = TemplateSchemaService.getPageCount(this.database.template);
-      this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-      this.dataSource = new MatTreeNestedDataSource();
-      this.database.dataChange.subscribe(data => {
-        this.dataSource.data = data;
-      });
-    }
-  }
-
-  onFormChanges() {
-    this.response.payload = this.form.value;
-    this.response.jsonLD = this.database.instanceModel;
-    this.response.formValid = this.form.valid;
-    let that = this;
-    jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-      that.response.rdf = err ? err : nquads;
-      that.changed.emit(that.response);
-    });
-  }
-
-  // listening to changed emitter from each question
-  onQuestionChanges(event) {
-    switch (event.type) {
-      case InputType.textarea:
-      case InputType.textfield:
-        //TemplateSchemaService.setTextValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.list:
-        //TemplateSchemaService.setListValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.date:
-        const date = new Date(event.value);
-        const isoDate = date.toISOString().substring(0, 10);
-        TemplateSchemaService.setDateValue(event.model, event.key, event.index, event.location, isoDate);
-        break;
-      case InputType.radio:
-        TemplateSchemaService.setRadioValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.checkbox:
-        //TemplateSchemaService.setCheckValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-    }
-    this.onFormChanges();
+    console.log('onPageChange',event)
+    this.pageEvent = event;
+    this.initialize() ;
+    // if (this.instance && this.template) {
+    //   this.pageEvent = event;
+    //   this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, this.pageEvent.pageIndex);
+    //   this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    //   this.dataSource = new MatTreeNestedDataSource();
+    //   this.database.dataChange.subscribe(data => {
+    //     this.dataSource.data = data;
+    //   });
+    // }
   }
 
   // keep up-to-date on changes in the form
   onChanges(): void {
     if (this.form) {
-      this._subscription = this.form.valueChanges.subscribe(val => {
-        this.onFormChanges();
+      this.formChanges = this.form.valueChanges.subscribe(val => {
+        setTimeout(() => {
+          this.response.payload = val;
+          this.response.jsonLD = this.database.instanceModel;
+          this.response.formValid = this.form.valid;
+          let that = this;
+          jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+            that.response.rdf = err ? err : nquads;
+            that.changed.emit(that.response);
+          });
+        }, 0);
       });
     }
   }
@@ -133,10 +107,7 @@ export class FormComponent implements OnChanges {
       }
     }
     this.changeLog.push(log.join(', '));
-
-    if (this.instance && this.template) {
-      this.initialize();
-    }
+    this.initialize();
   }
 
   private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
@@ -144,37 +115,34 @@ export class FormComponent implements OnChanges {
   private _getChildren = (node: FileNode) => node.children;
 
   initialize() {
-
     if (this.instance && this.template) {
+      this.pageEvent.length = TemplateSchemaService.getPageCount(this.template);
 
-      this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
       this.form = new FormGroup({});
-      this.database.initialize(this.form, this.instance, this.template);
+      this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
       this.title = this.database.getTitle();
-      // this.pageEvent.length =  TemplateSchemaService.getPageCount(this.database.template);
-      // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-      // this.dataSource = new MatTreeNestedDataSource();
       this.database.dataChange.subscribe(data => {
-
-
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
           this.dataSource.data = data;
-          this.pageEvent.length = this.database.template ? TemplateSchemaService.getPageCount(this.database.template) : 0;
+          console.log('page length',this.pageEvent);
           this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-
         }
-
       });
       this.onChanges();
-      this.onFormChanges();
-
     }
   }
 
-  // getTitle() {
-  //   return this.template ? this.database.getTitle() : "loading...";
-  // }
+  getPageCount(nodes: FileNode[]) {
+    let count = 0;
+    nodes.forEach(function (node) {
+      console.log(node.type,node.subtype);
+      if (InputTypeService.isPageBreak(node.subtype)) {
+        count++;
+      }
+    });
+    return count + 1;
+  }
 
   isDisabled() {
     return this.viewOnly;

@@ -9,15 +9,12 @@ import {
   ValidatorFn,
   Validators
 } from '@angular/forms';
-import {NgxYoutubePlayerModule} from 'ngx-youtube-player';
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
-
 
 import {TemplateSchemaService} from "../../services/template-schema.service";
 import {FileNode} from "../../models/file-node";
 import {ErrorStateMatcher} from "@angular/material";
-
 
 
 /** Error when invalid control is dirty, touched, or submitted. */
@@ -50,7 +47,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   player;
 
 
-  constructor(private fb: FormBuilder, private yt: NgxYoutubePlayerModule) {
+  constructor(private fb: FormBuilder) {
     //this._yt = new NgxYoutubePlayerModule();
     //this.player = this.yt.Player;
   }
@@ -58,19 +55,21 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
   }
 
-  savePlayer(player) {
-    this.player = player;
-    console.log('player instance', player);
-  }
-
-  onStateChange(event) {
-    console.log('player state', event.data);
-  }
+  // savePlayer(player) {
+  //   this.player = player;
+  //   console.log('player instance', player);
+  // }
+  //
+  // onStateChange(event) {
+  //   console.log('player state', event.data);
+  // }
 
   ngOnInit() {
 
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
+    let name;
+    let obj;
 
     switch (this.node.type) {
 
@@ -100,9 +99,22 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
+      case InputType.radio:
+        name = this.node.key + 'radio';
+        obj = {};
+        obj[name] = new FormControl(this.fb.array([]));
+        this.formGroup = this.fb.group(obj);
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+
+      case InputType.checkbox:
+        this.formGroup = this.fb.group({values: this.fb.array(this.buildCheckbox(this.node, this.disabled))});
+        this.parentGroup.addControl(this.node.key, this.formGroup);
+        break;
+
       case InputType.list:
-        const name = this.node.key + 'list';
-        let obj = {};
+        name = this.node.key + 'list';
+        obj = {};
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
         this.parentGroup.addControl(this.node.key, this.formGroup);
@@ -113,15 +125,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
-      case InputType.radio:
-        this.formGroup = this.fb.group({values: this.fb.array(this.buildRadio(this.node, this.disabled))});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
-        break;
 
-      case InputType.checkbox:
-        this.formGroup = this.fb.group({values: this.fb.array(this.buildCheckbox(this.node, this.disabled))});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
-        break;
     }
   }
 
@@ -136,7 +140,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   allowsMultiple(type: InputType) {
-    return InputTypeService.allowsMultiple(type);
+    return type !== InputType.element && InputTypeService.allowsMultiple(type);
   }
 
   getValidators(node: FileNode) {
@@ -239,14 +243,14 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return result;
   }
 
-  isChecked(node,  label) {
-      let result = false;
-      node.model[node.key].forEach((value, i) => {
-        if (value[node.valueLocation] == label) {
-          result = true;
-        }
-      });
-      return result;
+  isChecked(node, label) {
+    let result = false;
+    node.model[node.key].forEach((value, i) => {
+      if (value[node.valueLocation] == label) {
+        result = true;
+      }
+    });
+    return result;
   }
 
   // setRadio(node:FileNode, value:string) {
@@ -257,39 +261,37 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   //
   // };
 
-  setDate(node:FileNode, index:number, value) {
+  setDate(node: FileNode, index: number, value) {
     console.log('setDate', index, value);
     node.value[index] = value;
   };
 
-  setChecked(node:FileNode,  label:string, value:boolean) {
-      if (value != this.isChecked(node, label)) {
-        if (value) {
-          let obj = {}
-          obj[node.valueLocation] = label
-          node.model[node.key].push(obj);
-        } else {
-          node.model[node.key].forEach((value, i) => {
-            if (value[node.valueLocation] == label) {
-              node.model[node.key].splice(node.model[node.key][i], 1);
-            }
-          });
-        }
+  setChecked(node: FileNode, label: string, value: boolean) {
+    if (value != this.isChecked(node, label)) {
+      if (value) {
+        let obj = {}
+        obj[node.valueLocation] = label
+        node.model[node.key].push(obj);
+      } else {
+        node.model[node.key].forEach((value, i) => {
+          if (value[node.valueLocation] == label) {
+            node.model[node.key].splice(node.model[node.key][i], 1);
+          }
+        });
       }
+    }
   }
-
-
 
 
   copyAV(node: FileNode, index: number) {
     TemplateSchemaService.copyAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values',this.fb.array(this.buildAV(node, this.disabled))) ;
+    this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   removeAV(node: FileNode, index: number) {
     TemplateSchemaService.removeAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values',this.fb.array(this.buildAV(node, this.disabled))) ;
+    this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
@@ -301,7 +303,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   };
 
 
-  addNewItem(index:number) {
+  addNewItem(index: number) {
     const validators = this.getValidators(this.node);
 
 
@@ -312,8 +314,8 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         // this.node.value.splice(index, 0, this.node.value[index]);
         // this.node.label.splice(index, 0, this.node.label[index]);
         obj = Object.assign({}, this.node.model[this.node.key][index]);
-        this.node.model[this.node.key].splice(index, 0,this.node.model[this.node.key][index]);
-        this.formGroup.setControl('values',this.fb.array(this.buildControlled(this.node, this.disabled)));
+        this.node.model[this.node.key].splice(index, 0, this.node.model[this.node.key][index]);
+        this.formGroup.setControl('values', this.fb.array(this.buildControlled(this.node, this.disabled)));
         break;
 
       case InputType.textfield:
@@ -322,25 +324,28 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         if (Array.isArray(this.node.model[this.node.key])) {
           this.node.model[this.node.key].splice(index, 0, obj);
         } else {
-          this.node.model[this.node.key]= [obj, obj];
+          this.node.model[this.node.key] = [obj, obj];
         }
-        this.formGroup.setControl('values',this.fb.array(this.buildText(this.node, this.disabled, validators)));
+        this.formGroup.setControl('values', this.fb.array(this.buildText(this.node, this.disabled, validators)));
         break;
 
       case InputType.date:
         obj = Object.assign({}, this.node.model[this.node.key][index]);
-        this.node.model[this.node.key].splice(index, 0, obj);
-        // dates in the model are different from dates that we can edit; use node.value for editing the date
-        this.node.value.splice(index, 0, this.node.value[index]);
-        this.formGroup.setControl('values',this.fb.array(this.buildDate(this.node, this.disabled, validators)));
-        console.log( this.node.model[this.node.key]);
+        if (Array.isArray(this.node.model[this.node.key])) {
+          this.node.model[this.node.key].splice(index, 0, obj);
+        } else {
+          this.node.model[this.node.key] = [obj, obj];
+        }
+        this.formGroup.setControl('values', this.fb.array(this.buildDate(this.node, this.disabled, validators)));
+        this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
+
         break;
     }
 
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
-  deleteLastItem(index:number) {
+  deleteLastItem(index: number) {
     const validators = this.getValidators(this.node);
     switch (this.node.type) {
 
@@ -348,15 +353,15 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         // this.node.value.splice(index, 0, this.node.value[index]);
         // this.node.label.splice(index, 0, this.node.label[index]);
         this.node.model[this.node.key].splice(index, 1);
-        this.formGroup.setControl('values',this.fb.array(this.buildControlled(this.node, this.disabled)));
+        this.formGroup.setControl('values', this.fb.array(this.buildControlled(this.node, this.disabled)));
         break;
 
       case InputType.textfield:
       case InputType.textarea:
         // this.node.value.splice(index, 0,this.node.value[index])
         this.node.model[this.node.key].splice(index, 1);
-        this.formGroup.setControl('values',this.fb.array(this.buildText(this.node, this.disabled, validators)));
-        console.log( this.node.model[this.node.key]);
+        this.formGroup.setControl('values', this.fb.array(this.buildText(this.node, this.disabled, validators)));
+        console.log(this.node.model[this.node.key]);
         break;
 
     }
@@ -367,98 +372,43 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     console.log('load the form with key', key, form);
   }
 
-  getImageWidth(node: FileNode) {
-    let width = 367;
-    if (node.size && node.size.width && Number.isInteger(node.size.width)) {
-      width = node.size.width;
-    }
-    return width;
-  }
 
-  getImageHeight(node: FileNode) {
-    let height = 270;
-    if (node.size && node.size.height && Number.isInteger(node.size.height)) {
-      height = node.size.height;
-    }
-    return height;
-  }
-
-  getYouTubeEmbedFrame(node: FileNode) {
-    var width = 560;
-    var height = 315;
-    var content: string = node.value[0];
-    if (content) {
-      content = content.replace(/<(?:.|\n)*?>/gm, '');
-    }
-
-    //var size = dms.getSize(field);
-    let size;
-
-    if (size && size.width && Number.isInteger(size.width)) {
-      width = size.width;
-    }
-    if (size && size.height && Number.isInteger(size.height)) {
-      height = size.height;
-    }
-
-    // if I say trust as html, then better make sure it is safe first
-    if (content) {
-      return
-      '<iframe width="' + width + '" height="' + height + '" src="https://www.youtube.com/embed/' + content + '" frameborder="0" allowfullscreen></iframe>';
-    }
-  };
-
-  private buildList(node, disabled:boolean):any[] {
+  private buildList(node, disabled: boolean): any[] {
     const arr = node.options.map(opt => {
-      return new FormControl({value: node.model[node.key][node.valueLocation], disabled: disabled});;
+      return new FormControl({value: '', disabled: disabled});
+      ;
     });
     return arr;
 
   }
 
-  isCheckedx(node,  label) {
-    let result = false;
-    node.model[node.key].forEach((value, i) => {
-      if (value[node.valueLocation] == label) {
-        result = true;
-      }
-    });
-    return result;
-  }
-
-  private buildCheckbox(node, disabled:boolean):any[] {
+  private buildCheckbox(node, disabled: boolean): any[] {
     const arr = node.options.map(opt => {
-      return this.fb.control(this.isCheckedx(node,opt.label));
+      return this.fb.control({value: false, disabled: disabled});
     });
     return arr;
   }
 
-  private buildRadio(node:FileNode, disabled:boolean):any[] {
-    const arr = node.options.map(opt => {
-      return this.fb.control((node.model[node.key][node.valueLocation] == opt.label));
-    });
-    return arr;
-  }
 
-  private buildText(node:FileNode, disabled:boolean, validators):any[] {
+  private buildText(node: FileNode, disabled: boolean, validators): any[] {
     const arr = [];
     let length = node.model[node.key].length || 1;
-    for (let i=0;i<length;i++) {
+    for (let i = 0; i < length; i++) {
       arr.push(new FormControl({value: '', disabled: disabled}, validators));
     }
     return arr;
   }
 
-  private buildDate(node, disabled:boolean, validators):any[] {
+  private buildDate(node, disabled: boolean, validators): any[] {
     const arr = [];
-    node.value.forEach((value, i) => {
-      const control = new FormControl({value: new Date(value[node.valueLocation]), disabled: disabled, validators});
+    node.model[node.key].forEach((value, i) => {
+      const control = new FormControl({value: null, disabled: disabled, validators});
       arr.push(control);
     });
     return arr;
   }
 
-  private buildControlled(node:FileNode, disabled:boolean):any[] {
+  private buildControlled(node: FileNode, disabled: boolean): any[] {
     const arr = [];
     node.model[node.key].forEach((value) => {
       let group = this.fb.group({
@@ -472,11 +422,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   };
 
   // build the av form controls
-  private buildAV(node:FileNode, disabled:boolean):any[] {
-    console.log('buildAV',node);
+  private buildAV(node: FileNode, disabled: boolean): any[] {
+    console.log('buildAV', node);
     const arr = [];
     node.model[node.key].forEach((value) => {
-      console.log('buildAV',value, node.model[value['rdfs:label']]);
+      console.log('buildAV', value, node.model[value['rdfs:label']]);
       const items = [];
       items.push(new FormControl({value: value['rdfs:label'], disabled: disabled}));
       items.push(new FormControl({value: node.model[value['rdfs:label']]['@value'], disabled: disabled}));
@@ -486,59 +436,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return arr;
   }
 
-
-  onDateChanges(event) {
-    switch (event.type) {
-      case InputType.date:
-        const date = new Date(event.value);
-        const isoDate = date.toISOString().substring(0, 10);
-        TemplateSchemaService.setDateValue(event.model, event.key, event.index, event.location, isoDate);
-        break;
-    }
+  onChange(event) {
     this.broadcastChanges(event);
   }
-
-  onTextChanges(event) {
-    switch (event.type) {
-      case InputType.textfield:
-        break;
-    }
-    this.broadcastChanges(event);
-  }
-
-  onListChanges(event) {
-    switch (event.type) {
-      case InputType.list:
-        break;
-    }
-    this.broadcastChanges(event);
-  }
-
-  onRadioChanges(event) {
-    switch (event.type) {
-      case InputType.radio:
-        break;
-    }
-    this.broadcastChanges(event);
-  }
-
-  onCheckboxChanges(event) {
-    switch (event.type) {
-      case InputType.checkbox:
-        break;
-    }
-    this.broadcastChanges(event);
-  }
-
-  onAttributeValueChanges(event) {
-    switch (event.type) {
-      case InputType.checkbox:
-        break;
-    }
-    this.broadcastChanges(event);
-  }
-
-
+  
   broadcastChanges(event) {
     this.changed.emit({
       'type': event.type,

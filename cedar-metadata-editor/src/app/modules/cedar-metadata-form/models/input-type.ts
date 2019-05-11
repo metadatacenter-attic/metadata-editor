@@ -20,6 +20,7 @@ export enum InputType {
   richText = 'richtext',
   image = 'image',
   youTube = 'youtube',
-  static = 'static'
+  static = 'static',
+  element = 'element'
 }
 

@@ -1,7 +1,6 @@
 import {Component, OnInit, Input, Output, ChangeDetectionStrategy, EventEmitter} from '@angular/core'
 import {FormGroup, FormArray} from '@angular/forms';
 import {Subscription} from "rxjs";
-import {ElementService} from "./service/element.service";
 import {FileNode} from "../../models/file-node";
 import {UiService} from "../../../../services/ui/ui.service";
 
@@ -10,7 +9,7 @@ import {UiService} from "../../../../services/ui/ui.service";
   selector: 'app-element',
   templateUrl: './element.component.html',
   styleUrls: ['./element.component.less'],
-  providers: [ElementService],
+  providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {

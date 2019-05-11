@@ -1,10 +1,7 @@
-<mat-form-field  class="mat-form-field">
-<!--  {{node['value'][index] | json}}    {{node['model'][node.key][index] | json}}-->
+<mat-form-field class="mat-form-field">
   <input matInput
-    [value]="node['value'][index]"
     [matDatepicker]="picker"
-    [formControl]="control"
-    (dateChange)="setDate(node, index, control['value']);onChanges(node, index, control['value'])">
+    [formControl]="control">
   <mat-hint>{{node.hint}}</mat-hint>
   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker></mat-datepicker>

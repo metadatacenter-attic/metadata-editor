@@ -1,18 +1,21 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {FormGroup} from "@angular/forms";
+import {FileNode} from "../../models/file-node";
 
 @Component({
-  selector: 'app-richtext',
+  selector: 'cedar-richtext',
   templateUrl: './richtext.component.html',
   styleUrls: ['./richtext.component.less']
 })
 export class RichtextComponent implements OnInit {
-  @Input('field') field: object;
-  @Input('parent') parent: object;
-  @Input('key') key: object;
+  @Input() formGroup: FormGroup;
+  @Input() node: FileNode;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
+
 
 }
