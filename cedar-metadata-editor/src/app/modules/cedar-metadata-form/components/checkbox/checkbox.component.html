@@ -3,8 +3,7 @@
     <div *ngFor="let control of formGroup.controls['values']['controls']; let i=index">
       <mat-checkbox type=”checkbox”
         [formControl]='control'
-        [aria-label]="node.options[i]['label']"
-        (change)="onChanged(node, node.options[i]['label'], control['value'])">
+        [aria-label]="node.options[i]['label']">
         {{node.options[i]['label']}}
       </mat-checkbox>
     </div>

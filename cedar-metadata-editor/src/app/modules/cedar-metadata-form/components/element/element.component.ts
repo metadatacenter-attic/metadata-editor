@@ -1,7 +1,6 @@
 import {Component, OnInit, Input, Output, ChangeDetectionStrategy, EventEmitter} from '@angular/core'
 import {FormGroup, FormArray} from '@angular/forms';
 import {Subscription} from "rxjs";
-import {ElementService} from "./service/element.service";
 import {FileNode} from "../../models/file-node";
 import {UiService} from "../../../../services/ui/ui.service";
 
@@ -10,7 +9,7 @@ import {UiService} from "../../../../services/ui/ui.service";
   selector: 'app-element',
   templateUrl: './element.component.html',
   styleUrls: ['./element.component.less'],
-  providers: [ElementService],
+  providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ElementComponent {
@@ -19,6 +18,7 @@ export class ElementComponent {
   @Input() node: FileNode;
   @Input() parentGroup: FormGroup;
   @Input() formGroup: FormGroup;
+  @Input() index: number;
 
 
   darkMode: boolean;
@@ -28,6 +28,7 @@ export class ElementComponent {
   }
 
   ngOnInit() {
+    console.log('ngOnInit',this.node.key,this.node.itemCount,this.node.model[this.node.key],this.parentGroup);
     if (this.parentGroup) {
       this.parentGroup.addControl(this.node.key, this.formGroup);
     }

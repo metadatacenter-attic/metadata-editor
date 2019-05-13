@@ -12,7 +12,9 @@ import {UiService} from "../../../../services/ui/ui.service";
 import {TemplateSchemaService} from "../../services/template-schema.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
-import {MetadataModel} from "../../models/metadata-model";
+import {MetadataModel, MetadataSnip} from "../../models/metadata-model";
+import {TemplateSchema} from "../../models/template-schema";
+import {InputTypeService} from "../../services/input-type.service";
 
 
 @Component({
@@ -44,78 +46,50 @@ export class FormComponent implements OnChanges {
   copy: string = "Copy";
   remove: string = "Remove";
 
-
   darkMode: boolean;
   private _darkModeSub: Subscription;
-
-  private _subscription: Subscription;
+  private formChanges: Subscription;
 
   constructor(private ui: UiService, database: TemplateParserService, route: ActivatedRoute) {
+    this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
     this.database = database;
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
     this.title = 'loading'
-
   }
 
   changeLog: string[] = [];
 
   onPageChange(event) {
-    if (this.instance && this.template) {
-      this.pageEvent = event;
-      const page = this.pageEvent.pageIndex;
-      this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, page);
-      this.pageEvent.length = TemplateSchemaService.getPageCount(this.database.template);
-      this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-      this.dataSource = new MatTreeNestedDataSource();
-      this.database.dataChange.subscribe(data => {
-        this.dataSource.data = data;
-      });
-    }
-  }
-
-  onFormChanges() {
-    this.response.payload = this.form.value;
-    this.response.jsonLD = this.database.instanceModel;
-    this.response.formValid = this.form.valid;
-    let that = this;
-    jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
-      that.response.rdf = err ? err : nquads;
-      that.changed.emit(that.response);
-    });
-  }
-
-  // listening to changed emitter from each question
-  onQuestionChanges(event) {
-    switch (event.type) {
-      case InputType.textarea:
-      case InputType.textfield:
-        //TemplateSchemaService.setTextValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.list:
-        //TemplateSchemaService.setListValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.date:
-        const date = new Date(event.value);
-        const isoDate = date.toISOString().substring(0, 10);
-        TemplateSchemaService.setDateValue(event.model, event.key, event.index, event.location, isoDate);
-        break;
-      case InputType.radio:
-        TemplateSchemaService.setRadioValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-      case InputType.checkbox:
-        //TemplateSchemaService.setCheckValue(event.model, event.key, event.index, event.location, event.value);
-        break;
-    }
-    this.onFormChanges();
+    console.log('onPageChange',event)
+    this.pageEvent = event;
+    this.initialize() ;
+    // if (this.instance && this.template) {
+    //   this.pageEvent = event;
+    //   this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, this.pageEvent.pageIndex);
+    //   this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    //   this.dataSource = new MatTreeNestedDataSource();
+    //   this.database.dataChange.subscribe(data => {
+    //     this.dataSource.data = data;
+    //   });
+    // }
   }
 
   // keep up-to-date on changes in the form
   onChanges(): void {
     if (this.form) {
-      this._subscription = this.form.valueChanges.subscribe(val => {
-        this.onFormChanges();
+      this.formChanges = this.form.valueChanges.subscribe(val => {
+        setTimeout(() => {
+          this.response.payload = val;
+          this.response.jsonLD = this.database.instanceModel;
+          this.response.formValid = this.form.valid;
+          let that = this;
+          jsonld.toRDF(this.response.jsonLD, {format: 'application/nquads'}, function (err, nquads) {
+            that.response.rdf = err ? err : nquads;
+            that.changed.emit(that.response);
+          });
+        }, 0);
       });
     }
   }
@@ -133,10 +107,7 @@ export class FormComponent implements OnChanges {
       }
     }
     this.changeLog.push(log.join(', '));
-
-    if (this.instance && this.template) {
-      this.initialize();
-    }
+    this.initialize();
   }
 
   private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
@@ -144,37 +115,34 @@ export class FormComponent implements OnChanges {
   private _getChildren = (node: FileNode) => node.children;
 
   initialize() {
-
     if (this.instance && this.template) {
+      this.pageEvent.length = TemplateSchemaService.getPageCount(this.template);
 
-      this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
       this.form = new FormGroup({});
-      this.database.initialize(this.form, this.instance, this.template);
+      this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
       this.title = this.database.getTitle();
-      // this.pageEvent.length =  TemplateSchemaService.getPageCount(this.database.template);
-      // this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-      // this.dataSource = new MatTreeNestedDataSource();
       this.database.dataChange.subscribe(data => {
-
-
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
           this.dataSource.data = data;
-          this.pageEvent.length = this.database.template ? TemplateSchemaService.getPageCount(this.database.template) : 0;
+          console.log('page length',this.pageEvent);
           this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-
         }
-
       });
       this.onChanges();
-      this.onFormChanges();
-
     }
   }
 
-  // getTitle() {
-  //   return this.template ? this.database.getTitle() : "loading...";
-  // }
+  getPageCount(nodes: FileNode[]) {
+    let count = 0;
+    nodes.forEach(function (node) {
+      console.log(node.type,node.subtype);
+      if (InputTypeService.isPageBreak(node.subtype)) {
+        count++;
+      }
+    });
+    return count + 1;
+  }
 
   isDisabled() {
     return this.viewOnly;
@@ -184,32 +152,73 @@ export class FormComponent implements OnChanges {
   }
 
   // add new element to form
-  addNewItem(node: FileNode) {
+  copyItem(node: FileNode) {
+    const itemModel = cloneDeep(node.model[node.key][node.itemCount]);
+    node.model[node.key].splice(node.itemCount + 1, 0, itemModel);
 
-    const clonedObject: FileNode = cloneDeep(node);
-    clonedObject.itemCount++;
-    clonedObject.key += clonedObject.itemCount;
+    let clonedNode = cloneDeep(node);
+    clonedNode.model = node.model;
+    clonedNode.itemCount++;
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
-    siblings.splice(index + 1, 0, clonedObject);
+    siblings.splice(index + 1, 0, clonedNode);
 
-    clonedObject.parentGroup = node.parentGroup;
+    // adjust remaining siblings itemCounts
+    for (let i=index+2;i<siblings.length;i++) {
+      if (siblings[i].key == node.key) {
+        siblings[i].itemCount++;
+      }
+    }
+    this.updateModel(clonedNode, node.model);
+
     const parent = node.parentGroup || this.form;
-    parent.addControl(clonedObject.key, clonedObject.formGroup);
+    parent.addControl((clonedNode.key + clonedNode.itemCount), clonedNode.formGroup);
 
     this.database.dataChange.next(this.database.data);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   // delete last element in node array
-  deleteLastItem(node: FileNode) {
+  removeItem(node: FileNode) {
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index, 1);
+
+    // adjust remaining siblings itemCounts
+    for (let i=index;i<siblings.length;i++) {
+      if (siblings[i].key == node.key) {
+        siblings[i].itemCount--;
+      }
+    }
+
+    const parent = node.parentGroup || this.form;
+    parent.removeControl((node.key + node.itemCount));
     this.database.dataChange.next(this.database.data);
-    node.parentGroup.removeControl(node.key);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
+    //this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
+
+
+  // reset the model down the tree at itemCount
+  updateModel(node: FileNode, model) {
+    node.model = model;
+
+    //console.log('updateModel',node.key, model);
+    if (node.children ) {
+
+      let that = this;
+      let key = node.key;
+      let itemCount = node.itemCount;
+
+      node.children.forEach(function (child){
+        console.log('updateModel child', child.key,  model );
+        that.updateModel(child, model[key][itemCount]);
+      });
+    } else {
+      console.log('updateModel field',node.key,  model);
+      node.model = model;
+    }
+  }
+
+
 
 }
 

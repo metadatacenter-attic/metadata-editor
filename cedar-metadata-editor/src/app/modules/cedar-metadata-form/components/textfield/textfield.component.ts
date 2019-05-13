@@ -11,7 +11,6 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   }
 }
 
-
 @Component({
   selector: 'cedar-textfield',
   templateUrl: './textfield.component.html',
@@ -22,6 +21,7 @@ export class TextfieldComponent implements OnInit {
   @Input() control: FormControl;
   @Input() node: FileNode;
   @Input() index: number;
+  @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
 
   matcher = new MyErrorStateMatcher();
@@ -55,7 +55,7 @@ export class TextfieldComponent implements OnInit {
     let result = [];
     let m = Array.isArray(model) ? model : [model];
     m.forEach((value, i) => {
-      result.push(value[valueLocation] || '')
+      result.push(value[valueLocation] || null)
     });
     return result;
   }

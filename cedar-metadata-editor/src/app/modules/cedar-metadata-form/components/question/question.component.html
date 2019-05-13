@@ -1,42 +1,11 @@
 <ng-container *ngIf="node.type == 'static';else notStaticType">
-
-  <!-- youtube -->
-  <div class="static-video" *ngIf="node.subtype == 'youtube'" [ngStyle]="{'max-width.px': getImageWidth(node)}">
-    <youtube-player
-      [videoId]="node.value"
-      [height]="getImageHeight(node)"
-      [width]="getImageWidth(node)"
-      (ready)="savePlayer($event)"
-      (change)="onStateChange($event)"></youtube-player>
-    <div class="caption"><label>{{node.name}}</label></div>
-  </div>
-
-  <!-- image -->
-  <figure class="static-image" *ngIf="node.subtype == 'image'" [ngStyle]="{'max-width.px': getImageWidth(node)}">
-    <img class="image" src="{{node.value}}" width="{{getImageWidth(node)}}" alt="{{node.name}}"/>
-    <figcaption class="caption"><label>{{node.name}}</label></figcaption>
-  </figure>
-
-  <!-- richtext -->
-  <div *ngIf="node.subtype == 'richtext'">
-    <div [innerHTML]="node.value"></div>
-  </div>
-
-  <!-- sectionbreak -->
-  <div *ngIf="node.subtype == 'section-break'">
-    <div class="section-break">
-      {{node.name}}
-    </div>
-  </div>
-
-  <!-- pagebreak -->
-  <div *ngIf="node.subtype == 'page-break'">
-    page-break
-  </div>
+  <cedar-youtube *ngIf="node.subtype == 'youtube'" [formGroup]="formGroup" [node]="node"></cedar-youtube>
+  <cedar-image *ngIf="node.subtype == 'image'" [formGroup]="formGroup" [node]="node"></cedar-image>
+  <cedar-richtext *ngIf="node.subtype == 'richtext'" [formGroup]="formGroup" [node]="node"></cedar-richtext>
+  <cedar-section *ngIf="node.subtype == 'section-break'" [formGroup]="formGroup" [node]="node"></cedar-section>
 </ng-container>
 
 <ng-template #notStaticType>
-
   <div [formGroup]="formGroup" class="form-group">
 
     <label class="question-label" [attr.for]="node.name">{{node.name}}</label>
@@ -44,67 +13,53 @@
       <mat-icon>help_outline</mat-icon>
     </button>
 
-    <!-- attribute-value -->
-    <div *ngIf="node.type == 'attribute-value'">
-      <cedar-attribute-value [formGroup]="formGroup" [node]="node" [disabled]="disabled"
-        (changed)="onAttributeValueChanges($event)"></cedar-attribute-value>
+
+    <div *ngIf="node.type == 'attribute-value' || node.type == 'list' || node.type == 'controlled' || node.type == 'checkbox' || node.type == 'radio'">
+
+      <cedar-attribute-value *ngIf="node.type == 'attribute-value'" [formGroup]="formGroup" [node]="node"
+        [disabled]="disabled"
+        (changed)="onChange($event)"></cedar-attribute-value>
+
+      <cedar-list *ngIf="node.type == 'list'" [formGroup]="formGroup" [node]="node"
+        (changed)="onChange($event)"></cedar-list>
+
+      <controlled *ngIf="node.type == 'controlled'" [group]="formGroup"
+        [classLoader]="classLoader"
+        [valueConstraints]="node.valueConstraints"
+        (onRemovedOption)="onRemovedControlled($event)"
+        (onSelectedOption)="onSelectedControlled($event)"></controlled>
+
+      <cedar-checkbox *ngIf="node.type == 'checkbox'" [formGroup]="formGroup" [node]="node"
+        (changed)="onChange($event)"></cedar-checkbox>
+
+      <cedar-radio *ngIf="node.type == 'radio'" [formGroup]="formGroup" [node]="node"
+        (changed)="onChange($event)"></cedar-radio>
     </div>
 
-    <!-- list -->
-    <div *ngIf="node.type == 'list'">
-      <cedar-list [formGroup]="formGroup"  [node]="node"
-        (changed)="onListChanges($event)"></cedar-list>
-    </div>
+    <div *ngIf="allowsMultiple(node.type)">
+      <div [ngSwitch]="node.type">
+        <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
 
-    <!-- checkbox -->
-    <div *ngIf="node.type == 'checkbox'">
-      <cedar-checkbox [formGroup]="formGroup" [node]="node"
-        (changed)="onCheckboxChanges($event)"></cedar-checkbox>
-    </div>
 
-    <!-- radio -->
-    <div *ngIf="node.type == 'radio'">
-      <cedar-radio [formGroup]="formGroup" [node]="node"
-        (changed)="onRadioChanges($event)"></cedar-radio>
-    </div>
+          <div *ngIf="node.multiSelect">
+            {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
+            <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="copyItem(node,i)">
+              <mat-icon>add_circle_outline</mat-icon>
+            </button>
+            <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="removeItem(node,i)">
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </div>
 
-    <div *ngIf="node.type !== 'element' && node.type !== 'list'" [ngSwitch]="node.type">
-      <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
+          <cedar-textfield *ngSwitchCase="'textfield'" [formGroup]="formGroup" [control]="control" [node]="node"
+            [index]="i" [disabled]="disabled" (changed)="onChange($event)"></cedar-textfield>
 
-      <span *ngIf="node.minItems && allowsMultiple(node.type)">
-        {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-        <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="addNewItem(i)"><mat-icon>add_circle_outline</mat-icon></button>
-        <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="deleteLastItem(i)"><mat-icon>remove_circle_outline</mat-icon></button>
-      </span>
+          <cedar-textarea *ngSwitchCase="'textarea'" [formGroup]="formGroup" [control]="control" [node]="node"
+            [index]="i" (changed)="onChange($event)"></cedar-textarea>
 
-        <!-- controlled -->
-        <div *ngSwitchCase="'controlled'">
-          <controlled [group]="formGroup" [controlledGroup]="control"
-            [classLoader]="classLoader"
-            [valueConstraints]="node.valueConstraints"
-            (onRemovedOption)="onRemovedControlled($event)"
-            (onSelectedOption)="onSelectedControlled($event)"></controlled>
+          <cedar-date *ngSwitchCase="'date'" [formGroup]="formGroup" [control]="control" [node]="node" [index]="i"
+            (changed)="onChange($event)"></cedar-date>
         </div>
-
-        <!-- textfield -->
-        <div *ngSwitchCase="'textfield'">
-          <cedar-textfield [formGroup]="formGroup" [control]="control" [node]="node" [index]="i"
-            (changed)="onTextChanges($event)"></cedar-textfield>
-        </div>
-
-        <!-- textarea -->
-        <div *ngSwitchCase="'textarea'">
-          <cedar-textarea [formGroup]="formGroup" [control]="control" [node]="node" [index]="i"
-            (changed)="onTextChanges($event)"></cedar-textarea>
-        </div>
-
-        <!-- date -->
-        <div *ngSwitchCase="'date'">
-          <cedar-date [formGroup]="formGroup" [control]="control" [node]="node" [index]="i"
-            (changed)="onDateChanges($event)"></cedar-date>
-        </div>
-
-
       </div>
     </div>
   </div>
