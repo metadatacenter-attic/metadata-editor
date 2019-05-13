@@ -13,13 +13,22 @@
       <mat-icon>help_outline</mat-icon>
     </button>
 
-    <div *ngIf="!allowsMultiple(node.type)">
+<!--    {{node.model | json}}-->
+
+    <div *ngIf="node.type == 'attribute-value' || node.type == 'list' || node.type == 'controlled' || node.type == 'checkbox' || node.type == 'radio'">
+
       <cedar-attribute-value *ngIf="node.type == 'attribute-value'" [formGroup]="formGroup" [node]="node"
         [disabled]="disabled"
         (changed)="onChange($event)"></cedar-attribute-value>
 
       <cedar-list *ngIf="node.type == 'list'" [formGroup]="formGroup" [node]="node"
         (changed)="onChange($event)"></cedar-list>
+
+      <controlled *ngIf="node.type == 'controlled'" [group]="formGroup"
+        [classLoader]="classLoader"
+        [valueConstraints]="node.valueConstraints"
+        (onRemovedOption)="onRemovedControlled($event)"
+        (onSelectedOption)="onSelectedControlled($event)"></controlled>
 
       <cedar-checkbox *ngIf="node.type == 'checkbox'" [formGroup]="formGroup" [node]="node"
         (changed)="onChange($event)"></cedar-checkbox>
@@ -32,7 +41,7 @@
       <div [ngSwitch]="node.type">
         <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
 
-          <div *ngIf="node.minItems">
+          <div *ngIf="node.multiSelect">
             {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
             <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="addNewItem(i)">
               <mat-icon>add_circle_outline</mat-icon>
@@ -41,12 +50,6 @@
               <mat-icon>remove_circle_outline</mat-icon>
             </button>
           </div>
-
-          <controlled *ngSwitchCase="'controlled'" [group]="formGroup" [controlledGroup]="control"
-            [classLoader]="classLoader"
-            [valueConstraints]="node.valueConstraints"
-            (onRemovedOption)="onRemovedControlled($event)"
-            (onSelectedOption)="onSelectedControlled($event)"></controlled>
 
           <cedar-textfield *ngSwitchCase="'textfield'" [formGroup]="formGroup" [control]="control" [node]="node"
             [index]="i" [disabled]="disabled" (changed)="onChange($event)"></cedar-textfield>

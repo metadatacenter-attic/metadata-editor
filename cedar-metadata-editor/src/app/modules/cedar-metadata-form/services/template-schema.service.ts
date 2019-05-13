@@ -64,6 +64,8 @@ export class TemplateSchemaService {
     return schema._valueConstraints && schema._valueConstraints.requiredValue;
   }
 
+
+
   static getMin(schema: TemplateSchema) {
     return schema && schema._valueConstraints && schema._valueConstraints.minValue;
   }

@@ -33,11 +33,12 @@ export interface FileNode {
   maxLength?: number;
   pattern?: string;
   multipleChoice?: boolean;
+  multiSelect?: boolean;
 
   options?: any;
-  value?: any[];
-  label?: any[];
   size?:any;
+  staticValue?: any[];
+  // label?: any[];
 
   model?:MetadataModel;
   valueLocation?:string;

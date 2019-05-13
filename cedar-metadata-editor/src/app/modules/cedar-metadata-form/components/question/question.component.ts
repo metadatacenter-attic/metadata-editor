@@ -65,6 +65,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   // }
 
   ngOnInit() {
+    console.log('ngOnInit',this.node.key, this.node.itemCount, this.node.model[this.node.key], this.node.parent);
 
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
@@ -89,13 +90,13 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         break;
 
       case InputType.date:
-        this.formGroup = this.fb.group({values: this.fb.array(this.buildDate(this.node, this.disabled, validators))});
+        this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
       case InputType.textfield:
       case InputType.textarea:
-        this.formGroup = this.fb.group({values: this.fb.array(this.buildText(this.node, this.disabled, validators))});
+        this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
@@ -108,7 +109,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         break;
 
       case InputType.checkbox:
-        this.formGroup = this.fb.group({values: this.fb.array(this.buildCheckbox(this.node, this.disabled))});
+        this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleOptions(this.node, this.disabled))});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
@@ -261,10 +262,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   //
   // };
 
-  setDate(node: FileNode, index: number, value) {
-    console.log('setDate', index, value);
-    node.value[index] = value;
-  };
+  // setDate(node: FileNode, index: number, value) {
+  //   console.log('setDate', index, value);
+  //   node.value[index] = value;
+  // };
 
   setChecked(node: FileNode, label: string, value: boolean) {
     if (value != this.isChecked(node, label)) {
@@ -320,15 +321,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
       case InputType.textfield:
       case InputType.textarea:
-        obj = Object.assign({}, this.node.model[this.node.key][index]);
-        if (Array.isArray(this.node.model[this.node.key])) {
-          this.node.model[this.node.key].splice(index, 0, obj);
-        } else {
-          this.node.model[this.node.key] = [obj, obj];
-        }
-        this.formGroup.setControl('values', this.fb.array(this.buildText(this.node, this.disabled, validators)));
-        break;
-
       case InputType.date:
         obj = Object.assign({}, this.node.model[this.node.key][index]);
         if (Array.isArray(this.node.model[this.node.key])) {
@@ -336,12 +328,9 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         } else {
           this.node.model[this.node.key] = [obj, obj];
         }
-        this.formGroup.setControl('values', this.fb.array(this.buildDate(this.node, this.disabled, validators)));
-        this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
-
+        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators)));
         break;
     }
-
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
@@ -358,10 +347,10 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
       case InputType.textfield:
       case InputType.textarea:
+      case InputType.date:
         // this.node.value.splice(index, 0,this.node.value[index])
         this.node.model[this.node.key].splice(index, 1);
-        this.formGroup.setControl('values', this.fb.array(this.buildText(this.node, this.disabled, validators)));
-        console.log(this.node.model[this.node.key]);
+        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators)));
         break;
 
     }
@@ -373,51 +362,77 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
 
-  private buildList(node, disabled: boolean): any[] {
-    const arr = node.options.map(opt => {
-      return new FormControl({value: '', disabled: disabled});
-      ;
-    });
-    return arr;
-
-  }
-
-  private buildCheckbox(node, disabled: boolean): any[] {
+  private allowMultipleOptions(node, disabled: boolean): any[] {
     const arr = node.options.map(opt => {
       return this.fb.control({value: false, disabled: disabled});
     });
     return arr;
   }
 
+  getLength(model) {
+    return Array.isArray(model) ? model.length : 1;
+  }
 
-  private buildText(node: FileNode, disabled: boolean, validators): any[] {
+  private allowMultipleControls(node, disabled: boolean, validators): any[] {
     const arr = [];
-    let length = node.model[node.key].length || 1;
-    for (let i = 0; i < length; i++) {
-      arr.push(new FormControl({value: '', disabled: disabled}, validators));
+    for (let i = 0; i < this.getLength(node.model[node.key]); i++) {
+      const control = new FormControl({value: null, disabled: disabled, validators});
+      arr.push(control);
     }
     return arr;
   }
 
-  private buildDate(node, disabled: boolean, validators): any[] {
-    const arr = [];
-    node.model[node.key].forEach((value, i) => {
-      const control = new FormControl({value: null, disabled: disabled, validators});
-      arr.push(control);
-    });
-    return arr;
-  }
-
   private buildControlled(node: FileNode, disabled: boolean): any[] {
+    console.log('buildControlled', node.model[node.key], node.minItems);
     const arr = [];
-    node.model[node.key].forEach((value) => {
+    if (Array.isArray(node.model[node.key])) {
+      let chips = [];
+      let ids = [];
+      node.model[node.key].forEach((value) => {
+        chips.push(value['rdfs:label']);
+        ids.push(value['@id']);
+      });
+
       let group = this.fb.group({
-        chips: this.fb.array([value['rdfs:label']]),
-        ids: this.fb.array([value['@id']]),
+        chips: this.fb.array(chips),
+        ids: this.fb.array(ids),
         search: new FormControl({disabled: disabled})
       });
       arr.push(group);
-    });
+
+    } else {
+      let group = this.fb.group({
+        chips: this.fb.array([node.model[node.key]['rdfs:label']]),
+        ids: this.fb.array([node.model[node.key]['@id']]),
+        search: new FormControl({disabled: disabled})
+      });
+      arr.push(group);
+    }
+
+    return arr;
+  };
+
+  private buildControlledSingle(node: FileNode, disabled: boolean): any[] {
+    console.log('buildControlled', node.model[node.key], node.minItems);
+    const arr = [];
+    if (Array.isArray(node.model[node.key])) {
+      node.model[node.key].forEach((value) => {
+        let group = this.fb.group({
+          chips: this.fb.array([value['rdfs:label']]),
+          ids: this.fb.array([value['@id']]),
+          search: new FormControl({disabled: disabled})
+        });
+        arr.push(group);
+      });
+    } else {
+      let group = this.fb.group({
+        chips: this.fb.array([node.model[node.key]['rdfs:label']]),
+        ids: this.fb.array([node.model[node.key]['@id']]),
+        search: new FormControl({disabled: disabled})
+      });
+      arr.push(group);
+    }
+
     return arr;
   };
 

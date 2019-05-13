@@ -22,6 +22,7 @@
       </li>
     </mat-tree-node>
     <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+      {{node.type}} {{node.name}}
 
       <li>
         <div class="mat-tree-node">
@@ -44,7 +45,7 @@
 
         <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" *ngIf="treeControl.isExpanded(node)">
           <app-element *ngIf="treeControl.isExpanded(node)" [node]="node" [parentGroup]="node.parentGroup"
-            [formGroup]="node.formGroup"></app-element>
+            [formGroup]="node.formGroup" [index]="node.itemCount"></app-element>
           <ng-container matTreeNodeOutlet></ng-container>
         </ul>
 

@@ -27,15 +27,19 @@ export class ControlledComponent implements OnInit {
   @Output() onSelectedOption = new EventEmitter();
   @Output() onRemovedOption = new EventEmitter();
   @Input() group: FormGroup;
-  @Input() controlledGroup: FormGroup;
+  //@Input() controlledGroup: FormGroup;
   @Input() classLoader: any;
   @Input() valueConstraints: any;
 
+  controlledGroup: FormGroup;
 
   constructor(private ct: ControlledTermService, private fb: FormBuilder) {
   }
 
   ngOnInit() {
+    console.log('controlledGroup', this.group.controls['values']['controls'])
+    this.controlledGroup = this.group.controls['values']['controls'][0];
+
     // when user types something in input, the value changes will come through this
     this.controlledGroup.get('search').valueChanges.pipe(
       debounceTime(300),

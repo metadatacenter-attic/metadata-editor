@@ -1,6 +1,6 @@
 <div class="static-video" *ngIf="node.subtype == 'youtube'" [ngStyle]="{'max-width.px': getImageWidth(node)}" >
   <youtube-player  class="videoPlayer"
-    [videoId]="node.value"
+    [videoId]="node.staticValue"
     (ready)="savePlayer($event)"
     (change)="onChange($event)"></youtube-player>
   <div class="caption"><label>{{node.name}}</label></div>

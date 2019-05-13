@@ -12,7 +12,7 @@ import {UiService} from "../../../../services/ui/ui.service";
 import {TemplateSchemaService} from "../../services/template-schema.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
-import {MetadataModel} from "../../models/metadata-model";
+import {MetadataModel, MetadataSnip} from "../../models/metadata-model";
 import {TemplateSchema} from "../../models/template-schema";
 import {InputTypeService} from "../../services/input-type.service";
 
@@ -153,24 +153,39 @@ export class FormComponent implements OnChanges {
 
   // add new element to form
   addNewItem(node: FileNode) {
+    console.log('addNewItem',node);
 
-    const clonedObject: FileNode = cloneDeep(node);
-    clonedObject.itemCount++;
-    clonedObject.key += clonedObject.itemCount;
+    const itemModel = cloneDeep(node.model[node.key][node.itemCount]);
+    itemModel['title']={'@value':'three'};
+    node.model[node.key].splice(node.itemCount + 1, 0, itemModel);
+
+
+    let clonedNode = cloneDeep(node);
+    clonedNode.model = node.model;
+    clonedNode.itemCount++;
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
-    siblings.splice(index + 1, 0, clonedObject);
+    siblings.splice(index + 1, 0, clonedNode);
 
-    clonedObject.parentGroup = node.parentGroup;
+    this.updateModel(clonedNode, node.model);
+
+
+    //clonedNode.parentGroup = node.parentGroup;
     const parent = node.parentGroup || this.form;
-    parent.addControl(clonedObject.key, clonedObject.formGroup);
+
+    parent.addControl((clonedNode.key + clonedNode.itemCount), clonedNode.formGroup);
+    //this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
+    console.log('parent',parent);
+
+
+
 
     this.database.dataChange.next(this.database.data);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
   // delete last element in node array
   deleteLastItem(node: FileNode) {
+    console.log('deleteLastItem',node);
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index, 1);
@@ -178,6 +193,31 @@ export class FormComponent implements OnChanges {
     node.parentGroup.removeControl(node.key);
     this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
+
+
+  // reset the model down the tree at itemCount
+  updateModel(node: FileNode, model) {
+    node.model = model;
+
+    //console.log('updateModel',node.key, model);
+    if (node.children ) {
+
+      let that = this;
+      let key = node.key;
+      let itemCount = node.itemCount;
+
+      node.children.forEach(function (child){
+        console.log('updateModel child', child.key,  model );
+        that.updateModel(child, model[key][itemCount]);
+      });
+    } else {
+      console.log('updateModel field',node.key,  model);
+      node.model = model;
+    }
+  }
+
+
+
 
 }
 

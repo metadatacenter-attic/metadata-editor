@@ -208,7 +208,7 @@ export class TemplateParserService {
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      'value': TemplateSchemaService.getContent(schema),
+      'staticValue': TemplateSchemaService.getContent(schema),
       'size': TemplateSchemaService.getSize(schema)
 
     };
@@ -233,18 +233,16 @@ export class TemplateParserService {
       'parent': parent,
       'valueLocation': TemplateSchemaService.getValueLocation(schema, nodeType, nodeSubtype),
 
-      // constraints
+      // for the moment, don't make controlled items multiSelect
+      'multiSelect': (minItems !== undefined && nodeType !== InputType.controlled),
+      'multipleChoice': TemplateSchemaService.isMultiValue(schema),
       'min': TemplateSchemaService.getMin(schema),
       'max': TemplateSchemaService.getMax(schema),
       'decimals': TemplateSchemaService.getDecimals(schema),
       'minLength': TemplateSchemaService.getMinStringLength(schema),
       'maxLength': TemplateSchemaService.getMaxStringLength(schema),
       'valueConstraints': TemplateSchemaService.getValueConstraints(schema),
-
-      'value': this.getValues(schema, inputType, modelValue),
-      // 'label': this.getLabels(schema, inputType, modelValue),
       'options': TemplateParserService.getOptions(schema, inputType, modelValue),
-      'multipleChoice': TemplateSchemaService.isMultiValue(schema),
       'required': TemplateSchemaService.isRequired(schema),
       'help': TemplateSchemaService.getHelp(schema),
       'placeholder': TemplateSchemaService.getPlaceholder(schema),
@@ -267,6 +265,7 @@ export class TemplateParserService {
       'parent': parent,
       'parentGroup': parent ? parent.formGroup : null,
       'formGroup': new FormGroup({}),
+      'multiSelect': (minItems !== undefined),
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
