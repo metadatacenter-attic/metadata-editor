@@ -144,15 +144,20 @@ export class AttributeValueComponent implements OnInit {
     delete model[oldKey]
   };
 
+  removeable(node: FileNode) {
+    return node.model[node.key].length > 1;
+  }
+
   remove(node: FileNode, index: number) {
+    if (node.model[node.key].length > 1) {
+      this.removeAttributeValue(node.model, node.key, index);
+      this.formGroup.setControl('values',this.fb.array(this.buildAV(this.node, this.disabled)));
 
-    this.removeAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values',this.fb.array(this.buildAV(this.node, this.disabled)));
 
-
-    //this.buildAV(node, this.disabled);
-    this.formGroup.get('values').setValue(this.getValue(this.node));
-    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+      //this.buildAV(node, this.disabled);
+      this.formGroup.get('values').setValue(this.getValue(this.node));
+      this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+    }
   }
 
 }

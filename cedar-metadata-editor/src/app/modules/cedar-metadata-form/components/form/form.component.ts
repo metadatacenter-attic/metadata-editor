@@ -152,13 +152,9 @@ export class FormComponent implements OnChanges {
   }
 
   // add new element to form
-  addNewItem(node: FileNode) {
-    console.log('addNewItem',node);
-
+  copyItem(node: FileNode) {
     const itemModel = cloneDeep(node.model[node.key][node.itemCount]);
-    itemModel['title']={'@value':'three'};
     node.model[node.key].splice(node.itemCount + 1, 0, itemModel);
-
 
     let clonedNode = cloneDeep(node);
     clonedNode.model = node.model;
@@ -167,31 +163,37 @@ export class FormComponent implements OnChanges {
     const index = siblings.indexOf(node);
     siblings.splice(index + 1, 0, clonedNode);
 
+    // adjust remaining siblings itemCounts
+    for (let i=index+2;i<siblings.length;i++) {
+      if (siblings[i].key == node.key) {
+        siblings[i].itemCount++;
+      }
+    }
     this.updateModel(clonedNode, node.model);
 
-
-    //clonedNode.parentGroup = node.parentGroup;
     const parent = node.parentGroup || this.form;
-
     parent.addControl((clonedNode.key + clonedNode.itemCount), clonedNode.formGroup);
-    //this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
-    console.log('parent',parent);
-
-
-
 
     this.database.dataChange.next(this.database.data);
   }
 
   // delete last element in node array
-  deleteLastItem(node: FileNode) {
-    console.log('deleteLastItem',node);
+  removeItem(node: FileNode) {
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index, 1);
+
+    // adjust remaining siblings itemCounts
+    for (let i=index;i<siblings.length;i++) {
+      if (siblings[i].key == node.key) {
+        siblings[i].itemCount--;
+      }
+    }
+
+    const parent = node.parentGroup || this.form;
+    parent.removeControl((node.key + node.itemCount));
     this.database.dataChange.next(this.database.data);
-    node.parentGroup.removeControl(node.key);
-    this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
+    //this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
 
@@ -215,7 +217,6 @@ export class FormComponent implements OnChanges {
       node.model = model;
     }
   }
-
 
 
 

@@ -13,7 +13,6 @@
       <mat-icon>help_outline</mat-icon>
     </button>
 
-<!--    {{node.model | json}}-->
 
     <div *ngIf="node.type == 'attribute-value' || node.type == 'list' || node.type == 'controlled' || node.type == 'checkbox' || node.type == 'radio'">
 
@@ -41,12 +40,13 @@
       <div [ngSwitch]="node.type">
         <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
 
+
           <div *ngIf="node.multiSelect">
             {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-            <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="addNewItem(i)">
+            <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="copyItem(node,i)">
               <mat-icon>add_circle_outline</mat-icon>
             </button>
-            <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="deleteLastItem(i)">
+            <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="removeItem(node,i)">
               <mat-icon>remove_circle_outline</mat-icon>
             </button>
           </div>

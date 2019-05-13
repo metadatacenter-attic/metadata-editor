@@ -309,7 +309,7 @@ export class TemplateParserService {
       if (!TemplateSchemaService.isSpecialKey(key)) {
         const value = properties[key];
         const maxItems = value['maxItems'];
-        const minItems = value['minItems'] || 0;
+        const minItems = value['minItems'];
         const schema = TemplateSchemaService.schemaOf(value);
         const type = TemplateSchemaService.getInputType(schema);
         const label = labels[key];

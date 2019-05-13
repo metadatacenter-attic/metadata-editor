@@ -22,7 +22,6 @@
       </li>
     </mat-tree-node>
     <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
-      {{node.type}} {{node.name}}
 
       <li>
         <div class="mat-tree-node">
@@ -36,9 +35,9 @@
           <span *ngIf="node.minItems" style="color:#222">
                   &nbsp;({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
             <button mat-icon-button class="help-text-button" *ngIf="node.help" [matTooltip]="node.help"><mat-icon>help_outline</mat-icon></button>
-        <button mat-icon-button class="node-add" *ngIf="!viewOnly" [matTooltip]="copy" (click)="addNewItem(node)"><mat-icon>add_circle_outline</mat-icon></button>
+        <button mat-icon-button class="node-add" *ngIf="!viewOnly" [matTooltip]="copy" (click)="copyItem(node)"><mat-icon>add_circle_outline</mat-icon></button>
         <button mat-icon-button class="node-remove" *ngIf="!viewOnly" [matTooltip]="remove"
-          (click)="deleteLastItem(node)"><mat-icon>remove_circle_outline</mat-icon></button>
+          (click)="removeItem(node)"><mat-icon>remove_circle_outline</mat-icon></button>
 
                 </span>
         </div>

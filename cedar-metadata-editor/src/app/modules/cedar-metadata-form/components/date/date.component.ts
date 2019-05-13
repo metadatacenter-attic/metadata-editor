@@ -57,10 +57,10 @@ export class DateComponent implements OnInit {
     let result = [];
     if (Array.isArray(model)) {
       for (let i = 0; i < model.length; i++) {
-        result.push(this.parseDate(model[i][valueLocation]));
+        result.push(this.parseDate(model[i][valueLocation]) || null);
       }
     } else {
-      result.push(this.parseDate(model[valueLocation]));
+      result.push(this.parseDate(model[valueLocation])|| null);
     }
     return result;
   }

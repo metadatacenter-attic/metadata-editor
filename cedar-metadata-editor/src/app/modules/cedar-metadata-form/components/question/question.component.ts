@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -15,6 +15,7 @@ import {InputType} from "../../models/input-type";
 import {TemplateSchemaService} from "../../services/template-schema.service";
 import {FileNode} from "../../models/file-node";
 import {ErrorStateMatcher} from "@angular/material";
+import {TemplateParserService} from "../../services/template-parser.service";
 
 
 /** Error when invalid control is dirty, touched, or submitted. */
@@ -38,6 +39,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
 
+  database: TemplateParserService;
   formGroup: FormGroup;
   // controlled: ControlledComponent;
   // date:DateComponent;
@@ -47,12 +49,12 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   player;
 
 
-  constructor(private fb: FormBuilder) {
-    //this._yt = new NgxYoutubePlayerModule();
-    //this.player = this.yt.Player;
+  constructor(private fb: FormBuilder, db: TemplateParserService,private cd: ChangeDetectorRef) {
+    this.database = db;
   }
 
   ngAfterViewInit() {
+    this.cd.detectChanges();
   }
 
   // savePlayer(player) {
@@ -65,7 +67,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   // }
 
   ngOnInit() {
-    console.log('ngOnInit',this.node.key, this.node.itemCount, this.node.model[this.node.key], this.node.parent);
+    console.log('ngOnInit', this.node.key, this.node.itemCount, this.node.model[this.node.key], this.node.parent);
 
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
@@ -254,107 +256,88 @@ export class QuestionComponent implements OnInit, AfterViewInit {
     return result;
   }
 
-  // setRadio(node:FileNode, value:string) {
-  //   console.log('setRadio', value);
-  //   let obj = {};
-  //   obj[node.valueLocation] = value
-  //   node.model[node.key] = obj;
+
+
+  // setChecked(node: FileNode, label: string, value: boolean) {
+  //   if (value != this.isChecked(node, label)) {
+  //     if (value) {
+  //       let obj = {}
+  //       obj[node.valueLocation] = label
+  //       node.model[node.key].push(obj);
+  //     } else {
+  //       node.model[node.key].forEach((value, i) => {
+  //         if (value[node.valueLocation] == label) {
+  //           node.model[node.key].splice(node.model[node.key][i], 1);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
+
+
+  // copyAV(node: FileNode, index: number) {
+  //   TemplateSchemaService.copyAttributeValue(node.model, node.key, index);
+  //   this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
+  //   this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+  // }
   //
+  // removeAV(node: FileNode, index: number) {
+  //   TemplateSchemaService.removeAttributeValue(node.model, node.key, index);
+  //   this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
+  //   this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+  // }
+
+  // // do you want to filter dates out of the calendar?
+  // dateFilter = (d: Date): boolean => {
+  //   const day = d.getDay();
+  //   // Prevent Saturday and Sunday from being selected.
+  //   return day !== 0 && day !== 6;
   // };
 
-  // setDate(node: FileNode, index: number, value) {
-  //   console.log('setDate', index, value);
-  //   node.value[index] = value;
-  // };
 
-  setChecked(node: FileNode, label: string, value: boolean) {
-    if (value != this.isChecked(node, label)) {
-      if (value) {
-        let obj = {}
-        obj[node.valueLocation] = label
-        node.model[node.key].push(obj);
-      } else {
-        node.model[node.key].forEach((value, i) => {
-          if (value[node.valueLocation] == label) {
-            node.model[node.key].splice(node.model[node.key][i], 1);
-          }
-        });
-      }
-    }
-  }
-
-
-  copyAV(node: FileNode, index: number) {
-    TemplateSchemaService.copyAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
-    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  }
-
-  removeAV(node: FileNode, index: number) {
-    TemplateSchemaService.removeAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
-    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  }
-
-  // do you want to filter dates out of the calendar?
-  dateFilter = (d: Date): boolean => {
-    const day = d.getDay();
-    // Prevent Saturday and Sunday from being selected.
-    return day !== 0 && day !== 6;
-  };
-
-
-  addNewItem(index: number) {
+  copyItem(node: FileNode, index: number) {
     const validators = this.getValidators(this.node);
+    let clonedModel = Object.assign({}, node.model[node.key][index]);
 
-
-    let obj;
     switch (this.node.type) {
-
       case InputType.controlled:
-        // this.node.value.splice(index, 0, this.node.value[index]);
-        // this.node.label.splice(index, 0, this.node.label[index]);
-        obj = Object.assign({}, this.node.model[this.node.key][index]);
-        this.node.model[this.node.key].splice(index, 0, this.node.model[this.node.key][index]);
-        this.formGroup.setControl('values', this.fb.array(this.buildControlled(this.node, this.disabled)));
+        this.node.model[node.key].splice(index, 0, node.model[node.key][index]);
+        this.formGroup.setControl('values', this.fb.array(this.buildControlled(node, this.disabled)));
         break;
 
       case InputType.textfield:
       case InputType.textarea:
       case InputType.date:
-        obj = Object.assign({}, this.node.model[this.node.key][index]);
-        if (Array.isArray(this.node.model[this.node.key])) {
-          this.node.model[this.node.key].splice(index, 0, obj);
+
+        if (Array.isArray(node.model[node.key])) {
+          this.node.model[node.key].splice(index, 0, clonedModel);
         } else {
-          this.node.model[this.node.key] = [obj, obj];
+          this.node.model[node.key] = [clonedModel, clonedModel];
         }
-        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators)));
+        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
+        this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         break;
     }
-    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
-  deleteLastItem(index: number) {
+  removeItem(node: FileNode, index: number) {
     const validators = this.getValidators(this.node);
-    switch (this.node.type) {
+    switch (node.type) {
 
       case InputType.controlled:
-        // this.node.value.splice(index, 0, this.node.value[index]);
-        // this.node.label.splice(index, 0, this.node.label[index]);
-        this.node.model[this.node.key].splice(index, 1);
-        this.formGroup.setControl('values', this.fb.array(this.buildControlled(this.node, this.disabled)));
+        node.model[node.key].splice(index, 1);
+        this.formGroup.setControl('values', this.fb.array(this.buildControlled(node, this.disabled)));
         break;
 
       case InputType.textfield:
       case InputType.textarea:
       case InputType.date:
-        // this.node.value.splice(index, 0,this.node.value[index])
-        this.node.model[this.node.key].splice(index, 1);
-        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators)));
+        node.model[this.node.key].splice(index, 1);
+        this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+        this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
         break;
-
     }
-    this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+
   }
 
   loadForm(key, form) {
@@ -383,7 +366,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   }
 
   private buildControlled(node: FileNode, disabled: boolean): any[] {
-    console.log('buildControlled', node.model[node.key], node.minItems);
     const arr = [];
     if (Array.isArray(node.model[node.key])) {
       let chips = [];
@@ -413,7 +395,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   };
 
   private buildControlledSingle(node: FileNode, disabled: boolean): any[] {
-    console.log('buildControlled', node.model[node.key], node.minItems);
     const arr = [];
     if (Array.isArray(node.model[node.key])) {
       node.model[node.key].forEach((value) => {
