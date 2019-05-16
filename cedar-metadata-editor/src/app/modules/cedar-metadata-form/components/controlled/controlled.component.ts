@@ -37,7 +37,6 @@ export class ControlledComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('controlledGroup', this.group.controls['values']['controls'])
     this.controlledGroup = this.group.controls['values']['controls'][0];
 
     // when user types something in input, the value changes will come through this

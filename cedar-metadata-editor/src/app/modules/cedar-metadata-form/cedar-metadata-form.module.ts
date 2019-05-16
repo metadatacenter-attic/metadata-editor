@@ -22,6 +22,7 @@ import {YoutubeComponent} from "./components/youtube/youtube.component";
 import {SectionComponent} from "./components/section/section.component";
 import {ImageComponent} from "./components/image/image.component";
 import {RichtextComponent} from "./components/richtext/richtext.component";
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import {RichtextComponent} from "./components/richtext/richtext.component";
     NgbModule,
     DemoMaterialModule,
     SharedModule,
-    NgxYoutubePlayerModule.forRoot()
+    NgxYoutubePlayerModule.forRoot(),
+    FontAwesomeModule
   ],
   exports: [
     FormComponent

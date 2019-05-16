@@ -2,6 +2,7 @@
   <mat-radio-group [formControlName]="node.key + 'radio'"
     [required]="node.required">
     <mat-radio-button *ngFor="let opt of node.options; index as i" [value]="i"
+      style="padding-right:1em;"
       [aria-label]="node.options[i]['label']"
       [name]="node.key + 'radio'">
       {{opt['label']}}

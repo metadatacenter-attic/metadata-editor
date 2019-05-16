@@ -1,8 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {FileNode} from "../../models/file-node";
-import {TemplateSchemaService} from "../../services/template-schema.service";
-import {NgxYoutubePlayerModule} from "ngx-youtube-player";
+import {TemplateService} from "../../services/template.service";
 
 @Component({
   selector: 'cedar-attribute-value',
@@ -11,10 +10,8 @@ import {NgxYoutubePlayerModule} from "ngx-youtube-player";
 })
 export class AttributeValueComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() control: FormControl;
   @Input() node: FileNode;
   @Input() disabled: boolean;
-  @Input() index: number;
   @Output() changed = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder) {
@@ -22,6 +19,7 @@ export class AttributeValueComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
+    console.log('init av', this.formGroup)
     this.formGroup.get('values').setValue(this.getValue(this.node), this.node);
     this.watchChanges();
 
@@ -48,7 +46,6 @@ export class AttributeValueComponent implements OnInit {
   }
 
 
-
   setAttributeValue(model, key, index, location, val) {
     let itemKey = model[key][index];
     if (itemKey) {
@@ -73,31 +70,40 @@ export class AttributeValueComponent implements OnInit {
       while (model.hasOwnProperty(newKey)) {
         newKey = newKey + '1';
       }
-      model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateSchemaService.generateGUID();
+      model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateService.generateGUID();
       model[key] = [newKey];
       model[newKey] = {'@value': val};
     }
   }
 
   // get the form value into the model
-  private setValue(value,  node) {
+  private setValue(value, node) {
     value.forEach((val, i) => {
       this.setAttributeValue(node.model, node.key, i, 'label', val['values'][0]);
       this.setAttributeValue(node.model, node.key, i, 'value', val['values'][1]);
     });
   }
 
-  // get the value out of the model and into something the form can edit
+
   private getValue(node): any[] {
-    const arr = [];
-    if (node.model[node.key].length == 0) {
-      arr.push({values:[node.key + ' label',node.key + ' value']});
+    let val = [];
+    if (node.model[node.key]) {
+      const itemCount = node.model[node.key].length;
+      const modelValue = (node.model && node.model[node.key]) ? node.model[node.key] : [];
+
+      if (itemCount == 0) {
+        val.push({'@value': null, 'rdfs:label': null})
+      } else {
+        for (let i = 0; i < itemCount; i++) {
+          const itemKey = modelValue[i];
+          const itemValue = node.model[itemKey]['@value'];
+          val.push({'@value': itemValue, 'rdfs:label': itemKey})
+        }
+      }
     } else {
-      node.model[node.key].forEach((value) => {
-        arr.push({'values' : [  value, node.model[value]['@value']  ]});
-      });
+      val.push({'@value': null, 'rdfs:label': null})
     }
-    return arr;
+    return val;
   }
 
   // build the av form controls
@@ -111,6 +117,7 @@ export class AttributeValueComponent implements OnInit {
       const group = this.fb.group({values: this.fb.array(items)});
       arr.push(group);
     });
+    console.log('buildav',arr)
     return arr;
   }
 
@@ -121,7 +128,7 @@ export class AttributeValueComponent implements OnInit {
     while (model.hasOwnProperty(newKey)) {
       newKey = newKey + '1';
     }
-    model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateSchemaService.generateGUID();
+    model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateService.generateGUID();
     model[key].splice(index + 1, 0, newKey);
     model[newKey] = {'@value': oldValue};
   };
@@ -129,7 +136,7 @@ export class AttributeValueComponent implements OnInit {
 
   copy(node: FileNode, index: number) {
     this.copyAttributeValue(node.model, node.key, index);
-    this.formGroup.setControl('values',this.fb.array(this.buildAV(this.node, this.disabled)));
+    this.formGroup.setControl('values', this.fb.array(this.buildAV(this.node, this.disabled)));
     this.formGroup.get('values').setValue(this.getValue(this.node));
     this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
     this.watchChanges();
@@ -151,7 +158,7 @@ export class AttributeValueComponent implements OnInit {
   remove(node: FileNode, index: number) {
     if (node.model[node.key].length > 1) {
       this.removeAttributeValue(node.model, node.key, index);
-      this.formGroup.setControl('values',this.fb.array(this.buildAV(this.node, this.disabled)));
+      this.formGroup.setControl('values', this.fb.array(this.buildAV(this.node, this.disabled)));
 
 
       //this.buildAV(node, this.disabled);

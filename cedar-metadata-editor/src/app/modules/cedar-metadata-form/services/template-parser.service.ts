@@ -7,8 +7,10 @@ import {MetadataModel, MetadataSnip} from "../models/metadata-model";
 import {InputTypeService} from "./input-type.service";
 import {InputType} from "../models/input-type";
 
-import {TemplateSchemaService} from "./template-schema.service";
+import {TemplateService} from "./template.service";
+
 import {FileNode} from "../models/file-node";
+import {InstanceService} from "./instance.service";
 
 
 @Injectable()
@@ -30,7 +32,7 @@ export class TemplateParserService {
   }
 
   getTitle() {
-    return this.template ? TemplateSchemaService.getTitle(this.template, null) : "";
+    return this.instance ? TemplateService.getTitle(this.template, null) : "";
   }
 
   initialize(formGroup: FormGroup, instance: any, template: any, page: number): any {
@@ -69,8 +71,8 @@ export class TemplateParserService {
     const nodeType = TemplateParserService.getNodeType(schema, inputType);
     const nodeSubtype = TemplateParserService.getNodeSubtype(inputType);
 
-    const valueLocation = TemplateSchemaService.getValueLocation(schema, nodeType, nodeSubtype);
-    const literals = TemplateSchemaService.getLiterals(schema);
+    const valueLocation = TemplateService.getValueLocation(schema, nodeType, nodeSubtype);
+    const literals = TemplateService.getLiterals(schema);
     switch (inputType) {
       case InputType.controlled:
         result = getControlledValue(modelValue, '@id');
@@ -121,7 +123,7 @@ export class TemplateParserService {
   static getOptions(schema: TemplateSchema, inputType: InputType, modelValue) {
     let options: any[] = [];
     if (InputTypeService.isRadioCheckList(inputType)) {
-      const literals = TemplateSchemaService.getLiterals(schema);
+      const literals = TemplateService.getLiterals(schema);
       for (let i = 0; i < literals.length; i++) {
         let val: any = literals[i];
         let obj = {};
@@ -202,14 +204,14 @@ export class TemplateParserService {
       'minItems': 0,
       'maxItems': 0,
       'itemCount': 0,
-      'name': TemplateSchemaService.getTitle(schema, null),
+      'name': TemplateService.getTitle(schema, null),
       'type': nodeType,
       'subtype': nodeSubtype,
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      'staticValue': TemplateSchemaService.getContent(schema),
-      'size': TemplateSchemaService.getSize(schema)
+      'staticValue': TemplateService.getContent(schema),
+      'size': TemplateService.getSize(schema)
 
     };
 
@@ -222,7 +224,7 @@ export class TemplateParserService {
     return {
       'key': key,
       'model': model,
-      'name': TemplateSchemaService.getTitle(schema, propertyLabel),
+      'name': TemplateService.getTitle(schema, propertyLabel),
       'type': nodeType,
       'subtype': nodeSubtype,
       'minItems': minItems,
@@ -231,34 +233,42 @@ export class TemplateParserService {
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      'valueLocation': TemplateSchemaService.getValueLocation(schema, nodeType, nodeSubtype),
+      'valueLocation': TemplateService.getValueLocation(schema, nodeType, nodeSubtype),
 
       // for the moment, don't make controlled items multiSelect
       'multiSelect': (minItems !== undefined && nodeType !== InputType.controlled),
-      'multipleChoice': TemplateSchemaService.isMultiValue(schema),
-      'min': TemplateSchemaService.getMin(schema),
-      'max': TemplateSchemaService.getMax(schema),
-      'decimals': TemplateSchemaService.getDecimals(schema),
-      'minLength': TemplateSchemaService.getMinStringLength(schema),
-      'maxLength': TemplateSchemaService.getMaxStringLength(schema),
-      'valueConstraints': TemplateSchemaService.getValueConstraints(schema),
+      'multipleChoice': TemplateService.isMultiValue(schema),
+      'min': TemplateService.getMin(schema),
+      'max': TemplateService.getMax(schema),
+      'decimals': TemplateService.getDecimals(schema),
+      'minLength': TemplateService.getMinStringLength(schema),
+      'maxLength': TemplateService.getMaxStringLength(schema),
+      'valueConstraints': TemplateService.getValueConstraints(schema),
       'options': TemplateParserService.getOptions(schema, inputType, modelValue),
-      'required': TemplateSchemaService.isRequired(schema),
-      'help': TemplateSchemaService.getHelp(schema),
-      'placeholder': TemplateSchemaService.getPlaceholder(schema),
-      'hint': TemplateSchemaService.getHint(schema),
+      'required': TemplateService.isRequired(schema),
+      'help': TemplateService.getHelp(schema),
+      'placeholder': TemplateService.getPlaceholder(schema),
+      'hint': TemplateService.getHint(schema),
 
     };
+  }
+
+  getFirst(value, index) {
+    if (Array.isArray(value)) {
+      return value[index]
+    } else {
+      return value;
+    }
   }
 
   elementNode(schema: TemplateSchema, model: MetadataModel, label: string,  minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: FileNode, page:number): FileNode {
     const node = {
       'key': key,
       'model': model,
-      'name': TemplateSchemaService.getTitle(schema, label),
-      'help': TemplateSchemaService.getHelp(schema),
-      'placeholder': TemplateSchemaService.getPlaceholder(schema),
-      'hint': TemplateSchemaService.getHint(schema),
+      'name': TemplateService.getTitle(schema, label),
+      'help': TemplateService.getHelp(schema),
+      'placeholder': TemplateService.getPlaceholder(schema),
+      'hint': TemplateService.getHint(schema),
       'minItems': minItems,
       'maxItems': maxItems,
       'itemCount': i,
@@ -269,8 +279,9 @@ export class TemplateParserService {
     };
     formGroup.addControl(key + i, node.formGroup);
     if (schema.properties) {
-      node['children'] = this.buildFileTree(schema, modelValue[i], level + 1, node.formGroup, node, page);
+        node['children'] = this.buildFileTree(schema, this.getFirst(modelValue, i), level + 1, node.formGroup, node, page);
     }
+
     return node;
   }
 
@@ -278,58 +289,57 @@ export class TemplateParserService {
     const nodeType = TemplateParserService.getNodeType(schema, InputType.attributeValue);
     const nodeSubtype = TemplateParserService.getNodeSubtype(InputType.attributeValue);
     return {
-      'min': TemplateSchemaService.getMin(schema),
-      'max': TemplateSchemaService.getMax(schema),
-      'required': TemplateSchemaService.isRequired(schema),
+      'min': TemplateService.getMin(schema),
+      'max': TemplateService.getMax(schema),
+      'required': TemplateService.isRequired(schema),
       'key': key,
       'model': model,
-      'valueLocation': TemplateSchemaService.getValueLocation(schema, nodeType,nodeSubtype),
-      'name': TemplateSchemaService.getTitle(schema),
+      'valueLocation': TemplateService.getValueLocation(schema, nodeType,nodeSubtype),
+      'name': TemplateService.getTitle(schema),
       'type': nodeType,
       'subtype': nodeSubtype,
       'itemCount': 0,
       'formGroup': formGroup,
       'parentGroup': parent ? parent.formGroup : null,
       'parent': parent,
-      // 'value': modelValue,
-      // 'label': TemplateSchemaService.getTitle(schema),
-      'help': TemplateSchemaService.getHelp(schema),
-      'placeholder': TemplateSchemaService.getPlaceholder(schema),
-      'hint': TemplateSchemaService.getHint(schema)
+      'help': TemplateService.getHelp(schema),
+      'placeholder': TemplateService.getPlaceholder(schema),
+      'hint': TemplateService.getHint(schema)
     };
   }
 
   // build the tree of FileNodes
   buildFileTree(parentSchema: TemplateSchema , model: MetadataModel, level: number, formGroup: FormGroup, parentNode: FileNode, page:number): FileNode[] {
-    let order = TemplateSchemaService.getOrderofPage(parentSchema, page);
-    let properties =  TemplateSchemaService.getProperties(parentSchema);
-    let labels = TemplateSchemaService.getLabels(parentSchema);
+    let order = TemplateService.getOrderofPage(parentSchema, page);
+    let properties =  TemplateService.getProperties(parentSchema);
+    let labels = TemplateService.getLabels(parentSchema);
 
     return order.reduce<FileNode[]>((accumulator, key) => {
-      if (!TemplateSchemaService.isSpecialKey(key)) {
+      if (!TemplateService.isSpecialKey(key)) {
         const value = properties[key];
         const maxItems = value['maxItems'];
         const minItems = value['minItems'];
-        const schema = TemplateSchemaService.schemaOf(value);
-        const type = TemplateSchemaService.getInputType(schema);
+        const schema = TemplateService.schemaOf(value);
+        const type = TemplateService.getInputType(schema);
         const label = labels[key];
-        const modelValue: MetadataSnip = (model && model[key]) ? model[key] : [];
+        const modelValue = (model && model[key]) ? model[key] : [];
 
-        if (TemplateSchemaService.isElement(schema)) {
-          const itemCount = Array.isArray(modelValue) ? modelValue.length : 1;
+        if (TemplateService.isElement(schema)) {
+          let itemCount = modelValue.length ? modelValue.length : 1;
+
           for (let i = 0; i < itemCount; i++) {
             let node = this.elementNode(schema, model, label,  minItems, maxItems, i, key, level, modelValue, formGroup, parentNode, 0);
             accumulator = accumulator.concat(node);
           }
 
-        } else if (TemplateSchemaService.isStaticField(schema)) {
+        } else if (TemplateService.isStaticField(schema)) {
           let node = TemplateParserService.staticNode(schema, model, type, minItems, maxItems, key, modelValue, formGroup, parentNode);
           accumulator = accumulator.concat(node);
 
-        } else if (TemplateSchemaService.isField(schema)) {
+        } else if (TemplateService.isField(schema)) {
 
           if (InputTypeService.isAttributeValue(type)) {
-            const items = TemplateSchemaService.buildAttributeValue(model, key);
+            const items = InstanceService.buildAttributeValue(model, key);
             let node = TemplateParserService.attributeValueNode(schema, model, key, items, formGroup, parentNode);
             accumulator = accumulator.concat(node);
 

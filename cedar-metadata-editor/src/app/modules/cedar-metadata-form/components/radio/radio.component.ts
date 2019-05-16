@@ -45,7 +45,11 @@ export class RadioComponent implements OnInit {
 
   // get the value out of the model and into something the form can edit
   getValue(literals, model, valueLocation) {
-    return this.getLiteralMap(literals).indexOf(model[valueLocation]);
+    if (model) {
+      return  this.getLiteralMap(literals).indexOf(model[valueLocation]);
+    } else {
+      return null;
+    }
   }
 
   // get the form value into the model

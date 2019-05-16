@@ -9,12 +9,10 @@ import * as jsonld from 'jsonld';
 import * as cloneDeep from 'lodash/cloneDeep';
 import {TemplateParserService} from "../../services/template-parser.service";
 import {UiService} from "../../../../services/ui/ui.service";
-import {TemplateSchemaService} from "../../services/template-schema.service";
-import {InputType} from "../../models/input-type";
+import {TemplateService} from "../../services/template.service";
 import {FileNode} from "../../models/file-node";
-import {MetadataModel, MetadataSnip} from "../../models/metadata-model";
-import {TemplateSchema} from "../../models/template-schema";
 import {InputTypeService} from "../../services/input-type.service";
+import {InstanceService} from "../../services/instance.service";
 
 
 @Component({
@@ -27,11 +25,10 @@ import {InputTypeService} from "../../services/input-type.service";
 
 export class FormComponent implements OnChanges {
 
-  //@Input() id: string;
   @Input() instance: any;
   @Input() template: any;
   @Input() controlledTermsCallback: any;
-  @Input() viewOnly: boolean;
+  @Input() disabled: boolean;
   @Input() classLoader: any;
   @Output() changed = new EventEmitter<any>();
 
@@ -56,7 +53,6 @@ export class FormComponent implements OnChanges {
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
-    this.title = 'loading'
   }
 
   changeLog: string[] = [];
@@ -116,16 +112,16 @@ export class FormComponent implements OnChanges {
 
   initialize() {
     if (this.instance && this.template) {
-      this.pageEvent.length = TemplateSchemaService.getPageCount(this.template);
+      this.pageEvent.length = TemplateService.getPageCount(this.template);
 
       this.form = new FormGroup({});
+      this.title = InstanceService.getTitle(this.instance)  || TemplateService.getTitle(this.template);
       this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
-      this.title = this.database.getTitle();
+
       this.database.dataChange.subscribe(data => {
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
           this.dataSource.data = data;
-          console.log('page length',this.pageEvent);
           this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
         }
       });
@@ -145,7 +141,7 @@ export class FormComponent implements OnChanges {
   }
 
   isDisabled() {
-    return this.viewOnly;
+    return this.disabled;
   }
 
   ngAfterViewInit() {
@@ -201,7 +197,6 @@ export class FormComponent implements OnChanges {
   updateModel(node: FileNode, model) {
     node.model = model;
 
-    //console.log('updateModel',node.key, model);
     if (node.children ) {
 
       let that = this;
@@ -209,11 +204,9 @@ export class FormComponent implements OnChanges {
       let itemCount = node.itemCount;
 
       node.children.forEach(function (child){
-        console.log('updateModel child', child.key,  model );
         that.updateModel(child, model[key][itemCount]);
       });
     } else {
-      console.log('updateModel field',node.key,  model);
       node.model = model;
     }
   }

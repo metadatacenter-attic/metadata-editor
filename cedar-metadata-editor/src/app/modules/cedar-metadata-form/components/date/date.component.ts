@@ -55,19 +55,23 @@ export class DateComponent implements OnInit {
   // get the form value from the metadata model
   getValue(model, valueLocation): Date[] {
     let result = [];
-    if (Array.isArray(model)) {
-      for (let i = 0; i < model.length; i++) {
-        result.push(this.parseDate(model[i][valueLocation]) || null);
+    if (model) {
+      if (Array.isArray(model)) {
+        for (let i = 0; i < model.length; i++) {
+          result.push(this.parseDate(model[i][valueLocation]) || null);
+        }
+      } else {
+        result.push(this.parseDate(model[valueLocation]) || null);
       }
     } else {
-      result.push(this.parseDate(model[valueLocation])|| null);
+      result.push(null);
     }
     return result;
   }
 
   // create the metadata model date object
   setDate(value, valueLocation) {
-    let obj = {'@type':'xsd:date'};
+    let obj = {'@type': 'xsd:date'};
     obj[valueLocation] = value ? this.parseDate(value).toISOString().substring(0, 10) : null;
     return obj;
   }

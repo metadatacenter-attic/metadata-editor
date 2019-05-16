@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, Optional} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {Subscription} from 'rxjs';
@@ -8,13 +8,12 @@ import {LocalSettingsService} from "../../../../services/local-settings.service"
 import {UiService} from "../../../../services/ui/ui.service";
 import {DataHandlerService} from "../../../../services/data-handler.service";
 import {DataStoreService} from "../../../../services/data-store.service";
-import {FileNode} from "../../../cedar-metadata-form/models/file-node";
-import {TemplateSchemaService} from "../../../cedar-metadata-form/services/template-schema.service";
-import {MetadataModel} from "../../../cedar-metadata-form/models/metadata-model";
+import {TemplateService} from "../../../cedar-metadata-form/services/template.service";
 import {environment} from "../../../../../environments/environment";
 import {DataHandlerDataId} from "../../../shared/model/data-handler-data-id.model";
 import {TemplateSchema} from "../../../cedar-metadata-form/models/template-schema";
 import {DataHandlerDataStatus} from "../../../shared/model/data-handler-data-status.model";
+import {InstanceService} from "../../../cedar-metadata-form/services/instance.service";
 
 
 @Component({
@@ -27,7 +26,7 @@ import {DataHandlerDataStatus} from "../../../shared/model/data-handler-data-sta
 export class InstanceComponent implements OnInit {
   form: FormGroup;
   instanceId: string;
-  templateId:string;
+  templateId: string;
 
   template: any;
   instance: any;
@@ -36,12 +35,12 @@ export class InstanceComponent implements OnInit {
   payload: any;
   jsonLD: any;
   rdf: any;
-  id: string;
+  //id: string;
   formValid: boolean;
   viewOnly: boolean = false;
   ui: UiService;
-  _tr:TranslateService;
-  _ls:LocalSettingsService;
+  _tr: TranslateService;
+  _ls: LocalSettingsService;
   dh: DataHandlerService;
   ds: DataStoreService;
   artifactStatus: number = null;
@@ -69,8 +68,7 @@ export class InstanceComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((val) => {
-      this.id = val.templateId;
-      this.initialize(this.id);
+      this.initialize(val.instanceId, val.templateId);
     });
 
     this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
@@ -95,40 +93,53 @@ export class InstanceComponent implements OnInit {
   //   return this.template ? TemplateSchemaService.getTitle(this.template) : "";
   // }
 
-  initialize(instanceId: string): any {
+  initialize(instanceId: string, templateId: string): any {
     this.instanceId = instanceId;
+    this.templateId = templateId;
 
-    // load the instance
-    this.initDataHandler();
-    this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
-    this.dh
-      .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
-      .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+    if (instanceId) {
+      this.initDataHandler();
+      this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
+      this.dh
+        .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
+        .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+    } else if (templateId) {
+      this.instance = InstanceService.initInstance();
+
+      // load the template it is based on
+      this.dh
+        .requireId(DataHandlerDataId.TEMPLATE, this.templateId)
+        .load(() => this.templateLoadedCallback(this.templateId,), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+
+    }
   }
 
   private instanceLoadedCallback(instanceId) {
     this.instance = this.ds.getTemplateInstance(instanceId);
-    this.templateId = TemplateSchemaService.isBasedOn(this.instance);
+    this.templateId = TemplateService.isBasedOn(this.instance);
 
     // load the template it is based on
     this.dh
       .requireId(DataHandlerDataId.TEMPLATE, this.templateId)
-      .load(() => this.templateLoadedCallback(this.templateId, ), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
+      .load(() => this.templateLoadedCallback(this.templateId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
   }
 
   private templateLoadedCallback(templateId) {
-    const template = this.ds.getTemplate(templateId);
-    this.template = template as TemplateSchema;
+    this.template = this.ds.getTemplate(templateId);
 
-    // build the tree
-    //this.dataChange.next(this.buildFileTree(TemplateSchemaService.getOrder(this.template), TemplateSchemaService.getProperties(this.template), this.model, 0, this.formGroup, null));
+    // if this is a default instance, save the template info
+    if (!TemplateService.isBasedOn(this.instance)) {
+      const schema = TemplateService.schemaOf(this.template) as TemplateSchema;
+      InstanceService.setBasedOn(this.instance, TemplateService.getId(schema));
+      InstanceService.setName(this.instance, TemplateService.getName(schema));
+      InstanceService.setHelp(this.instance, TemplateService.getHelp(schema));
+    }
   }
 
   private dataErrorCallback(error: any, dataStatus: DataHandlerDataStatus) {
     this.artifactStatus = error.status;
     console.log('dataErrorCallback', error)
   }
-
 
 
   // form changed, update tab contents and submit button status

@@ -1,30 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormGroupDirective,
-  NgForm,
-  ValidatorFn,
-  Validators
-} from '@angular/forms';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
 
-import {TemplateSchemaService} from "../../services/template-schema.service";
 import {FileNode} from "../../models/file-node";
-import {ErrorStateMatcher} from "@angular/material";
 import {TemplateParserService} from "../../services/template-parser.service";
+import {InstanceService} from "../../services/instance.service";
+import { faAsterisk, faEnvelope, faCalendar, faFont ,faHashtag, faLink, faPlusSquare,faParagraph, faCheckSquare,faList,faPhoneSquare, faExternalLinkAlt, faDotCircle} from '@fortawesome/free-solid-svg-icons';
 
-
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
 
 @Component({
   selector: 'app-question',
@@ -32,43 +15,36 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./question.component.less'],
   providers: []
 })
-export class QuestionComponent implements OnInit, AfterViewInit {
+export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
   @Input() classLoader: any;
   @Input() parentGroup: FormGroup;
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
+  faAsterisk = faAsterisk;
+  faEnvelope = faEnvelope;
+  faCalendar = faCalendar;
+  faFont = faFont;
+  faHashtag = faHashtag;
+  faLink = faLink;
+  faParagraph = faParagraph;
+  faCheckSquare = faCheckSquare;
+  faList= faList;
+  faPhoneSquare = faPhoneSquare;
+  faDotCircle = faDotCircle;
+  faExternalLinkAlt = faExternalLinkAlt;
+  faPlusSquare=faPlusSquare;
 
   database: TemplateParserService;
   formGroup: FormGroup;
-  // controlled: ControlledComponent;
-  // date:DateComponent;
-  // controlledGroup: FormGroup;
-  matcher = new MyErrorStateMatcher();
   _yt;
   player;
 
-
-  constructor(private fb: FormBuilder, db: TemplateParserService,private cd: ChangeDetectorRef) {
+  constructor(private fb: FormBuilder, db: TemplateParserService, private cd: ChangeDetectorRef) {
     this.database = db;
   }
 
-  ngAfterViewInit() {
-    this.cd.detectChanges();
-  }
-
-  // savePlayer(player) {
-  //   this.player = player;
-  //   console.log('player instance', player);
-  // }
-  //
-  // onStateChange(event) {
-  //   console.log('player state', event.data);
-  // }
-
   ngOnInit() {
-    console.log('ngOnInit', this.node.key, this.node.itemCount, this.node.model[this.node.key], this.node.parent);
-
     // build the array of controls and add it to the parent
     const validators = this.getValidators(this.node);
     let name;
@@ -93,12 +69,14 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
       case InputType.date:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
+        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
       case InputType.textfield:
       case InputType.textarea:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
+        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
 
@@ -127,19 +105,17 @@ export class QuestionComponent implements OnInit, AfterViewInit {
         this.formGroup = this.fb.group({values: this.fb.array(this.buildAV(this.node, this.disabled))});
         this.parentGroup.addControl(this.node.key, this.formGroup);
         break;
-
-
     }
   }
 
   // controlled term was selected
   onSelectedControlled(event) {
-    TemplateSchemaService.addControlledValue(this.node.model, this.node.key, event['@id'], event['prefLabel']);
+    InstanceService.addControlledValue(this.node.model, this.node.key, event['@id'], event['prefLabel']);
   }
 
   // controlled term was removed
   onRemovedControlled(index) {
-    TemplateSchemaService.removeControlledValue(this.node.model, this.node.key, index);
+    InstanceService.removeControlledValue(this.node.model, this.node.key, index);
   }
 
   allowsMultiple(type: InputType) {
@@ -161,6 +137,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       validators.push(Validators.max(node.max));
     }
     if (node.subtype == InputType.numeric) {
+      console.log('validator for numeric',node.key)
       validators.push(this.numericValidator());
     }
     if (node.decimals) {
@@ -258,22 +235,6 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
 
 
-  // setChecked(node: FileNode, label: string, value: boolean) {
-  //   if (value != this.isChecked(node, label)) {
-  //     if (value) {
-  //       let obj = {}
-  //       obj[node.valueLocation] = label
-  //       node.model[node.key].push(obj);
-  //     } else {
-  //       node.model[node.key].forEach((value, i) => {
-  //         if (value[node.valueLocation] == label) {
-  //           node.model[node.key].splice(node.model[node.key][i], 1);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-
 
   // copyAV(node: FileNode, index: number) {
   //   TemplateSchemaService.copyAttributeValue(node.model, node.key, index);
@@ -297,10 +258,11 @@ export class QuestionComponent implements OnInit, AfterViewInit {
 
   copyItem(node: FileNode, index: number) {
     const validators = this.getValidators(this.node);
-    let clonedModel = Object.assign({}, node.model[node.key][index]);
+
 
     switch (this.node.type) {
       case InputType.controlled:
+        let clonedModel = Object.assign({}, node.model[node.key][index]);
         this.node.model[node.key].splice(index, 0, node.model[node.key][index]);
         this.formGroup.setControl('values', this.fb.array(this.buildControlled(node, this.disabled)));
         break;
@@ -309,13 +271,19 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       case InputType.textarea:
       case InputType.date:
 
-        if (Array.isArray(node.model[node.key])) {
-          this.node.model[node.key].splice(index, 0, clonedModel);
+        if (node.model) {
+          if (Array.isArray(node.model[node.key])) {
+            let clonedModel = Object.assign({}, node.model[node.key][index]);
+            this.node.model[node.key].splice(index, 0, clonedModel);
+          } else {
+            let clonedModel = Object.assign({}, node.model[node.key]);
+            this.node.model[node.key] = [clonedModel, clonedModel];
+          }
         } else {
-          this.node.model[node.key] = [clonedModel, clonedModel];
+          this.node.model[node.key] = [null, null];
         }
         this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
-        this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
+        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         break;
     }
   }
@@ -333,7 +301,7 @@ export class QuestionComponent implements OnInit, AfterViewInit {
       case InputType.textarea:
       case InputType.date:
         node.model[this.node.key].splice(index, 1);
-        this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+        //this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
         this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
         break;
     }
@@ -359,33 +327,41 @@ export class QuestionComponent implements OnInit, AfterViewInit {
   private allowMultipleControls(node, disabled: boolean, validators): any[] {
     const arr = [];
     for (let i = 0; i < this.getLength(node.model[node.key]); i++) {
-      const control = new FormControl({value: null, disabled: disabled, validators});
-      arr.push(control);
+      arr.push(new FormControl({value: null, disabled: disabled, validators:validators}));
     }
     return arr;
   }
 
   private buildControlled(node: FileNode, disabled: boolean): any[] {
     const arr = [];
-    if (Array.isArray(node.model[node.key])) {
-      let chips = [];
-      let ids = [];
-      node.model[node.key].forEach((value) => {
-        chips.push(value['rdfs:label']);
-        ids.push(value['@id']);
-      });
+    if (node.model[node.key]) {
+      if (Array.isArray(node.model[node.key])) {
+        let chips = [];
+        let ids = [];
+        node.model[node.key].forEach((value) => {
+          chips.push(value['rdfs:label']);
+          ids.push(value['@id']);
+        });
 
-      let group = this.fb.group({
-        chips: this.fb.array(chips),
-        ids: this.fb.array(ids),
-        search: new FormControl({disabled: disabled})
-      });
-      arr.push(group);
+        let group = this.fb.group({
+          chips: this.fb.array(chips),
+          ids: this.fb.array(ids),
+          search: new FormControl({disabled: disabled})
+        });
+        arr.push(group);
 
+      } else {
+        let group = this.fb.group({
+          chips: this.fb.array([node.model[node.key]['rdfs:label']]),
+          ids: this.fb.array([node.model[node.key]['@id']]),
+          search: new FormControl({disabled: disabled})
+        });
+        arr.push(group);
+      }
     } else {
       let group = this.fb.group({
-        chips: this.fb.array([node.model[node.key]['rdfs:label']]),
-        ids: this.fb.array([node.model[node.key]['@id']]),
+        chips: this.fb.array([]),
+        ids: this.fb.array([]),
         search: new FormControl({disabled: disabled})
       });
       arr.push(group);

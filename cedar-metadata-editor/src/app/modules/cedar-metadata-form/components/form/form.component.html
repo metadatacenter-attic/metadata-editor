@@ -17,7 +17,7 @@
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
       <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
         <button mat-icon-button disabled></button>
-        <app-question [disabled]="viewOnly" [node]="node" [classLoader]="classLoader" [parentGroup]="node.formGroup"
+        <app-question [disabled]="disabled" [node]="node" [classLoader]="classLoader" [parentGroup]="node.formGroup"
            style="width:100%"></app-question>
       </li>
     </mat-tree-node>
@@ -35,8 +35,8 @@
           <span *ngIf="node.minItems" style="color:#222">
                   &nbsp;({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})
             <button mat-icon-button class="help-text-button" *ngIf="node.help" [matTooltip]="node.help"><mat-icon>help_outline</mat-icon></button>
-        <button mat-icon-button class="node-add" *ngIf="!viewOnly" [matTooltip]="copy" (click)="copyItem(node)"><mat-icon>add_circle_outline</mat-icon></button>
-        <button mat-icon-button class="node-remove" *ngIf="!viewOnly" [matTooltip]="remove"
+        <button mat-icon-button class="node-add" *ngIf="!disabled" [matTooltip]="copy" (click)="copyItem(node)"><mat-icon>add_circle_outline</mat-icon></button>
+        <button mat-icon-button class="node-remove" *ngIf="!disabled" [matTooltip]="remove"
           (click)="removeItem(node)"><mat-icon>remove_circle_outline</mat-icon></button>
 
                 </span>

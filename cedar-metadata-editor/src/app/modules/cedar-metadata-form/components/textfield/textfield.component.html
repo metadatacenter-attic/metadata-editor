@@ -2,17 +2,17 @@
   <input matInput [formControl]="control" [type]="node.subtype"
     [required]="node.required"
     [min]="node.minLength" [max]="node.maxLength"
-    [min]="node.min" [max]="node.max"
-    [errorStateMatcher]="matcher">
+    [min]="node.min" [max]="node.max">
 
   <mat-hint>{{node.hint}} </mat-hint>
+  <span *ngIf="control['errors']">{{control['errors'] | json}}</span>
   <mat-error *ngIf="control['hasError']('url')">
     Value must be a <strong>URL</strong>
   </mat-error>
-  <mat-error *ngIf="control['hasError']('tel') && !control['hasError']('required')">
+  <mat-error *ngIf="control['hasError']('tel')">
     Value must be a <strong>phone number</strong>
   </mat-error>
-  <mat-error *ngIf="control['hasError']('email') && !control['hasError']('required')">
+  <mat-error *ngIf="control['hasError']('email')">
     Value must be an <strong>email address</strong>
   </mat-error>
   <mat-error *ngIf="control['hasError']('numeric')">

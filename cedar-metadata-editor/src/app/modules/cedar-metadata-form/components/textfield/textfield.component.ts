@@ -1,15 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
 import {FileNode} from "../../models/file-node";
-import {ErrorStateMatcher} from "@angular/material";
-
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
 
 @Component({
   selector: 'cedar-textfield',
@@ -23,8 +14,6 @@ export class TextfieldComponent implements OnInit {
   @Input() index: number;
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
-
-  matcher = new MyErrorStateMatcher();
 
   constructor() { }
 
@@ -53,27 +42,39 @@ export class TextfieldComponent implements OnInit {
   // get the value out of the model and into something the form can edit
   getValue(model, valueLocation) {
     let result = [];
-    let m = Array.isArray(model) ? model : [model];
-    m.forEach((value, i) => {
-      result.push(value[valueLocation] || null)
-    });
+    if (model) {
+      if (Array.isArray(model)) {
+        for (let i = 0; i < model.length; i++) {
+          result.push(model[i][valueLocation] || null);
+        }
+      } else {
+        result.push(model[valueLocation] || null);
+      }
+    } else {
+      result.push(null);
+    }
     return result;
+
   }
 
+
+  // create the metadata model date object
+  setVal(value, valueLocation) {
+    let obj = {};
+    obj[valueLocation] = value ? value : null;
+    return obj;
+  }
 
   // get the form value into the model
   setValue(value, model, valueLocation) {
     let result;
     if (value.length > 1) {
       result = [];
-      value.forEach((val, i) => {
-        let obj = {};
-        obj[valueLocation] = val;
-        result.push(obj)
+      value.forEach((val) => {
+        result.push(this.setVal(val,valueLocation));
       });
     } else if (value.length == 1) {
-      result = {};
-      result[valueLocation] = value[0];
+      result.push(this.setVal(value[0],valueLocation));
     }
     return result;
   }
