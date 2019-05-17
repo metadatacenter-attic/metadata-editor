@@ -1,12 +1,27 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {Form, FormBuilder, FormControl, FormGroup} from '@angular/forms';
+
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
-
 import {FileNode} from "../../models/file-node";
 import {TemplateParserService} from "../../services/template-parser.service";
 import {InstanceService} from "../../services/instance.service";
-import { faAsterisk, faEnvelope, faCalendar, faFont ,faHashtag, faLink, faPlusSquare,faParagraph, faCheckSquare,faList,faPhoneSquare, faExternalLinkAlt, faDotCircle} from '@fortawesome/free-solid-svg-icons';
+import {ValidationService} from "../../services/validation.service";
+import {
+  faAsterisk,
+  faCalendar,
+  faCheckSquare,
+  faDotCircle,
+  faEnvelope,
+  faExternalLinkAlt,
+  faFont,
+  faHashtag,
+  faLink,
+  faList,
+  faParagraph,
+  faPhoneSquare,
+  faPlusSquare
+} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -29,11 +44,11 @@ export class QuestionComponent implements OnInit {
   faLink = faLink;
   faParagraph = faParagraph;
   faCheckSquare = faCheckSquare;
-  faList= faList;
+  faList = faList;
   faPhoneSquare = faPhoneSquare;
   faDotCircle = faDotCircle;
   faExternalLinkAlt = faExternalLinkAlt;
-  faPlusSquare=faPlusSquare;
+  faPlusSquare = faPlusSquare;
 
   database: TemplateParserService;
   formGroup: FormGroup;
@@ -46,7 +61,7 @@ export class QuestionComponent implements OnInit {
 
   ngOnInit() {
     // build the array of controls and add it to the parent
-    const validators = this.getValidators(this.node);
+    const validators = ValidationService.getValidators(this.node);
     let name;
     let obj;
 
@@ -65,18 +80,21 @@ export class QuestionComponent implements OnInit {
       case InputType.controlled:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildControlled(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.date:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.textfield:
       case InputType.textarea:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.radio:
@@ -85,11 +103,13 @@ export class QuestionComponent implements OnInit {
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.checkbox:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleOptions(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.list:
@@ -98,14 +118,22 @@ export class QuestionComponent implements OnInit {
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
 
       case InputType.attributeValue:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildAV(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
+        this.setDisable(this.formGroup,this.disabled);
         break;
     }
   }
+
+  setDisable(formGroup:FormGroup, disabled) {
+    if (disabled) {
+      formGroup.disable()
+    }
+  };
 
   // controlled term was selected
   onSelectedControlled(event) {
@@ -121,97 +149,6 @@ export class QuestionComponent implements OnInit {
     return type !== InputType.element && InputTypeService.allowsMultiple(type);
   }
 
-  getValidators(node: FileNode) {
-    const validators = [];
-    if (node.required) {
-      validators.push(Validators.required);
-    }
-    if (node.subtype === InputType.email) {
-      validators.push(Validators.email);
-    }
-    if (node.min !== null) {
-      validators.push(Validators.min(node.min));
-    }
-    if (node.max !== null) {
-      validators.push(Validators.max(node.max));
-    }
-    if (node.subtype == InputType.numeric) {
-      validators.push(this.numericValidator());
-    }
-    if (node.decimals) {
-      validators.push(this.decimalValidator(node.decimals));
-    }
-    if (node.minLength !== null) {
-      validators.push(Validators.minLength(node.minLength));
-    }
-    if (node.maxLength !== null) {
-      validators.push(Validators.maxLength(node.maxLength));
-    }
-    if (node.pattern !== null) {
-      validators.push(Validators.pattern(node.pattern));
-    }
-    if (node.subtype === InputType.url) {
-      validators.push(this.urlValidator);
-    }
-    return validators;
-  }
-
-  // validator for min and max
-  quantityRangeValidator(min: number, max: number): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: boolean } | null => {
-      if (control.value !== undefined && (isNaN(control.value) || control.value < min || control.value > max)) {
-        return {'quantityRange': true};
-      }
-      return null;
-    };
-  }
-
-  // validator for URLs
-  numericValidator(): any {
-    return (control: AbstractControl): { [key: string]: boolean } | null => {
-      let result = null;
-      if (control.value) {
-        if (isNaN(Number(control.value))) {
-          result = {'numeric': true};
-        }
-      }
-      return result;
-    };
-  }
-
-  // validator for precision of a number
-  decimalValidator(precision: number): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: { actual: number, required: number } } | null => {
-      let result = null;
-      if (control.value && (!isNaN(Number(control.value)))) {
-        const actual = control.value.split(".")[1].length;
-        if (precision !== actual) {
-          result = {
-            decimal: {
-              actual: actual,
-              required: precision
-            }
-          };
-        }
-      }
-      return result;
-    };
-  }
-
-  // validator for URLs
-  urlValidator(url: FormControl): any {
-    if (url.pristine) {
-      return null;
-    }
-    const URL_REGEXP = /^(http?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/;
-    url.markAsTouched();
-    if (URL_REGEXP.test(url.value)) {
-      return null;
-    }
-    return {
-      url: true
-    };
-  }
 
   get isValid() {
     let result = false;
@@ -231,32 +168,8 @@ export class QuestionComponent implements OnInit {
     return result;
   }
 
-
-
-
-  // copyAV(node: FileNode, index: number) {
-  //   TemplateSchemaService.copyAttributeValue(node.model, node.key, index);
-  //   this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
-  //   this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  // }
-  //
-  // removeAV(node: FileNode, index: number) {
-  //   TemplateSchemaService.removeAttributeValue(node.model, node.key, index);
-  //   this.formGroup.setControl('values', this.fb.array(this.buildAV(node, this.disabled)));
-  //   this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
-  // }
-
-  // // do you want to filter dates out of the calendar?
-  // dateFilter = (d: Date): boolean => {
-  //   const day = d.getDay();
-  //   // Prevent Saturday and Sunday from being selected.
-  //   return day !== 0 && day !== 6;
-  // };
-
-
   copyItem(node: FileNode, index: number) {
-    const validators = this.getValidators(this.node);
-
+    const validators = ValidationService.getValidators(this.node);
 
     switch (this.node.type) {
       case InputType.controlled:
@@ -287,7 +200,7 @@ export class QuestionComponent implements OnInit {
   }
 
   removeItem(node: FileNode, index: number) {
-    const validators = this.getValidators(this.node);
+    const validators = ValidationService.getValidators(this.node);
     switch (node.type) {
 
       case InputType.controlled:
@@ -303,7 +216,6 @@ export class QuestionComponent implements OnInit {
         this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
         break;
     }
-
   }
 
   loadForm(key, form) {
@@ -325,7 +237,7 @@ export class QuestionComponent implements OnInit {
   private allowMultipleControls(node, disabled: boolean, validators): any[] {
     const arr = [];
     for (let i = 0; i < this.getLength(node.model[node.key]); i++) {
-      arr.push(new FormControl({value: null, disabled: disabled, validators:validators}));
+      arr.push(new FormControl({value: null, disabled: disabled, validators: validators}));
     }
     return arr;
   }
@@ -391,16 +303,24 @@ export class QuestionComponent implements OnInit {
     return arr;
   };
 
-  // build the av form controls
+  // build the attribute value form controls
   private buildAV(node: FileNode, disabled: boolean): any[] {
     const arr = [];
-    node.model[node.key].forEach((value) => {
+    if (node.model[node.key] && node.model[node.key].length) {
+      node.model[node.key].forEach((value) => {
+        const items = [];
+        items.push(new FormControl({value: '', disabled: disabled}));
+        items.push(new FormControl({value: '', disabled: disabled}));
+        const group = this.fb.group({values: this.fb.array(items)});
+        arr.push(group);
+      });
+    } else {
       const items = [];
       items.push(new FormControl({value: '', disabled: disabled}));
       items.push(new FormControl({value: '', disabled: disabled}));
       const group = this.fb.group({values: this.fb.array(items)});
       arr.push(group);
-    });
+    }
     return arr;
   }
 

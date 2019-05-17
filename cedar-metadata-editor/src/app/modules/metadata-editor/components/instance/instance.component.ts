@@ -86,14 +86,6 @@ export class InstanceComponent implements OnInit {
   private preDataIsLoaded() {
   }
 
-  // get data(): FileNode[] {
-  //   return this.dataChange.value;
-  // }
-
-  // getTitle() {
-  //   return this.template ? TemplateSchemaService.getTitle(this.template) : "";
-  // }
-
   initialize(instanceId: string, templateId: string): any {
     this.instanceId = instanceId;
     this.templateId = templateId;
@@ -213,7 +205,6 @@ export class InstanceComponent implements OnInit {
 
   validateAllFormFields(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(field => {
-
       const control = formGroup.get(field);
       if (control instanceof FormControl) {
         control.markAsTouched({onlySelf: true});

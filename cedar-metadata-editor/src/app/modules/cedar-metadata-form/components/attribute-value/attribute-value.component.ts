@@ -19,7 +19,10 @@ export class AttributeValueComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
-    console.log('init av', this.formGroup)
+    console.log('init av',  this.formGroup.get('values').value, this.getValue(this.node));
+    // this.formGroup.get('values').forEach(function(value) {
+    //
+    // });
     this.formGroup.get('values').setValue(this.getValue(this.node), this.node);
     this.watchChanges();
 
@@ -84,7 +87,7 @@ export class AttributeValueComponent implements OnInit {
     });
   }
 
-
+// get the form value from the metadata model
   private getValue(node): any[] {
     let val = [];
     if (node.model[node.key]) {
@@ -92,17 +95,18 @@ export class AttributeValueComponent implements OnInit {
       const modelValue = (node.model && node.model[node.key]) ? node.model[node.key] : [];
 
       if (itemCount == 0) {
-        val.push({'@value': null, 'rdfs:label': null})
+        val.push({'values':[null,null]})
       } else {
         for (let i = 0; i < itemCount; i++) {
           const itemKey = modelValue[i];
           const itemValue = node.model[itemKey]['@value'];
-          val.push({'@value': itemValue, 'rdfs:label': itemKey})
+          val.push({'values':[itemKey, itemValue]})
         }
       }
     } else {
-      val.push({'@value': null, 'rdfs:label': null})
+      val.push({'values':[null,null]})
     }
+    console.log('getValue',val);
     return val;
   }
 

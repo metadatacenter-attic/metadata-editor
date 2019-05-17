@@ -110,6 +110,7 @@ export class FormComponent implements OnChanges {
       this.title = InstanceService.getTitle(this.instance)  || TemplateService.getTitle(this.template);
       this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
 
+
       this.database.dataChange.subscribe(data => {
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
