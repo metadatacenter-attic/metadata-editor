@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
+
 import {FileNode} from "../../models/file-node";
+import {ValidationService} from "../../services/validation.service";
 
 @Component({
   selector: 'cedar-textfield',
@@ -19,10 +21,12 @@ export class TextfieldComponent implements OnInit {
 
   ngOnInit() {
       // initialize the value
-      this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation))
+      this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation));
+      this.setValidators(this.formGroup);
 
       // watch for changes
       this.formGroup.get( 'values').valueChanges.subscribe(value => {
+
         // update our metadata model
         this.node.model[this.node.key] = this.setValue(value, this.node.model[this.node.key], this.node.valueLocation);
 
@@ -38,6 +42,15 @@ export class TextfieldComponent implements OnInit {
         });
       })
   }
+
+  setValidators(formGroup:FormGroup) {
+    const validators = ValidationService.getValidators(this.node);
+    this.formGroup.get('values')['controls'].forEach(function(control) {
+      control.setValidators(validators);
+      control.updateValueAndValidity();
+    })
+  }
+
 
   // get the value out of the model and into something the form can edit
   getValue(model, valueLocation) {
@@ -67,9 +80,8 @@ export class TextfieldComponent implements OnInit {
 
   // get the form value into the model
   setValue(value, model, valueLocation) {
-    let result;
+    let result = [];
     if (value.length > 1) {
-      result = [];
       value.forEach((val) => {
         result.push(this.setVal(val,valueLocation));
       });

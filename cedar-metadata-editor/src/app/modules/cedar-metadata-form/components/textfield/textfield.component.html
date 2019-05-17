@@ -1,11 +1,9 @@
 <mat-form-field class="mat-form-field">
   <input matInput [formControl]="control" [type]="node.subtype"
-    [required]="node.required"
     [min]="node.minLength" [max]="node.maxLength"
     [min]="node.min" [max]="node.max">
 
   <mat-hint>{{node.hint}} </mat-hint>
-  <span *ngIf="control['errors']">{{control['errors'] | json}}</span>
   <mat-error *ngIf="control['hasError']('url')">
     Value must be a <strong>URL</strong>
   </mat-error>

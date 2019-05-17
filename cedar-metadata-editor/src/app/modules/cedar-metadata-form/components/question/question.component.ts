@@ -59,25 +59,24 @@ export class QuestionComponent implements OnInit {
       case InputType.pageBreak:
       case InputType.richText:
         this.formGroup = this.fb.group({values: this.fb.array([])});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.controlled:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildControlled(this.node, this.disabled))});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.date:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.textfield:
       case InputType.textarea:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
-        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.radio:
@@ -85,12 +84,12 @@ export class QuestionComponent implements OnInit {
         obj = {};
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.checkbox:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleOptions(this.node, this.disabled))});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.list:
@@ -98,12 +97,12 @@ export class QuestionComponent implements OnInit {
         obj = {};
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
 
       case InputType.attributeValue:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildAV(this.node, this.disabled))});
-        this.parentGroup.addControl(this.node.key, this.formGroup);
+        this.parentGroup.setControl(this.node.key, this.formGroup);
         break;
     }
   }
@@ -137,7 +136,6 @@ export class QuestionComponent implements OnInit {
       validators.push(Validators.max(node.max));
     }
     if (node.subtype == InputType.numeric) {
-      console.log('validator for numeric',node.key)
       validators.push(this.numericValidator());
     }
     if (node.decimals) {

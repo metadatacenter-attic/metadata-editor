@@ -25,6 +25,7 @@ import {InstanceService} from "../../services/instance.service";
 
 export class FormComponent implements OnChanges {
 
+  @Input() form: FormGroup;
   @Input() instance: any;
   @Input() template: any;
   @Input() controlledTermsCallback: any;
@@ -32,7 +33,7 @@ export class FormComponent implements OnChanges {
   @Input() classLoader: any;
   @Output() changed = new EventEmitter<any>();
 
-  form: FormGroup;
+
   title:string;
   dataSource: MatTreeNestedDataSource<FileNode>;
   treeControl: NestedTreeControl<FileNode>;
@@ -58,18 +59,8 @@ export class FormComponent implements OnChanges {
   changeLog: string[] = [];
 
   onPageChange(event) {
-    console.log('onPageChange',event)
     this.pageEvent = event;
     this.initialize() ;
-    // if (this.instance && this.template) {
-    //   this.pageEvent = event;
-    //   this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, this.pageEvent.pageIndex);
-    //   this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    //   this.dataSource = new MatTreeNestedDataSource();
-    //   this.database.dataChange.subscribe(data => {
-    //     this.dataSource.data = data;
-    //   });
-    // }
   }
 
   // keep up-to-date on changes in the form
@@ -111,10 +102,11 @@ export class FormComponent implements OnChanges {
   private _getChildren = (node: FileNode) => node.children;
 
   initialize() {
+
     if (this.instance && this.template) {
       this.pageEvent.length = TemplateService.getPageCount(this.template);
 
-      this.form = new FormGroup({});
+      //this.form = new FormGroup({});
       this.title = InstanceService.getTitle(this.instance)  || TemplateService.getTitle(this.template);
       this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
 
@@ -132,7 +124,6 @@ export class FormComponent implements OnChanges {
   getPageCount(nodes: FileNode[]) {
     let count = 0;
     nodes.forEach(function (node) {
-      console.log(node.type,node.subtype);
       if (InputTypeService.isPageBreak(node.subtype)) {
         count++;
       }

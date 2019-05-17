@@ -15,10 +15,10 @@
         </div>
       </div>
 
-     <cedar-metadata-form  [instance]="instance" [template]="template"  [disabled]="viewOnly" [classLoader]="classLoader" (changed)="onChanged($event)"></cedar-metadata-form>
+     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" [classLoader]="classLoader" (changed)="onChanged($event)"></cedar-metadata-form>
 
       <div>
-        <button mat-raised-button color="primary" [disabled]="!formValid || viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}
+        <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}
         </button>
       </div>
 

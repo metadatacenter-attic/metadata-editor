@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {Subscription} from 'rxjs';
-import {FormGroup} from '@angular/forms';
+import {FormArray, FormControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {LocalSettingsService} from "../../../../services/local-settings.service";
 import {UiService} from "../../../../services/ui/ui.service";
@@ -67,6 +67,7 @@ export class InstanceComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.form = new FormGroup({});
     this.route.params.subscribe((val) => {
       this.initialize(val.instanceId, val.templateId);
     });
@@ -203,7 +204,27 @@ export class InstanceComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('onSubmit')
+    if (this.form.valid) {
+      console.log('form submitted');
+    } else {
+      this.validateAllFormFields(this.form);
+    }
+  }
+
+  validateAllFormFields(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(field => {
+
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({onlySelf: true});
+      } else if (control instanceof FormArray) {
+        control.controls.forEach(cntl => {
+          cntl.markAsTouched({onlySelf: true});
+        });
+      } else if (control instanceof FormGroup) {
+        this.validateAllFormFields(control);
+      }
+    });
   }
 
 
