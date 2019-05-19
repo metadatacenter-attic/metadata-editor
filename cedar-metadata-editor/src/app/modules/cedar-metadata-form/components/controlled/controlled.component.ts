@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
-import { debounceTime } from 'rxjs/operators';
+import {debounceTime} from 'rxjs/operators';
 
 import {Post} from '../../models/post';
 
@@ -18,7 +18,6 @@ export class ControlledComponent implements OnInit {
   isLoading = false;
   search;
 
-
   @Input() group: FormGroup;
   @Input() autocompleteResults;
   @Input() valueConstraints: any;
@@ -33,7 +32,7 @@ export class ControlledComponent implements OnInit {
   }
 
   filterItems(arr, query) {
-    return arr.filter(function(el) {
+    return arr.filter(function (el) {
       return el.prefLabel.toLowerCase().indexOf(query.toLowerCase().toLowerCase()) !== -1;
     })
   }
@@ -49,7 +48,7 @@ export class ControlledComponent implements OnInit {
         posts = this.filterItems(posts, this.search);
 
         // and sort
-        posts =  posts.sort((leftSide, rightSide): number => {
+        posts = posts.sort((leftSide, rightSide): number => {
           if (leftSide.prefLabel.toLowerCase() < rightSide.prefLabel.toLowerCase()) return -1;
           if (leftSide.prefLabel.toLowerCase() > rightSide.prefLabel.toLowerCase()) return 1;
           return 0;
@@ -63,11 +62,11 @@ export class ControlledComponent implements OnInit {
   }
 
   ngOnInit() {
-    let sample = [{prefLabel:"banana"}, {prefLabel:"orange"}, {prefLabel:"apple"}];
-    console.log(this.filterItems(sample,"ap"));
+    let sample = [{prefLabel: "banana"}, {prefLabel: "orange"}, {prefLabel: "apple"}];
+    console.log(this.filterItems(sample, "ap"));
 
     this.group.controls['values']['controls'][0].get('search').valueChanges.pipe(debounceTime(500)).subscribe(val => {
-      this.search  = val;
+      this.search = val;
       this.autocomplete.emit({"search": val, "constraints": this.valueConstraints});
 
       // show the loading spinner
@@ -77,14 +76,14 @@ export class ControlledComponent implements OnInit {
 
 
   // after you clicked an autosuggest option, this function will show the field you want to show in input
-  displayFn(post:Post) {
+  displayFn(post: Post) {
     if (post) {
       return post.prefLabel;
     }
   }
 
   // add chips
-  add(event:MatChipInputEvent) {
+  add(event: MatChipInputEvent) {
     let input = event.input;
     let value = event.value;
 

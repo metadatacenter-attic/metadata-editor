@@ -1,10 +1,9 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChange} from '@angular/core';
-import {Form, FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
-import {Post} from "../../models/post";
 import {TemplateParserService} from "../../services/template-parser.service";
 import {InstanceService} from "../../services/instance.service";
 import {ValidationService} from "../../services/validation.service";

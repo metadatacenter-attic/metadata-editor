@@ -1,5 +1,5 @@
-import {Component, OnInit, Input, Output, ChangeDetectionStrategy, EventEmitter} from '@angular/core'
-import {FormGroup, FormArray} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core'
+import {FormGroup} from '@angular/forms';
 import {Subscription} from "rxjs";
 import {FileNode} from "../../models/file-node";
 import {UiService} from "../../../../services/ui/ui.service";
@@ -28,7 +28,7 @@ export class ElementComponent {
   }
 
   ngOnInit() {
-    console.log('ngOnInit',this.node.key,this.node.itemCount,this.node.model[this.node.key],this.parentGroup);
+    console.log('ngOnInit', this.node.key, this.node.itemCount, this.node.model[this.node.key], this.parentGroup);
     if (this.parentGroup) {
       this.parentGroup.addControl(this.node.key, this.formGroup);
     }
