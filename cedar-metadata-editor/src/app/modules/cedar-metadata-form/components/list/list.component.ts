@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormGroup} from "@angular/forms";
 import {FileNode} from "../../models/file-node";
-import {TemplateSchemaService} from "../../services/template-schema.service";
 
 @Component({
   selector: 'cedar-list',
@@ -46,16 +45,18 @@ export class ListComponent implements OnInit {
   }
 
   // get the value out of the model and into something the form can edit
-  getListValue(literals, value, valueLocation, multiple) {
-    let result;
+  getListValue(literals, model, valueLocation, multiple) {
+    let result = [];
     let map = this.getLiteralMap(literals);
-    if (multiple) {
-      result = [];
-      for (let i = 0; i < value.length; i++) {
-        result.push(map.indexOf(value[i][valueLocation]));
+    if (model) {
+      if (multiple) {
+
+        for (let i = 0; i < model.length; i++) {
+          result.push(map.indexOf(model[i][valueLocation]));
+        }
+      } else {
+        result = map.indexOf(model[valueLocation]);
       }
-    } else {
-      result = map.indexOf(value[valueLocation]);
     }
     return result;
   }

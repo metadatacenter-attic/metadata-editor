@@ -1,14 +1,9 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
+import {debounceTime} from 'rxjs/operators';
 
-import {ControlledTermService} from '../../services/controlled-terms.service';
 import {Post} from '../../models/post';
-import {debounceTime, finalize} from "rxjs/operators";
-import {tap} from "rxjs/internal/operators/tap";
-import {switchMap} from "rxjs/internal/operators";
-import {forkJoin} from 'rxjs';
-
 
 @Component({
   selector: 'controlled',
@@ -21,58 +16,64 @@ export class ControlledComponent implements OnInit {
   selectable = true;
   removable = true;
   isLoading = false;
+  search;
 
+  @Input() group: FormGroup;
+  @Input() autocompleteResults;
+  @Input() valueConstraints: any;
   @ViewChild('autocompleteInput') autocompleteInput: ElementRef;
   @ViewChild('chipList') chipList: ElementRef;
   @Output() onSelectedOption = new EventEmitter();
   @Output() onRemovedOption = new EventEmitter();
-  @Input() group: FormGroup;
-  //@Input() controlledGroup: FormGroup;
-  @Input() classLoader: any;
-  @Input() valueConstraints: any;
+  @Output() autocomplete = new EventEmitter<any>();
 
-  controlledGroup: FormGroup;
 
-  constructor(private ct: ControlledTermService, private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {
+  }
+
+  filterItems(arr, query) {
+    return arr.filter(function (el) {
+      return el.prefLabel.toLowerCase().indexOf(query.toLowerCase().toLowerCase()) !== -1;
+    })
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['autocompleteResults']) {
+      if (this.group && this.search) {
+
+        // save the posts
+        let posts = changes['autocompleteResults']['currentValue'];
+
+        // filter
+        posts = this.filterItems(posts, this.search);
+
+        // and sort
+        posts = posts.sort((leftSide, rightSide): number => {
+          if (leftSide.prefLabel.toLowerCase() < rightSide.prefLabel.toLowerCase()) return -1;
+          if (leftSide.prefLabel.toLowerCase() > rightSide.prefLabel.toLowerCase()) return 1;
+          return 0;
+        });
+
+        // hide the spinner and show the data
+        this.isLoading = false;
+        this.allPosts = posts;
+      }
+    }
   }
 
   ngOnInit() {
-    console.log('controlledGroup', this.group.controls['values']['controls'])
-    this.controlledGroup = this.group.controls['values']['controls'][0];
+    let sample = [{prefLabel: "banana"}, {prefLabel: "orange"}, {prefLabel: "apple"}];
+    console.log(this.filterItems(sample, "ap"));
 
-    // when user types something in input, the value changes will come through this
-    this.controlledGroup.get('search').valueChanges.pipe(
-      debounceTime(300),
-      tap(() => this.isLoading = true),
-      switchMap(() =>
-        forkJoin(
-          this.ct.getPosts(this.controlledGroup.get('search').value, this.classLoader, this.valueConstraints)
-        ).pipe(
-          finalize(() => this.isLoading = false),
-        )
-      )
-    ).subscribe(posts => {
+    this.group.controls['values']['controls'][0].get('search').valueChanges.pipe(debounceTime(500)).subscribe(val => {
+      this.search = val;
+      this.autocomplete.emit({"search": val, "constraints": this.valueConstraints});
 
-      // still need to filter on the search term because valueSets don't filter
-      let term = this.controlledGroup.get('search').value.toLowerCase();
-      let hasSearchTerm = function(element, index, array) {
-        return ( element.prefLabel.toLowerCase().indexOf(term) >= 0);
-      };
-
-      this.allPosts = [];
-      for (let i = 0; i < posts.length; i++) {
-        this.allPosts = this.allPosts.concat(posts[i]['collection']);
-      }
-
-      // and still need to filter and sort
-      this.allPosts = this.allPosts.filter(hasSearchTerm).sort((leftSide,rightSide):number => {
-        if (leftSide.prefLabel < rightSide.prefLabel) return -1;
-        if (leftSide.prefLabel > rightSide.prefLabel) return 1;
-        return 0;
-      });
-
+      // show the loading spinner
+      this.isLoading = true;
     });
-  }
+  };
+
 
   // after you clicked an autosuggest option, this function will show the field you want to show in input
   displayFn(post: Post) {
@@ -82,13 +83,13 @@ export class ControlledComponent implements OnInit {
   }
 
   // add chips
-  add(event: MatChipInputEvent): void {
+  add(event: MatChipInputEvent) {
     let input = event.input;
     let value = event.value;
 
     // Add our requirement
     if ((value || '').trim()) {
-      const chips = this.controlledGroup.get('chips') as FormArray;
+      const chips = this.group.controls['values']['controls'][0].get('chips') as FormArray;
       chips.push(this.fb.control(value.trim()));
     }
 
@@ -104,8 +105,8 @@ export class ControlledComponent implements OnInit {
 
   // chip was removed
   remove(index: number): void {
-    const chips = this.controlledGroup.get('chips') as FormArray;
-    const ids = this.controlledGroup.get('ids') as FormArray;
+    const chips = this.group.controls['values']['controls'][0].get('chips') as FormArray;
+    const ids = this.group.controls['values']['controls'][0].get('ids') as FormArray;
 
     if (index >= 0) {
       chips.removeAt(index);
@@ -119,14 +120,14 @@ export class ControlledComponent implements OnInit {
     this.autocompleteInput.nativeElement.value = '';
     this.autocompleteInput.nativeElement.focus();
 
-    const chips = this.controlledGroup.get('chips') as FormArray;
+    const chips = this.group.controls['values']['controls'][0].get('chips') as FormArray;
     chips.push(this.fb.control(label.trim()));
-    const ids = this.controlledGroup.get('ids') as FormArray;
+    const ids = this.group.controls['values']['controls'][0].get('ids') as FormArray;
     ids.push(this.fb.control(value.toString().trim()));
 
     // notify the parent component of the selection
     this.onSelectedOption.emit(event.option.value);
-    this.controlledGroup.get('search').setValue('');
+    this.group.controls['values']['controls'][0].get('search').setValue('');
   }
 
   // filter the data by the search string

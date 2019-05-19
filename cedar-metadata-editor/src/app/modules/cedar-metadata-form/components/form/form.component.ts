@@ -9,12 +9,10 @@ import * as jsonld from 'jsonld';
 import * as cloneDeep from 'lodash/cloneDeep';
 import {TemplateParserService} from "../../services/template-parser.service";
 import {UiService} from "../../../../services/ui/ui.service";
-import {TemplateSchemaService} from "../../services/template-schema.service";
-import {InputType} from "../../models/input-type";
+import {TemplateService} from "../../services/template.service";
 import {FileNode} from "../../models/file-node";
-import {MetadataModel, MetadataSnip} from "../../models/metadata-model";
-import {TemplateSchema} from "../../models/template-schema";
 import {InputTypeService} from "../../services/input-type.service";
+import {InstanceService} from "../../services/instance.service";
 
 
 @Component({
@@ -27,16 +25,16 @@ import {InputTypeService} from "../../services/input-type.service";
 
 export class FormComponent implements OnChanges {
 
-  //@Input() id: string;
+  @Input() form: FormGroup;
   @Input() instance: any;
   @Input() template: any;
-  @Input() controlledTermsCallback: any;
-  @Input() viewOnly: boolean;
-  @Input() classLoader: any;
+  @Input() disabled: boolean;
+  @Input() autocompleteResults: any;
   @Output() changed = new EventEmitter<any>();
+  @Output() autocomplete = new EventEmitter<any>();
 
-  form: FormGroup;
-  title:string;
+
+  title: string;
   dataSource: MatTreeNestedDataSource<FileNode>;
   treeControl: NestedTreeControl<FileNode>;
   database: TemplateParserService;
@@ -45,9 +43,6 @@ export class FormComponent implements OnChanges {
   pageEvent: PageEvent;
   copy: string = "Copy";
   remove: string = "Remove";
-
-  darkMode: boolean;
-  private _darkModeSub: Subscription;
   private formChanges: Subscription;
 
   constructor(private ui: UiService, database: TemplateParserService, route: ActivatedRoute) {
@@ -56,24 +51,18 @@ export class FormComponent implements OnChanges {
     this.dataSource = new MatTreeNestedDataSource();
     this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.route = route;
-    this.title = 'loading'
   }
 
   changeLog: string[] = [];
 
+
   onPageChange(event) {
-    console.log('onPageChange',event)
     this.pageEvent = event;
-    this.initialize() ;
-    // if (this.instance && this.template) {
-    //   this.pageEvent = event;
-    //   this.response.jsonLD = this.database.initialize(this.form, this.database.instanceModel, this.database.template, this.pageEvent.pageIndex);
-    //   this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
-    //   this.dataSource = new MatTreeNestedDataSource();
-    //   this.database.dataChange.subscribe(data => {
-    //     this.dataSource.data = data;
-    //   });
-    // }
+    this.initialize();
+  }
+
+  onAutocomplete(event) {
+    this.autocomplete.emit(event);
   }
 
   // keep up-to-date on changes in the form
@@ -94,20 +83,27 @@ export class FormComponent implements OnChanges {
     }
   }
 
+
   ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
-    let log: string[] = [];
-    for (let propName in changes) {
-      let changedProp = changes[propName];
-      let to = JSON.stringify(changedProp.currentValue);
-      if (changedProp.isFirstChange()) {
-        log.push(`Initial value of ${propName} set to ${to}`);
-      } else {
-        let from = JSON.stringify(changedProp.previousValue);
-        log.push(`${propName} changed from ${from} to ${to}`);
+    if (changes['autocompleteResults']) {
+      this.autocompleteResults = changes['autocompleteResults']['currentValue'];
+    } else {
+
+
+      let log: string[] = [];
+      for (let propName in changes) {
+        let changedProp = changes[propName];
+        let to = JSON.stringify(changedProp.currentValue);
+        if (changedProp.isFirstChange()) {
+          log.push(`Initial value of ${propName} set to ${to}`);
+        } else {
+          let from = JSON.stringify(changedProp.previousValue);
+          log.push(`${propName} changed from ${from} to ${to}`);
+        }
       }
+      this.changeLog.push(log.join(', '));
+      this.initialize();
     }
-    this.changeLog.push(log.join(', '));
-    this.initialize();
   }
 
   private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
@@ -115,17 +111,19 @@ export class FormComponent implements OnChanges {
   private _getChildren = (node: FileNode) => node.children;
 
   initialize() {
-    if (this.instance && this.template) {
-      this.pageEvent.length = TemplateSchemaService.getPageCount(this.template);
 
-      this.form = new FormGroup({});
-      this.database.initialize(this.form, this.instance, this.template,this.pageEvent.pageIndex);
-      this.title = this.database.getTitle();
+    if (this.instance && this.template) {
+      this.pageEvent.length = TemplateService.getPageCount(this.template);
+
+      //this.form = new FormGroup({});
+      this.title = InstanceService.getTitle(this.instance) || TemplateService.getTitle(this.template);
+      this.database.initialize(this.form, this.instance, this.template, this.pageEvent.pageIndex);
+
+
       this.database.dataChange.subscribe(data => {
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
           this.dataSource.data = data;
-          console.log('page length',this.pageEvent);
           this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
         }
       });
@@ -136,7 +134,6 @@ export class FormComponent implements OnChanges {
   getPageCount(nodes: FileNode[]) {
     let count = 0;
     nodes.forEach(function (node) {
-      console.log(node.type,node.subtype);
       if (InputTypeService.isPageBreak(node.subtype)) {
         count++;
       }
@@ -145,7 +142,7 @@ export class FormComponent implements OnChanges {
   }
 
   isDisabled() {
-    return this.viewOnly;
+    return this.disabled;
   }
 
   ngAfterViewInit() {
@@ -164,7 +161,7 @@ export class FormComponent implements OnChanges {
     siblings.splice(index + 1, 0, clonedNode);
 
     // adjust remaining siblings itemCounts
-    for (let i=index+2;i<siblings.length;i++) {
+    for (let i = index + 2; i < siblings.length; i++) {
       if (siblings[i].key == node.key) {
         siblings[i].itemCount++;
       }
@@ -184,7 +181,7 @@ export class FormComponent implements OnChanges {
     siblings.splice(index, 1);
 
     // adjust remaining siblings itemCounts
-    for (let i=index;i<siblings.length;i++) {
+    for (let i = index; i < siblings.length; i++) {
       if (siblings[i].key == node.key) {
         siblings[i].itemCount--;
       }
@@ -201,23 +198,19 @@ export class FormComponent implements OnChanges {
   updateModel(node: FileNode, model) {
     node.model = model;
 
-    //console.log('updateModel',node.key, model);
-    if (node.children ) {
+    if (node.children) {
 
       let that = this;
       let key = node.key;
       let itemCount = node.itemCount;
 
-      node.children.forEach(function (child){
-        console.log('updateModel child', child.key,  model );
+      node.children.forEach(function (child) {
         that.updateModel(child, model[key][itemCount]);
       });
     } else {
-      console.log('updateModel field',node.key,  model);
       node.model = model;
     }
   }
-
 
 
 }

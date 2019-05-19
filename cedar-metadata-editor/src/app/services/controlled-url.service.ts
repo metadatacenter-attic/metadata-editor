@@ -1,6 +1,7 @@
-import {environment} from "../../../../environments/environment";
+import {environment} from '../../environments/environment';
 
-export class UrlService {
+
+export class ControlledUrlService {
 
   static terminologyService = environment.terminologyUrl;
   static controlledService = environment.terminologyUrl + 'bioportal';
@@ -120,7 +121,7 @@ export class UrlService {
       propertyId) + '/tree';
   };
 
-  static getValuesInValueSet(vsCollection, vsId, page?:string, size?:string) {
+  static getValuesInValueSet(vsCollection, vsId, page?: string, size?: string) {
     return this.controlledTerm() + '/vs-collections/' + vsCollection + '/value-sets/' + encodeURIComponent(vsId)
       + "/values?" + this.paging(page, size, 1, 50, 'page', 'pageSize');
   };
@@ -179,7 +180,7 @@ export class UrlService {
     return url;
   };
 
-  static autocompleteOntology(query:string, acronym:string, page?:number, size?:number) {
+  static autocompleteOntology(query: string, acronym: string, page?: number, size?: number) {
     let url = this.controlledTerm();
     if (query == '*') {
       url += "/ontologies/" + acronym + "/classes?" + this.paging(page, size, 1, 500, 'page', 'page_size');
@@ -187,11 +188,11 @@ export class UrlService {
       url += "/search?q=" + encodeURIComponent(query) +
         "&scope=classes&sources=" + acronym + "&suggest=true&" + this.paging(page, size, 1, 500, 'page', 'page_size');
     }
-    console.log('autocompleteOntology',url)
+    console.log('autocompleteOntology', url)
     return url;
   };
 
-  static autocompleteOntologySubtree(query, acronym, subtree_root_id, max_depth?:number, page?:number, size?:number) {
+  static autocompleteOntologySubtree(query, acronym, subtree_root_id, max_depth?: number, page?: number, size?: number) {
     let url = this.controlledTerm();
 
     if (query == '*') {
@@ -205,6 +206,4 @@ export class UrlService {
 
     return url;
   };
-
-
 }

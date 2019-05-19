@@ -1,6 +1,6 @@
 
 
-export interface Response {
+export interface AutocompleteResponse {
   page: number,
   pageCount: number,
   pageSize: number,

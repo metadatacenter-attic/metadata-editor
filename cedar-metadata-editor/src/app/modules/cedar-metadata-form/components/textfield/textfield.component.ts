@@ -1,15 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
-import {ErrorStateMatcher} from "@angular/material";
+import {FormControl, FormGroup} from "@angular/forms";
 
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+import {FileNode} from "../../models/file-node";
+import {ValidationService} from "../../services/validation.service";
 
 @Component({
   selector: 'cedar-textfield',
@@ -24,16 +17,16 @@ export class TextfieldComponent implements OnInit {
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
 
-  matcher = new MyErrorStateMatcher();
-
   constructor() { }
 
   ngOnInit() {
       // initialize the value
-      this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation))
+      this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation));
+      this.setValidators(this.formGroup);
 
       // watch for changes
       this.formGroup.get( 'values').valueChanges.subscribe(value => {
+
         // update our metadata model
         this.node.model[this.node.key] = this.setValue(value, this.node.model[this.node.key], this.node.valueLocation);
 
@@ -50,30 +43,50 @@ export class TextfieldComponent implements OnInit {
       })
   }
 
-  // get the value out of the model and into something the form can edit
-  getValue(model, valueLocation) {
-    let result = [];
-    let m = Array.isArray(model) ? model : [model];
-    m.forEach((value, i) => {
-      result.push(value[valueLocation] || null)
-    });
-    return result;
+  setValidators(formGroup:FormGroup) {
+    const validators = ValidationService.getValidators(this.node);
+    this.formGroup.get('values')['controls'].forEach(function(control) {
+      control.setValidators(validators);
+      control.updateValueAndValidity();
+    })
   }
 
 
+  // get the value out of the model and into something the form can edit
+  getValue(model, valueLocation) {
+    let result = [];
+    if (model) {
+      if (Array.isArray(model)) {
+        for (let i = 0; i < model.length; i++) {
+          result.push(model[i][valueLocation] || null);
+        }
+      } else {
+        result.push(model[valueLocation] || null);
+      }
+    } else {
+      result.push(null);
+    }
+    return result;
+
+  }
+
+
+  // create the metadata model date object
+  setVal(value, valueLocation) {
+    let obj = {};
+    obj[valueLocation] = value ? value : null;
+    return obj;
+  }
+
   // get the form value into the model
   setValue(value, model, valueLocation) {
-    let result;
+    let result = [];
     if (value.length > 1) {
-      result = [];
-      value.forEach((val, i) => {
-        let obj = {};
-        obj[valueLocation] = val;
-        result.push(obj)
+      value.forEach((val) => {
+        result.push(this.setVal(val,valueLocation));
       });
     } else if (value.length == 1) {
-      result = {};
-      result[valueLocation] = value[0];
+      result.push(this.setVal(value[0],valueLocation));
     }
     return result;
   }

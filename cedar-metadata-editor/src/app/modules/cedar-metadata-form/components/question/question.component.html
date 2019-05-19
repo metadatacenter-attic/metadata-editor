@@ -8,8 +8,27 @@
 <ng-template #notStaticType>
   <div [formGroup]="formGroup" class="form-group">
 
-    <label class="question-label" [attr.for]="node.name">{{node.name}}</label>
-    <button mat-icon-button class="help-text-button" *ngIf="node.help" [matTooltip]="node.help">
+    <label class="question-label" [attr.for]="node.name">
+       <span *ngIf="node.type == 'textfield'" class="question-icon">
+         <span *ngIf="node.subtype == 'email'" class="question-icon"><fa-icon [icon]="faEnvelope"></fa-icon></span>
+         <span *ngIf="node.subtype == 'number'" class="question-icon"><fa-icon [icon]="faHashtag"></fa-icon></span>
+         <span *ngIf="node.subtype == 'url'" class="question-icon"><fa-icon [icon]="faLink"></fa-icon></span>
+         <span *ngIf="node.subtype == 'text'" class="question-icon"><fa-icon [icon]="faFont"></fa-icon></span>
+         <span *ngIf="node.subtype == 'tel'" class="question-icon"><fa-icon [icon]="faPhoneSquare"></fa-icon></span>
+       </span>
+      <span *ngIf="node.type == 'date'" class="question-icon"><fa-icon [icon]="faCalendar"></fa-icon></span>
+      <span *ngIf="node.type == 'textarea'" class="question-icon"><fa-icon [icon]="faParagraph"></fa-icon></span>
+      <span *ngIf="node.type == 'checkbox'" class="question-icon"><fa-icon [icon]="faCheckSquare"></fa-icon></span>
+      <span *ngIf="node.type == 'list'" class="question-icon"><fa-icon [icon]="faList"></fa-icon></span>
+      <span *ngIf="node.type == 'radio'" class="question-icon"><fa-icon [icon]="faDotCircle"></fa-icon></span>
+      <span *ngIf="node.type == 'controlled'" class="question-icon"><fa-icon [icon]="faExternalLinkAlt"></fa-icon></span>
+      <span *ngIf="node.type == 'attribute-value'" class="question-icon"><fa-icon [icon]="faPlusSquare"></fa-icon></span>
+      {{node.name}}
+    </label>
+
+    <span *ngIf="node.required" class="required"><fa-icon [icon]="faAsterisk"></fa-icon></span>
+
+    <button mat-icon-button class="mat-icon-button help" *ngIf="node.help" [matTooltip]="node.help">
       <mat-icon>help_outline</mat-icon>
     </button>
 
@@ -24,8 +43,9 @@
         (changed)="onChange($event)"></cedar-list>
 
       <controlled *ngIf="node.type == 'controlled'" [group]="formGroup"
-        [classLoader]="classLoader"
         [valueConstraints]="node.valueConstraints"
+        [autocompleteResults]="autocompleteResults"
+        (autocomplete)="onAutocomplete($event)"
         (onRemovedOption)="onRemovedControlled($event)"
         (onSelectedOption)="onSelectedControlled($event)"></controlled>
 
@@ -41,12 +61,12 @@
         <div *ngFor="let control of formGroup.controls['values']['controls'];index as i">
 
 
-          <div *ngIf="node.multiSelect">
+          <div *ngIf="node.multiSelect" style="padding-top:.5em">
             {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-            <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="copyItem(node,i)">
+            <button mat-icon-button class="mat-icon-button help" *ngIf="!disabled" (click)="copyItem(node,i)">
               <mat-icon>add_circle_outline</mat-icon>
             </button>
-            <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="removeItem(node,i)">
+            <button mat-icon-button class="mat-icon-button help" *ngIf="!disabled" (click)="removeItem(node,i)">
               <mat-icon>remove_circle_outline</mat-icon>
             </button>
           </div>

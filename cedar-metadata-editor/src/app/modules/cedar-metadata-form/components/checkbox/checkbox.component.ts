@@ -49,11 +49,16 @@ export class CheckboxComponent implements OnInit {
 
   // get the value out of the model and into something the form can edit
   getValue(literals, model, valueLocation) {
-    let result;
+    let result = [];
     let map = this.getLiteralMap(literals);
-    result = [];
-    for (let i = 0; i < model.length; i++) {
-      result.push(map.indexOf(model[i][valueLocation]) > -1);
+    if (model) {
+      for (let i = 0; i < model.length; i++) {
+        result.push(map.indexOf(model[i][valueLocation]) > -1);
+      }
+    } else {
+      map.forEach(function () {
+        result.push(false);
+      });
     }
     return result;
   }

@@ -2,10 +2,9 @@ import {Injectable} from "@angular/core";
 import {InputTypeService} from "./input-type.service";
 import {TemplateSchema} from "../models/template-schema";
 import {InputType} from "../models/input-type";
-import {FormControl, FormGroup} from "@angular/forms";
 
 @Injectable()
-export class TemplateSchemaService {
+export class TemplateService {
 
   it: InputTypeService;
 
@@ -26,8 +25,12 @@ export class TemplateSchemaService {
     return schema.properties;
   }
 
-  static isBasedOn(instance: any) {
-    return instance['schema:isBasedOn'];
+  static isBasedOn(schema: any) {
+    return schema['schema:isBasedOn'];
+  }
+
+  static getId(schema: TemplateSchema) {
+    return schema['@id'];
   }
 
   static isSpecialKey(key) {
@@ -52,6 +55,7 @@ export class TemplateSchemaService {
     return schema['schema:description'];
   }
 
+
   static getPlaceholder(schema: TemplateSchema) {
     return 'placeholder text';
   }
@@ -63,7 +67,6 @@ export class TemplateSchemaService {
   static isRequired(schema: TemplateSchema) {
     return schema._valueConstraints && schema._valueConstraints.requiredValue;
   }
-
 
 
   static getMin(schema: TemplateSchema) {
@@ -98,12 +101,13 @@ export class TemplateSchemaService {
     return schema['schema:name'];
   }
 
+
   static getPrefLabel(schema: TemplateSchema) {
     return schema['skos:prefLabel'];
   }
 
   static getTitle(schema: TemplateSchema, label?: string) {
-    return  TemplateSchemaService.getPrefLabel(schema) || label || TemplateSchemaService.getName(schema);
+    return TemplateService.getPrefLabel(schema) || label || TemplateService.getName(schema);
   }
 
   static isElement(schema: TemplateSchema) {
@@ -136,8 +140,8 @@ export class TemplateSchemaService {
 
   // where is the value of this field, @id or @value?
   static getValueLocation(schema: TemplateSchema, nodeType: InputType, nodeSubtype: InputType) {
-    const ct = TemplateSchemaService.getFieldControlledTerms(schema, nodeType);
-    const ctv = TemplateSchemaService.hasControlledTermValue(schema);
+    const ct = TemplateService.getFieldControlledTerms(schema, nodeType);
+    const ctv = TemplateService.hasControlledTermValue(schema);
     const link = nodeSubtype === InputType.url;
     return (ct || ctv || link) ? '@id' : '@value';
   }
@@ -167,13 +171,11 @@ export class TemplateSchemaService {
   }
 
   static getPageCount(schema: TemplateSchema) {
-    console.log('getPageCount', schema)
     const properties = this.getProperties(schema);
     let currentPage = 0;
     this.getOrder(schema).forEach(function (key) {
       let prop: TemplateSchema = properties[key];
-      let type: InputType = TemplateSchemaService.getInputType(prop);
-      console.log('type',type)
+      let type: InputType = TemplateService.getInputType(prop);
       if (InputTypeService.isPageBreak(type)) {
         currentPage++;
       }
@@ -230,23 +232,7 @@ export class TemplateSchemaService {
     return schema._valueConstraints && schema._valueConstraints.multipleChoice;
   }
 
-  // Function that generates the @type for a field in an instance, based on the schema @type definition
-  static generateInstanceType(value) {
-    const enumeration = this.isUndefined(value.oneOf) ? value.enum : value.oneOf[0].enum;
 
-    // If the type is defined at the schema level
-    if (!this.isUndefined(enumeration)) {
-      // If only one type has been defined, it is returned
-      const instanceType = (enumeration.length === 1) ? enumeration[0] : enumeration;
-      if (instanceType) {
-        return instanceType;
-      }
-    }
-  }
-
-  static generateInstanceTypeForDateField() {
-    return 'xsd:date';
-  }
 
   static generateInstanceTypeForNumericField(schema: TemplateSchema) {
     if (schema._valueConstraints.hasOwnProperty('numberType')) {
@@ -254,33 +240,7 @@ export class TemplateSchemaService {
     }
   }
 
-  static setTextValue(model, key, index, valueLocation, val) {
-    if (Array.isArray(model[key])) {
-      model[key][index][valueLocation] = val;
-    } else {
-      model[key][valueLocation] = val;
-    }
-  }
 
-  static setListValue(model, key, index, valueLocation, val) {
-    if (Array.isArray(model[key])) {
-      let arr = [];
-      for (let i = 0; i < val.length; i++) {
-        arr.push({'@value': val[i]});
-      }
-      model[key] = arr;
-    } else {
-      model[key][valueLocation] = val;
-    }
-  }
-
-  static setRadioValue(model, key, index, valueLocation, val) {
-    if (Array.isArray(model[key])) {
-      model[key][index][valueLocation] = val;
-    } else {
-      model[key][valueLocation] = val;
-    }
-  }
 
   static generateGUID = function () {
     let d = Date.now();
@@ -291,106 +251,6 @@ export class TemplateSchemaService {
     });
     return guid;
   };
-
-  // build the form value for the attribute value field
-  static buildAttributeValue(model, key): any[] {
-    const itemCount = model[key].length;
-    const modelValue = (model && model[key]) ? model[key] : [];
-    let val = [];
-    if (itemCount == 0) {
-      val.push({'@value': null, 'rdfs:label': null})
-    } else {
-      for (let i = 0; i < itemCount; i++) {
-        const itemKey = modelValue[i];
-        const itemValue = model[itemKey]['@value'];
-        val.push({'@value': itemValue, 'rdfs:label': itemKey})
-      }
-    }
-    return val;
-  }
-
-  // set the form values for the attribute value field into the model
-  static setAttributeValue(model, key, index, location, val) {
-    let itemKey = model[key][index];
-    if (itemKey) {
-
-      if (location === 'value') {
-        // change the value
-        model[itemKey]['@value'] = val;
-
-      } else {
-        // change the label
-        const itemValue = model[itemKey]['@value'];
-        const index = model[key].indexOf(itemKey);
-        delete model[itemKey];
-        model['@context'][val] = model['@context'][itemKey];
-        delete model['@context'][itemKey];
-        model[key][index] = val;
-        model[val] = {'@value': itemValue}
-      }
-    } else {
-      // initialize attribute value field with this itemKey
-      let newKey = val;
-      while (model.hasOwnProperty(newKey)) {
-        newKey = newKey + '1';
-      }
-      model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + this.generateGUID();
-      model[key] = [newKey];
-      model[newKey] = {'@value': val};
-    }
-  }
-
-
-  // copy the attribute value field pair at index to a new index
-  static copyAttributeValue(model, key, index) {
-    const oldKey = model[key][index];
-    const oldValue = model[oldKey]['@value'];
-    let newKey = oldKey;
-    while (model.hasOwnProperty(newKey)) {
-      newKey = newKey + '1';
-    }
-    model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + this.generateGUID();
-    model[key].splice(index + 1, 0, newKey);
-    model[newKey] = {'@value': oldValue};
-  };
-
-  // remove the attribute value field pair at index
-  static removeAttributeValue(model, key, index) {
-    const oldKey = model[key][index];
-    delete model['@context'][oldKey];
-    model[key].splice(index, 1);
-    delete model[oldKey]
-  };
-
-  static getRadioValue(model, key, index, valueLocation) {
-    if (Array.isArray(model[key])) {
-      return model[key][index][valueLocation];
-    } else {
-      return model[key][valueLocation];
-    }
-  }
-
-  static addControlledValue(model: any, key: string, value: string, label: string) {
-    let val = {'@id': value, 'rdfs:label': label};
-    model[key] = Array.isArray(model[key]) ? model[key] : [model[key]];
-    model[key].push(val);
-  }
-
-  static removeControlledValue(model: any, key: string, index: number) {
-    model[key].splice(index, 1);
-  }
-
-
-  static setCheckValue(model: any, key: string, index: number, location: string, val: string[]) {
-    let arr = [];
-    for (let i = 0; i < val[index].length; i++) {
-      let obj = {};
-      obj[location] = val[index][i];
-      arr.push(obj);
-    }
-    model[key] = arr;
-  }
-
 
 
 }

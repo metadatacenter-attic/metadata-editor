@@ -1,15 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
 import {FileNode} from "../../models/file-node";
-import {ErrorStateMatcher} from "@angular/material";
 
-/** Error when invalid control is dirty, touched, or submitted. */
-export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
-  }
-}
+
 
 @Component({
   selector: 'cedar-textarea',
@@ -23,7 +16,6 @@ export class TextareaComponent implements OnInit {
   @Input() index: number;
   @Output() changed = new EventEmitter<any>();
 
-  matcher = new MyErrorStateMatcher();
 
   constructor() { }
 
@@ -52,10 +44,17 @@ export class TextareaComponent implements OnInit {
   // get the value out of the model and into something the form can edit
   getValue(model, valueLocation) {
     let result = [];
-    let m = Array.isArray(model) ? model : [model];
-    m.forEach((value, i) => {
-      result.push(value[valueLocation] || '')
-    });
+    if (model) {
+      if (Array.isArray(model)) {
+        model.forEach((value, i) => {
+          result.push(value[valueLocation] || null);
+        });
+      } else {
+        result.push(model[valueLocation] || null);
+      }
+    } else {
+      result.push(null);
+    }
     return result;
   }
 
