@@ -15,9 +15,9 @@
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-      <li class="mat-tree-node" [ngClass]="{'instance__container-dark': darkMode}">
+      <li class="mat-tree-node" >
         <button mat-icon-button disabled></button>
-        <app-question [disabled]="disabled" [node]="node" [classLoader]="classLoader" [parentGroup]="node.formGroup"
+        <app-question [disabled]="disabled" [node]="node" (autocomplete)="onAutocomplete($event)"  [autocompleteResults]="autocompleteResults" [parentGroup]="node.formGroup"
            style="width:100%"></app-question>
       </li>
     </mat-tree-node>
@@ -38,7 +38,6 @@
         <button mat-icon-button class="node-add" *ngIf="!disabled" [matTooltip]="copy" (click)="copyItem(node)"><mat-icon>add_circle_outline</mat-icon></button>
         <button mat-icon-button class="node-remove" *ngIf="!disabled" [matTooltip]="remove"
           (click)="removeItem(node)"><mat-icon>remove_circle_outline</mat-icon></button>
-
                 </span>
         </div>
 

@@ -1,9 +1,10 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChange} from '@angular/core';
 import {Form, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
 import {FileNode} from "../../models/file-node";
+import {Post} from "../../models/post";
 import {TemplateParserService} from "../../services/template-parser.service";
 import {InstanceService} from "../../services/instance.service";
 import {ValidationService} from "../../services/validation.service";
@@ -32,10 +33,13 @@ import {
 })
 export class QuestionComponent implements OnInit {
   @Input() node: FileNode;
-  @Input() classLoader: any;
   @Input() parentGroup: FormGroup;
+  @Input() autocompleteResults: any;
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
+  @Output() autocomplete = new EventEmitter<any>();
+
+
   faAsterisk = faAsterisk;
   faEnvelope = faEnvelope;
   faCalendar = faCalendar;
@@ -59,7 +63,18 @@ export class QuestionComponent implements OnInit {
     this.database = db;
   }
 
+  onAutocomplete(event) {
+    this.autocomplete.emit(event);
+  }
+
+  ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
+    if (changes['autocompleteResults']) {
+      this.autocompleteResults = changes['autocompleteResults']['currentValue'];
+    }
+  }
+
   ngOnInit() {
+    this.autocompleteResults = [];
     // build the array of controls and add it to the parent
     const validators = ValidationService.getValidators(this.node);
     let name;

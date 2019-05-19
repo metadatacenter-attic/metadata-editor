@@ -1,4 +1,3 @@
-
 import {ReactiveFormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
@@ -8,6 +7,8 @@ import {DemoMaterialModule} from "../../../material-module";
 import {InstanceComponent} from "./components/instance/instance.component";
 import {MetadataEditorRoutingModule} from "./metadata-editor-routing.module";
 import {CedarMetadataFormModule} from "../cedar-metadata-form/cedar-metadata-form.module";
+import {NgxYoutubePlayerModule} from "ngx-youtube-player";
+import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import {CedarMetadataFormModule} from "../cedar-metadata-form/cedar-metadata-for
     MetadataEditorRoutingModule,
     DemoMaterialModule,
     SharedModule,
-    CedarMetadataFormModule
+    CedarMetadataFormModule,
+    FontAwesomeModule
   ],
   exports: [
     InstanceComponent

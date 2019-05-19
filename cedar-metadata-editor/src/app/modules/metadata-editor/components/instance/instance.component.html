@@ -15,7 +15,8 @@
         </div>
       </div>
 
-     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" [classLoader]="classLoader" (changed)="onChanged($event)"></cedar-metadata-form>
+     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+     [autocompleteResults]="allPosts"></cedar-metadata-form>
 
       <div>
         <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}

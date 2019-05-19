@@ -43,8 +43,9 @@
         (changed)="onChange($event)"></cedar-list>
 
       <controlled *ngIf="node.type == 'controlled'" [group]="formGroup"
-        [classLoader]="classLoader"
         [valueConstraints]="node.valueConstraints"
+        [autocompleteResults]="autocompleteResults"
+        (autocomplete)="onAutocomplete($event)"
         (onRemovedOption)="onRemovedControlled($event)"
         (onSelectedOption)="onSelectedControlled($event)"></controlled>
 

@@ -19,13 +19,8 @@ export class AttributeValueComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
-    console.log('init av',  this.formGroup.get('values').value, this.getValue(this.node));
-    // this.formGroup.get('values').forEach(function(value) {
-    //
-    // });
     this.formGroup.get('values').setValue(this.getValue(this.node), this.node);
     this.watchChanges();
-
   }
 
   watchChanges() {
@@ -106,7 +101,6 @@ export class AttributeValueComponent implements OnInit {
     } else {
       val.push({'values':[null,null]})
     }
-    console.log('getValue',val);
     return val;
   }
 
@@ -121,7 +115,6 @@ export class AttributeValueComponent implements OnInit {
       const group = this.fb.group({values: this.fb.array(items)});
       arr.push(group);
     });
-    console.log('buildav',arr)
     return arr;
   }
 

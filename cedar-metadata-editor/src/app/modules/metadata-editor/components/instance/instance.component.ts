@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {Subscription} from 'rxjs';
+import {forkJoin, Subscription} from 'rxjs';
 import {FormArray, FormControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {LocalSettingsService} from "../../../../services/local-settings.service";
@@ -9,11 +9,13 @@ import {UiService} from "../../../../services/ui/ui.service";
 import {DataHandlerService} from "../../../../services/data-handler.service";
 import {DataStoreService} from "../../../../services/data-store.service";
 import {TemplateService} from "../../../cedar-metadata-form/services/template.service";
-import {environment} from "../../../../../environments/environment";
 import {DataHandlerDataId} from "../../../shared/model/data-handler-data-id.model";
 import {TemplateSchema} from "../../../cedar-metadata-form/models/template-schema";
 import {DataHandlerDataStatus} from "../../../shared/model/data-handler-data-status.model";
 import {InstanceService} from "../../../cedar-metadata-form/services/instance.service";
+import {AutocompleteService} from "../../services/autocomplete.service";
+import {environment} from "../../../../../environments/environment";
+import {HttpClient} from "@angular/common/http";
 
 
 @Component({
@@ -35,7 +37,6 @@ export class InstanceComponent implements OnInit {
   payload: any;
   jsonLD: any;
   rdf: any;
-  //id: string;
   formValid: boolean;
   viewOnly: boolean = false;
   ui: UiService;
@@ -49,9 +50,11 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
+  allPosts;
 
-  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService, dataHandler: DataHandlerService,
-              dataStore: DataStoreService,) {
+
+  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService,  dataHandler: DataHandlerService,
+              dataStore: DataStoreService, private http: HttpClient, private autocompleteService: AutocompleteService) {
     this.route = route;
     this.ui = ui;
     this._tr = tr;
@@ -62,13 +65,21 @@ export class InstanceComponent implements OnInit {
 
   }
 
-  classLoader(param) {
-    console.log('classLoader', param);
+  protected onAutocomplete(event) {
+    if (event['search']) {
+      forkJoin(this.autocompleteService.getPosts(event['search'], event.constraints)).subscribe(posts => {
+        this.allPosts = [];
+        for (let i = 0; i < posts.length; i++) {
+          this.allPosts = this.allPosts.concat(posts[i]['collection']);
+        }
+      });
+    }
   }
 
   ngOnInit() {
     this.form = new FormGroup({});
     this.route.params.subscribe((val) => {
+      this.allPosts = [];
       this.initialize(val.instanceId, val.templateId);
     });
 
