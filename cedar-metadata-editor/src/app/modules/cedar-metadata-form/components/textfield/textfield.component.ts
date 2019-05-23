@@ -1,8 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup} from "@angular/forms";
 
-import {FileNode} from "../../models/file-node";
-import {ValidationService} from "../../services/validation.service";
+import {TreeNode} from "../../models/tree-node.model";
+import {ValidatorService} from "../../services/validator.service";
+
 
 @Component({
   selector: 'cedar-textfield',
@@ -12,7 +13,7 @@ import {ValidationService} from "../../services/validation.service";
 export class TextfieldComponent implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() control: FormControl;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() index: number;
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
@@ -44,7 +45,7 @@ export class TextfieldComponent implements OnInit {
   }
 
   setValidators(formGroup:FormGroup) {
-    const validators = ValidationService.getValidators(this.node);
+    const validators = ValidatorService.getValidators(this.node);
     this.formGroup.get('values')['controls'].forEach(function(control) {
       control.setValidators(validators);
       control.updateValueAndValidity();

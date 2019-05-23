@@ -1,14 +1,14 @@
 import {Injectable} from "@angular/core";
-import {FileNode} from "../models/file-node";
+import {TreeNode} from "../models/tree-node.model";
 import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from "@angular/forms";
 import {InputType} from "../models/input-type";
 
 
 @Injectable()
-export class ValidationService {
+export class ValidatorService {
 
 
-  static getValidators(node: FileNode) {
+  static getValidators(node: TreeNode) {
     const validators = [];
     if (node.required) {
       validators.push(Validators.required);

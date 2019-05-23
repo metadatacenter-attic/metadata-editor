@@ -1,10 +1,9 @@
 
-
 .instance__container {
-  margin:50px auto;
-  //color:#000;
-  max-width:80%;
-  //background-color: #f2f2f3;
+  margin: 50px auto;
+  overflow: auto;
+  max-width: 70%; /* fallback if needed */
+  max-width: calc(80% - 10em);
 }
 
 .tab-header {
@@ -14,9 +13,8 @@
 }
 
 .instance__container-dark {
-  color:#fff;
+  color: #fff;
 }
-
 
 
 .toggle-button__container {
@@ -79,14 +77,14 @@
 }
 
 pre {
-  font-family: monaco,consolas,"courier new",monospace;
+  font-family: monaco, consolas, "courier new", monospace;
   font-size: 1em;
   min-height: 3em;
   overflow: auto;
   padding: 0 1em;
   display: inline-block;
-  white-space: pre-wrap;       /* css-3 */
-  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-  white-space: -o-pre-wrap;    /* Opera 7 */
-  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
 }

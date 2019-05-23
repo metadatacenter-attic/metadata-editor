@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {FormGroup} from "@angular/forms";
+import {TreeNode} from "../../models/tree-node.model";
 
 
 @Component({
@@ -10,7 +10,7 @@ import {FileNode} from "../../models/file-node";
 })
 export class ImageComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
 
 
   constructor() {}
@@ -20,7 +20,7 @@ export class ImageComponent implements OnInit {
 
 
 
-  getImageWidth(node: FileNode) {
+  getImageWidth(node: TreeNode) {
     let result = 367;
     if (node.size && node.size.width && Number.isInteger(node.size.width)) {
       result = node.size.width;
@@ -28,7 +28,7 @@ export class ImageComponent implements OnInit {
     return result;
   }
 
-  getImageHeight(node: FileNode) {
+  getImageHeight(node: TreeNode) {
     if (node.size && node.size.height && Number.isInteger(node.size.height)) {
       return node.size.height;
     }

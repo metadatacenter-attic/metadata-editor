@@ -10,7 +10,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import {TemplateParserService} from "../../services/template-parser.service";
 import {UiService} from "../../../../services/ui/ui.service";
 import {TemplateService} from "../../services/template.service";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 import {InputTypeService} from "../../services/input-type.service";
 import {InstanceService} from "../../services/instance.service";
 
@@ -35,8 +35,8 @@ export class FormComponent implements OnChanges {
 
 
   title: string;
-  dataSource: MatTreeNestedDataSource<FileNode>;
-  treeControl: NestedTreeControl<FileNode>;
+  dataSource: MatTreeNestedDataSource<TreeNode>;
+  treeControl: NestedTreeControl<TreeNode>;
   database: TemplateParserService;
   route: ActivatedRoute;
   response: any = {payload: null, jsonLD: null, rdf: null, formValid: false};
@@ -49,7 +49,7 @@ export class FormComponent implements OnChanges {
     this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};
     this.database = database;
     this.dataSource = new MatTreeNestedDataSource();
-    this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.treeControl = new NestedTreeControl<TreeNode>(this._getChildren);
     this.route = route;
   }
 
@@ -106,9 +106,9 @@ export class FormComponent implements OnChanges {
     }
   }
 
-  private hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
+  private hasNestedChild = (_: number, nodeData: TreeNode) => !nodeData.type;
 
-  private _getChildren = (node: FileNode) => node.children;
+  private _getChildren = (node: TreeNode) => node.children;
 
   initialize() {
 
@@ -124,14 +124,14 @@ export class FormComponent implements OnChanges {
         if (data && data.length > 0) {
           this.dataSource = new MatTreeNestedDataSource();
           this.dataSource.data = data;
-          this.treeControl = new NestedTreeControl<FileNode>(this._getChildren);
+          this.treeControl = new NestedTreeControl<TreeNode>(this._getChildren);
         }
       });
       this.onChanges();
     }
   }
 
-  getPageCount(nodes: FileNode[]) {
+  getPageCount(nodes: TreeNode[]) {
     let count = 0;
     nodes.forEach(function (node) {
       if (InputTypeService.isPageBreak(node.subtype)) {
@@ -149,7 +149,7 @@ export class FormComponent implements OnChanges {
   }
 
   // add new element to form
-  copyItem(node: FileNode) {
+  copyItem(node: TreeNode) {
     const itemModel = cloneDeep(node.model[node.key][node.itemCount]);
     node.model[node.key].splice(node.itemCount + 1, 0, itemModel);
 
@@ -175,7 +175,7 @@ export class FormComponent implements OnChanges {
   }
 
   // delete last element in node array
-  removeItem(node: FileNode) {
+  removeItem(node: TreeNode) {
     const siblings = node.parent ? node.parent.children : this.database.data;
     const index = siblings.indexOf(node);
     siblings.splice(index, 1);
@@ -195,7 +195,7 @@ export class FormComponent implements OnChanges {
 
 
   // reset the model down the tree at itemCount
-  updateModel(node: FileNode, model) {
+  updateModel(node: TreeNode, model) {
     node.model = model;
 
     if (node.children) {

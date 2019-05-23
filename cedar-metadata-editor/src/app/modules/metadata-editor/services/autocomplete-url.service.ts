@@ -188,7 +188,6 @@ export class AutocompleteUrlService {
       url += "/search?q=" + encodeURIComponent(query) +
         "&scope=classes&sources=" + acronym + "&suggest=true&" + this.paging(page, size, 1, 500, 'page', 'page_size');
     }
-    console.log('autocompleteOntology',url)
     return url;
   };
 

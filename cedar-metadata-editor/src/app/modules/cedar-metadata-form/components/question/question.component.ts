@@ -3,10 +3,10 @@ import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 import {InputTypeService} from "../../services/input-type.service";
 import {InputType} from "../../models/input-type";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 import {TemplateParserService} from "../../services/template-parser.service";
 import {InstanceService} from "../../services/instance.service";
-import {ValidationService} from "../../services/validation.service";
+import {ValidatorService} from "../../services/validator.service";
 import {
   faAsterisk,
   faCalendar,
@@ -31,7 +31,7 @@ import {
   providers: []
 })
 export class QuestionComponent implements OnInit {
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() parentGroup: FormGroup;
   @Input() autocompleteResults: any;
   @Input() disabled: boolean;
@@ -75,9 +75,10 @@ export class QuestionComponent implements OnInit {
   ngOnInit() {
     this.autocompleteResults = [];
     // build the array of controls and add it to the parent
-    const validators = ValidationService.getValidators(this.node);
+    const validators = ValidatorService.getValidators(this.node);
     let name;
     let obj;
+    console.log('question',this.node);
 
     switch (this.node.type) {
 
@@ -182,8 +183,8 @@ export class QuestionComponent implements OnInit {
     return result;
   }
 
-  copyItem(node: FileNode, index: number) {
-    const validators = ValidationService.getValidators(this.node);
+  copyItem(node: TreeNode, index: number) {
+    const validators = ValidatorService.getValidators(this.node);
 
     switch (this.node.type) {
       case InputType.controlled:
@@ -213,8 +214,8 @@ export class QuestionComponent implements OnInit {
     }
   }
 
-  removeItem(node: FileNode, index: number) {
-    const validators = ValidationService.getValidators(this.node);
+  removeItem(node: TreeNode, index: number) {
+    const validators = ValidatorService.getValidators(this.node);
     switch (node.type) {
 
       case InputType.controlled:
@@ -256,7 +257,7 @@ export class QuestionComponent implements OnInit {
     return arr;
   }
 
-  private buildControlled(node: FileNode, disabled: boolean): any[] {
+  private buildControlled(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
     if (node.model[node.key]) {
       if (Array.isArray(node.model[node.key])) {
@@ -294,7 +295,7 @@ export class QuestionComponent implements OnInit {
     return arr;
   };
 
-  private buildControlledSingle(node: FileNode, disabled: boolean): any[] {
+  private buildControlledSingle(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
     if (Array.isArray(node.model[node.key])) {
       node.model[node.key].forEach((value) => {
@@ -318,7 +319,7 @@ export class QuestionComponent implements OnInit {
   };
 
   // build the attribute value form controls
-  private buildAV(node: FileNode, disabled: boolean): any[] {
+  private buildAV(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
     if (node.model[node.key] && node.model[node.key].length) {
       node.model[node.key].forEach((value) => {

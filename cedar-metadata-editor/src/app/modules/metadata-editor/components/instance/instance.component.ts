@@ -10,7 +10,7 @@ import {DataHandlerService} from "../../../../services/data-handler.service";
 import {DataStoreService} from "../../../../services/data-store.service";
 import {TemplateService} from "../../../cedar-metadata-form/services/template.service";
 import {DataHandlerDataId} from "../../../shared/model/data-handler-data-id.model";
-import {TemplateSchema} from "../../../cedar-metadata-form/models/template-schema";
+import {TemplateSchema} from "../../../cedar-metadata-form/models/template-schema.model";
 import {DataHandlerDataStatus} from "../../../shared/model/data-handler-data-status.model";
 import {InstanceService} from "../../../cedar-metadata-form/services/instance.service";
 import {AutocompleteService} from "../../services/autocomplete.service";

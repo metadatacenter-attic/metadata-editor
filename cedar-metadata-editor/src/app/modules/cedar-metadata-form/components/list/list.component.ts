@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormGroup} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 
 @Component({
   selector: 'cedar-list',
@@ -9,7 +9,7 @@ import {FileNode} from "../../models/file-node";
 })
 export class ListComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Output() changed = new EventEmitter<any>();
 
 

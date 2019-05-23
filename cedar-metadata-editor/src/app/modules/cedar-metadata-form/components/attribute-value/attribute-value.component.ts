@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 import {TemplateService} from "../../services/template.service";
 
 @Component({
@@ -10,7 +10,7 @@ import {TemplateService} from "../../services/template.service";
 })
 export class AttributeValueComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() disabled: boolean;
   @Output() changed = new EventEmitter<any>();
 
@@ -105,7 +105,7 @@ export class AttributeValueComponent implements OnInit {
   }
 
   // build the av form controls
-  private buildAV(node: FileNode, disabled: boolean): any[] {
+  private buildAV(node: TreeNode, disabled: boolean): any[] {
 
     const arr = [];
     node.model[node.key].forEach((value) => {
@@ -131,7 +131,7 @@ export class AttributeValueComponent implements OnInit {
   };
 
 
-  copy(node: FileNode, index: number) {
+  copy(node: TreeNode, index: number) {
     this.copyAttributeValue(node.model, node.key, index);
     this.formGroup.setControl('values', this.fb.array(this.buildAV(this.node, this.disabled)));
     this.formGroup.get('values').setValue(this.getValue(this.node));
@@ -148,11 +148,11 @@ export class AttributeValueComponent implements OnInit {
     delete model[oldKey]
   };
 
-  removeable(node: FileNode) {
+  removeable(node: TreeNode) {
     return node.model[node.key].length > 1;
   }
 
-  remove(node: FileNode, index: number) {
+  remove(node: TreeNode, index: number) {
     if (node.model[node.key].length > 1) {
       this.removeAttributeValue(node.model, node.key, index);
       this.formGroup.setControl('values', this.fb.array(this.buildAV(this.node, this.disabled)));
