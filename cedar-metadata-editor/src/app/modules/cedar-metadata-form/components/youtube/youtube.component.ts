@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 import {NgxYoutubePlayerModule} from "ngx-youtube-player";
 
 @Component({
@@ -12,7 +12,7 @@ import {NgxYoutubePlayerModule} from "ngx-youtube-player";
 
 export class YoutubeComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
 
 
   constructor(private yt: NgxYoutubePlayerModule) {
@@ -30,13 +30,13 @@ export class YoutubeComponent implements OnInit {
     console.log('onChange', event);
   }
 
-  getImageWidth(node: FileNode) {
+  getImageWidth(node: TreeNode) {
     if (node.size && node.size.width && Number.isInteger(node.size.width)) {
       return node.size.width;
     }
   }
 
-  getImageHeight(node: FileNode) {
+  getImageHeight(node: TreeNode) {
     if (node.size && node.size.height && Number.isInteger(node.size.height)) {
       return node.size.height;
     }

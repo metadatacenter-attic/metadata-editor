@@ -1,5 +1,5 @@
 
-export interface MetadataModel {
+export interface Metadata {
   '@context'?: {
     'rdfs': string,
     'xsd': string,
@@ -46,5 +46,4 @@ export interface MetadataModel {
 }
 
 
-export interface MetadataSnip {
-}
+

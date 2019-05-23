@@ -1,12 +1,9 @@
 import {FormGroup} from '@angular/forms';
 
-
-import {MetadataModel} from './metadata-model';
+import {Metadata} from './metadata.model';
 import {InputType} from "../models/input-type";
 
-
-
-export interface FileNode {
+export interface TreeNode {
   key: string;
   name: string;
 
@@ -18,9 +15,9 @@ export interface FileNode {
   subtype?: InputType;
 
   formGroup?: FormGroup;
-  parent?: FileNode;
+  parent?: TreeNode;
   parentGroup?: FormGroup;
-  children?: FileNode[];
+  children?: TreeNode[];
 
   help?: string;
   placeholder?: string;
@@ -36,11 +33,10 @@ export interface FileNode {
   multiSelect?: boolean;
 
   options?: any;
-  size?:any;
+  size?: any;
   staticValue?: any[];
-  // label?: any[];
 
-  model?:MetadataModel;
-  valueLocation?:string;
-  valueConstraints?:any;
+  model?: Metadata;
+  valueLocation?: string;
+  valueConstraints?: any;
 }

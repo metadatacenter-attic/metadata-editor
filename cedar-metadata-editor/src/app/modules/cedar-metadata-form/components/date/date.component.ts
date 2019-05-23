@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 
 @Component({
   selector: 'cedar-date',
@@ -10,7 +10,7 @@ import {FileNode} from "../../models/file-node";
 export class DateComponent implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() control: FormControl;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() index: number;
   @Output() changed = new EventEmitter<any>();
 

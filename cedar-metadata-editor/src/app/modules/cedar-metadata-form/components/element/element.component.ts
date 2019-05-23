@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core'
 import {FormGroup} from '@angular/forms';
 import {Subscription} from "rxjs";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 import {UiService} from "../../../../services/ui/ui.service";
 
 
@@ -15,7 +15,7 @@ import {UiService} from "../../../../services/ui/ui.service";
 export class ElementComponent {
 
 
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() parentGroup: FormGroup;
   @Input() formGroup: FormGroup;
   @Input() index: number;

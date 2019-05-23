@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {InputTypeService} from "./input-type.service";
-import {TemplateSchema} from "../models/template-schema";
-import {InputType} from "../models/input-type";
+import {TemplateSchema} from "../models/template-schema.model";
+
 
 @Injectable()
 export class InstanceService {

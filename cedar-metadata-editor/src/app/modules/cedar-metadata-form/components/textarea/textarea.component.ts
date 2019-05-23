@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
-import {FileNode} from "../../models/file-node";
+import {TreeNode} from "../../models/tree-node.model";
 
 
 
@@ -12,7 +12,7 @@ import {FileNode} from "../../models/file-node";
 export class TextareaComponent implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() control: FormControl;
-  @Input() node: FileNode;
+  @Input() node: TreeNode;
   @Input() index: number;
   @Output() changed = new EventEmitter<any>();
 

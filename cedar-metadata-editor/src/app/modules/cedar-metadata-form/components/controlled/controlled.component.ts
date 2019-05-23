@@ -3,7 +3,7 @@ import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {MatAutocompleteSelectedEvent, MatChipInputEvent} from '@angular/material';
 import {debounceTime} from 'rxjs/operators';
 
-import {Post} from '../../models/post';
+import {Post} from '../../models/post.model';
 
 @Component({
   selector: 'controlled',
