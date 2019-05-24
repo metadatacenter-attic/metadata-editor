@@ -1,37 +1,37 @@
 
 export interface Metadata {
   '@context'?: {
-    'rdfs': string,
-    'xsd': string,
-    'pav': string,
-    'schema': string,
-    'oslc': string,
-    'skos': string,
-    'rdfs:label': {
+    'rdfs'?: string,
+    'xsd'?: string,
+    'pav'?: string,
+    'schema'?: string,
+    'oslc'?: string,
+    'skos'?: string,
+    'rdfs:label'?: {
       '@type': string
     },
-    'schema:isBasedOn': {
+    'schema:isBasedOn'?: {
       '@type': string
     },
-    'schema:name': {
+    'schema:name'?: {
       '@type': string
     },
-    'schema:description': {
+    'schema:description'?: {
       '@type': string
     },
-    'pav:createdOn': {
+    'pav:createdOn'?: {
       '@type': string
     },
-    'pav:createdBy': {
+    'pav:createdBy'?: {
       '@type': string
     },
-    'pav:lastUpdatedOn': {
+    'pav:lastUpdatedOn'?: {
       '@type': string
     },
-    'oslc:modifiedBy': {
+    'oslc:modifiedBy'?: {
       '@type': string
     },
-    'skos:notation': {
+    'skos:notation'?: {
       '@type': string
     }
   };

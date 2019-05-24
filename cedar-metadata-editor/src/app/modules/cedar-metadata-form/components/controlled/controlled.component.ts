@@ -62,9 +62,6 @@ export class ControlledComponent implements OnInit {
   }
 
   ngOnInit() {
-    let sample = [{prefLabel: "banana"}, {prefLabel: "orange"}, {prefLabel: "apple"}];
-    console.log(this.filterItems(sample, "ap"));
-
     this.group.controls['values']['controls'][0].get('search').valueChanges.pipe(debounceTime(500)).subscribe(val => {
       this.search = val;
       this.autocomplete.emit({"search": val, "constraints": this.valueConstraints});

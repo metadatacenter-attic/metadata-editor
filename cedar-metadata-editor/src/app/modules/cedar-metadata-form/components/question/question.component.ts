@@ -78,7 +78,6 @@ export class QuestionComponent implements OnInit {
     const validators = ValidatorService.getValidators(this.node);
     let name;
     let obj;
-    console.log('question',this.node);
 
     switch (this.node.type) {
 
@@ -95,21 +94,21 @@ export class QuestionComponent implements OnInit {
       case InputType.controlled:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildControlled(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.date:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.textfield:
       case InputType.textarea:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.radio:
@@ -118,13 +117,13 @@ export class QuestionComponent implements OnInit {
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.checkbox:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleOptions(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.list:
@@ -133,18 +132,18 @@ export class QuestionComponent implements OnInit {
         obj[name] = new FormControl(this.fb.array([]));
         this.formGroup = this.fb.group(obj);
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
 
       case InputType.attributeValue:
         this.formGroup = this.fb.group({values: this.fb.array(this.buildAV(this.node, this.disabled))});
         this.parentGroup.setControl(this.node.key, this.formGroup);
-        this.setDisable(this.formGroup,this.disabled);
+        this.setDisable(this.formGroup, this.disabled);
         break;
     }
   }
 
-  setDisable(formGroup:FormGroup, disabled) {
+  setDisable(formGroup: FormGroup, disabled) {
     if (disabled) {
       formGroup.disable()
     }
@@ -251,7 +250,11 @@ export class QuestionComponent implements OnInit {
 
   private allowMultipleControls(node, disabled: boolean, validators): any[] {
     const arr = [];
-    for (let i = 0; i < this.getLength(node.model[node.key]); i++) {
+    if (node.model && node.model[node.key]) {
+      for (let i = 0; i < this.getLength(node.model[node.key]); i++) {
+        arr.push(new FormControl({value: null, disabled: disabled, validators: validators}));
+      }
+    } else {
       arr.push(new FormControl({value: null, disabled: disabled, validators: validators}));
     }
     return arr;
@@ -259,10 +262,11 @@ export class QuestionComponent implements OnInit {
 
   private buildControlled(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
+    let chips = [];
+    let ids = [];
     if (node.model[node.key]) {
       if (Array.isArray(node.model[node.key])) {
-        let chips = [];
-        let ids = [];
+
         node.model[node.key].forEach((value) => {
           chips.push(value['rdfs:label']);
           ids.push(value['@id']);
@@ -276,17 +280,24 @@ export class QuestionComponent implements OnInit {
         arr.push(group);
 
       } else {
+
+        if (node.model[node.key].hasOwnProperty('rdfs:label')) {
+          chips.push(node.model[node.key]['rdfs:label']);
+          ids.push(node.model[node.key]['@id']);
+        }
+
         let group = this.fb.group({
-          chips: this.fb.array([node.model[node.key]['rdfs:label']]),
-          ids: this.fb.array([node.model[node.key]['@id']]),
+          chips: this.fb.array(chips),
+          ids: this.fb.array(ids),
           search: new FormControl({disabled: disabled})
         });
+
         arr.push(group);
       }
     } else {
       let group = this.fb.group({
-        chips: this.fb.array([]),
-        ids: this.fb.array([]),
+        chips: this.fb.array(chips),
+        ids: this.fb.array(ids),
         search: new FormControl({disabled: disabled})
       });
       arr.push(group);
