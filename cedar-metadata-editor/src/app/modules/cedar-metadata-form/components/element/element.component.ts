@@ -28,7 +28,6 @@ export class ElementComponent {
   }
 
   ngOnInit() {
-    console.log('ngOnInit', this.node.key, this.node.itemCount, this.node.model[this.node.key], this.parentGroup);
     if (this.parentGroup) {
       this.parentGroup.addControl(this.node.key, this.formGroup);
     }

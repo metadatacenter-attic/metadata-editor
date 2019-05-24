@@ -150,8 +150,9 @@ export class FormComponent implements OnChanges {
 
   // add new element to form
   copyItem(node: TreeNode) {
-    const itemModel = cloneDeep(node.model[node.key][node.itemCount]);
-    node.model[node.key].splice(node.itemCount + 1, 0, itemModel);
+
+    const clonedModel = cloneDeep(node.model[node.key][node.itemCount]);
+    node.model[node.key].splice(node.itemCount + 1, 0, clonedModel);
 
     let clonedNode = cloneDeep(node);
     clonedNode.model = node.model;
@@ -167,10 +168,8 @@ export class FormComponent implements OnChanges {
       }
     }
     this.updateModel(clonedNode, node.model);
-
-    const parent = node.parentGroup || this.form;
-    parent.addControl((clonedNode.key + clonedNode.itemCount), clonedNode.formGroup);
-
+    const parentGroup = node.parentGroup || this.form;
+    parentGroup.addControl((clonedNode.key + clonedNode.itemCount), clonedNode.formGroup);
     this.database.dataChange.next(this.database.data);
   }
 
@@ -190,12 +189,12 @@ export class FormComponent implements OnChanges {
     const parent = node.parentGroup || this.form;
     parent.removeControl((node.key + node.itemCount));
     this.database.dataChange.next(this.database.data);
-    //this.form.updateValueAndValidity({onlySelf: false, emitEvent: true});
   }
 
 
   // reset the model down the tree at itemCount
   updateModel(node: TreeNode, model) {
+
     node.model = model;
 
     if (node.children) {
@@ -204,11 +203,16 @@ export class FormComponent implements OnChanges {
       let key = node.key;
       let itemCount = node.itemCount;
 
-      node.children.forEach(function (child) {
-        that.updateModel(child, model[key][itemCount]);
-      });
-    } else {
-      node.model = model;
+      if (Array.isArray(model[key])) {
+        node.children.forEach(function (child) {
+          that.updateModel(child, model[key][itemCount]);
+        });
+      } else {
+        node.children.forEach(function (child) {
+          that.updateModel(child, model[key]);
+        });
+      }
+      
     }
   }
 

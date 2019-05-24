@@ -114,6 +114,120 @@ export class TemplateService {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateElement');
   }
 
+  static isTemplate(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/Template');
+  }
+
+  static getNodeType( inputType: InputType): InputType {
+    let result: InputType;
+    switch (inputType) {
+      case InputType.numeric:
+      case InputType.phoneNumber:
+      case InputType.email:
+      case InputType.link:
+        result = InputType.textfield;
+        break;
+      case InputType.pageBreak:
+      case InputType.sectionBreak:
+      case InputType.richText:
+      case InputType.image:
+      case InputType.youTube:
+        result = InputType.static;
+        break;
+      default:
+        result = inputType;
+        break;
+    }
+    return result;
+  }
+
+  static getNodeSubtype(inputType) {
+    let result: InputType;
+    switch (inputType) {
+      case InputType.youTube:
+        result = InputType.youTube;
+        break;
+      case InputType.image:
+        result = InputType.image;
+        break;
+      case InputType.richText:
+        result = InputType.richText;
+        break;
+      case InputType.sectionBreak:
+        result = InputType.sectionBreak;
+        break;
+      case InputType.pageBreak:
+        result = InputType.pageBreak;
+        break;
+      case InputType.email:
+        result = InputType.email;
+        break;
+      case InputType.numeric:
+        result = InputType.number;
+        break;
+      case InputType.link:
+        result = InputType.url;
+        break;
+      case InputType.phoneNumber:
+        result = InputType.tel;
+        break;
+      default:
+        result = InputType.text;
+        break;
+    }
+    return result;
+  }
+
+  static initValue(schema: TemplateSchema, type:InputType, minItems:number, maxItems:number) {
+    console.log('initValue',type, location, this.isUndefined(minItems))
+    let result;
+    if (type == InputType.element) {
+      console.log('initValue element', minItems)
+      if (!this.isUndefined(minItems)) {
+        result = [{'@context':{},'@id':schema['@id']}];
+      } else {
+        result = {'@context':{},'@id':schema['@id']};
+      }
+    } else {
+    let location = this.getValueLocation(schema, this.getNodeType(type), this.getNodeSubtype(type));
+
+    if (location == '@value') {
+      if (!this.isUndefined(minItems)) {
+        result = [];
+        for (let i=0; i<minItems; i++) {
+          let item = {'@value': null};
+          if (type == InputType.date) {
+            item['@type'] = 'xsd:date';
+          }
+          result.push(item)
+        }
+      } else {
+        result = {'@value': null};
+        if (type == InputType.date) {
+          result['@type'] = 'xsd:date';
+        }
+      }
+    } else {
+      if (type == InputType.controlled) {
+        if (!this.isUndefined(minItems)) {
+          result = [];
+        } else {
+          result = {};
+        }
+      } else if (!this.isUndefined(minItems)) {
+        result = [];
+        for (let i=0; i<minItems; i++) {
+          let item = {};
+          result.push(item)
+        }
+      } else {
+        result = {};
+      }
+    }
+    }
+    return result;
+  }
+
   // does this field have a value constraint?
   static hasControlledTermValue(schema: TemplateSchema) {
     let result = false;

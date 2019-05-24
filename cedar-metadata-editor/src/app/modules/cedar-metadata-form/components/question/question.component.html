@@ -62,11 +62,11 @@
 
 
           <div *ngIf="node.multiSelect" style="padding-top:.5em">
-            {{node.name}} ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
-            <button mat-icon-button class="mat-icon-button help" *ngIf="!disabled" (click)="copyItem(node,i)">
+            {{node.name}}  ({{(i + 1)}}  of {{ node.maxItems || 'N' }})
+            <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="copyItem(node,i)">
               <mat-icon>add_circle_outline</mat-icon>
             </button>
-            <button mat-icon-button class="mat-icon-button help" *ngIf="!disabled" (click)="removeItem(node,i)">
+            <button mat-icon-button class="node-remove" *ngIf="!disabled" (click)="removeItem(node,i)">
               <mat-icon>remove_circle_outline</mat-icon>
             </button>
           </div>

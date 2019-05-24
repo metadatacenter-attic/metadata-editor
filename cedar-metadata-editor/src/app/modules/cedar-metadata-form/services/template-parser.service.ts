@@ -37,7 +37,7 @@ export class TemplateParserService {
 
   initialize(formGroup: FormGroup, instance: any, template: any, page: number): any {
     this.templateSchema = template as TemplateSchema;
-    this.instanceModel = instance as Metadata;
+    this.instanceModel = (instance || {}) as Metadata;
     this.formGroup = formGroup;
     this.pageIndex = 0;
     this.dataChange.next(this.buildTree(this.templateSchema, this.instanceModel, 0, this.formGroup, null, page));
@@ -119,8 +119,8 @@ export class TemplateParserService {
   }
 
   static staticNode(schema: TemplateSchema, model: Metadata, inputType: InputType, minItems, maxItems, key: string, modelValue: MetadataSnip, formGroup: FormGroup, parent: TreeNode): TreeNode {
-    const nodeType = TemplateParserService.getNodeType(schema, inputType);
-    const nodeSubtype = TemplateParserService.getNodeSubtype(inputType);
+    const nodeType = TemplateService.getNodeType(inputType);
+    const nodeSubtype = TemplateService.getNodeSubtype(inputType);
     return {
       'key': key,
       'model': model,
@@ -141,8 +141,12 @@ export class TemplateParserService {
   }
 
   fieldNode(schema: TemplateSchema, model: Metadata, propertyLabel: string, inputType: InputType, minItems, maxItems, key: string, modelValue: MetadataSnip, formGroup: FormGroup, parent: TreeNode): TreeNode {
-    const nodeType = TemplateParserService.getNodeType(schema, inputType);
-    const nodeSubtype = TemplateParserService.getNodeSubtype(inputType);
+    const nodeType = TemplateService.getNodeType(inputType);
+    const nodeSubtype = TemplateService.getNodeSubtype(inputType);
+    console.log('fieldNode',model, key,  modelValue);
+
+
+
     return {
       'key': key,
       'name': TemplateService.getTitle(schema, propertyLabel),
@@ -184,8 +188,10 @@ export class TemplateParserService {
   }
 
   elementNode(schema: TemplateSchema, model: Metadata, label: string, minItems, maxItems, i, key, level, modelValue, formGroup: FormGroup, parent: TreeNode, page: number): TreeNode {
-    const nodeType = TemplateParserService.getNodeType(schema, InputType.element);
-    const nodeSubtype = TemplateParserService.getNodeSubtype(InputType.element);
+    const nodeType = TemplateService.getNodeType(InputType.element);
+    const nodeSubtype = TemplateService.getNodeSubtype(InputType.element);
+    console.log('elementNode',key, model);
+
     const node = {
       'key': key,
       'name': TemplateService.getTitle(schema),
@@ -241,15 +247,37 @@ export class TemplateParserService {
 
     return order.reduce<TreeNode[]>((accumulator, key) => {
       if (!TemplateService.isSpecialKey(key)) {
+
         const value = properties[key];
         const maxItems = value['maxItems'];
         const minItems = value['minItems'];
         const schema = TemplateService.schemaOf(value);
         const type = TemplateService.getInputType(schema);
         const label = labels[key];
-        const modelValue = (model && model[key]) ? model[key] : [];
+
+
+
+        console.log('buildTree', key, type, !model.hasOwnProperty(key));
+        if (!model.hasOwnProperty(key) ) {
+
+          model['@context'][key] = schema['@id'];
+
+          if (TemplateService.isElement(schema)) {
+            model[key] = TemplateService.initValue(schema, InputType.element, minItems, maxItems);
+
+          } else if (TemplateService.isField(schema)){
+            model[key] = TemplateService.initValue(schema, type, minItems, maxItems);
+
+          }
+        }
+        const modelValue = model[key];
+        console.log('modelValue', key, modelValue);
+
+
+
 
         if (TemplateService.isElement(schema)) {
+
           let itemCount = modelValue.length ? modelValue.length : 1;
 
           for (let i = 0; i < itemCount; i++) {
