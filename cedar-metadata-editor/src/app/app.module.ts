@@ -17,6 +17,7 @@ import {UiService} from './services/ui/ui.service';
 import {DemoMaterialModule} from '../material-module';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -39,6 +40,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DemoMaterialModule,
     HttpClientModule,
     FlexLayoutModule,
+    FontAwesomeModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

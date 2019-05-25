@@ -41,6 +41,10 @@ export class InstanceService {
     return instance['schema:name'];
   }
 
+  static getDescription(instance: any) {
+    return instance['schema:description'];
+  }
+
   // Function that generates the @type for a field in an instance, based on the schema @type definition
   static generateInstanceType(value) {
     const enumeration = this.isUndefined(value.oneOf) ? value.enum : value.oneOf[0].enum;

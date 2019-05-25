@@ -8,6 +8,7 @@ import {TemplateParserService} from "../../services/template-parser.service";
 import {InstanceService} from "../../services/instance.service";
 import {ValidatorService} from "../../services/validator.service";
 import {
+  faSquare,
   faAsterisk,
   faCalendar,
   faCheckSquare,
@@ -52,6 +53,7 @@ export class QuestionComponent implements OnInit {
   faDotCircle = faDotCircle;
   faExternalLinkAlt = faExternalLinkAlt;
   faPlusSquare = faPlusSquare;
+  faSquare = faSquare;
 
   database: TemplateParserService;
   formGroup: FormGroup;
