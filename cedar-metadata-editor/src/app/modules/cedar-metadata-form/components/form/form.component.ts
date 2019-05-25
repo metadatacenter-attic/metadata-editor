@@ -35,6 +35,7 @@ export class FormComponent implements OnChanges {
 
 
   title: string;
+  description: string;
   dataSource: MatTreeNestedDataSource<TreeNode>;
   treeControl: NestedTreeControl<TreeNode>;
   database: TemplateParserService;
@@ -117,6 +118,7 @@ export class FormComponent implements OnChanges {
 
       //this.form = new FormGroup({});
       this.title = InstanceService.getTitle(this.instance) || TemplateService.getTitle(this.template);
+      this.description = InstanceService.getDescription(this.instance) || TemplateService.getDescription(this.template);
       this.database.initialize(this.form, this.instance, this.template, this.pageEvent.pageIndex);
 
 
@@ -150,6 +152,7 @@ export class FormComponent implements OnChanges {
 
   // add new element to form
   copyItem(node: TreeNode) {
+    console.log('copyItem', Array.isArray(node.model[node.key]))
 
     const clonedModel = cloneDeep(node.model[node.key][node.itemCount]);
     node.model[node.key].splice(node.itemCount + 1, 0, clonedModel);

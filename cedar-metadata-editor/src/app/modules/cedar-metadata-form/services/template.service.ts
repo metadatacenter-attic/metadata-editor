@@ -110,6 +110,10 @@ export class TemplateService {
     return TemplateService.getPrefLabel(schema) || label || TemplateService.getName(schema);
   }
 
+  static getDescription(schema: any) {
+    return schema['schema:description'];
+  }
+
   static isElement(schema: TemplateSchema) {
     return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateElement');
   }
@@ -178,11 +182,10 @@ export class TemplateService {
     return result;
   }
 
-  static initValue(schema: TemplateSchema, type:InputType, minItems:number, maxItems:number) {
-    console.log('initValue',type, location, this.isUndefined(minItems))
+  static initValue(schema: TemplateSchema, key:string, type:InputType, minItems:number, maxItems:number) {
     let result;
     if (type == InputType.element) {
-      console.log('initValue element', minItems)
+      console.log('initValue element',key, minItems);
       if (!this.isUndefined(minItems)) {
         result = [{'@context':{},'@id':schema['@id']}];
       } else {

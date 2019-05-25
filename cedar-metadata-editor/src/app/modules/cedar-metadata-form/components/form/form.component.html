@@ -1,6 +1,9 @@
 <script src="https://www.youtube.com/iframe_api"></script>
 
-<h2>{{title}}</h2>
+<h2>{{title}} <button mat-icon-button class="help-text-button" *ngIf="description" [matTooltip]="description">
+  <mat-icon>help_outline</mat-icon>
+</button></h2>
+
 
 <form [formGroup]="form" *ngIf="form" class="cedar-form">
 
@@ -33,15 +36,15 @@
             </mat-icon>
           </button>
           <span><label class="element-label" [attr.for]="node.name">{{node.name}}
-            <span style="font-weight:normal" *ngIf="node.minItems">({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})</span></label>
+            <span style="font-weight:normal" *ngIf="node.multiSelect">({{(node.itemCount + 1)}}  of {{ node.maxItems || 'N'}})</span></label>
 
           <button mat-icon-button class="help-text-button" *ngIf="node.help" [matTooltip]="node.help">
             <mat-icon>help_outline</mat-icon>
           </button>
-          <button mat-icon-button class="node-add" *ngIf="!disabled" (click)="copyItem(node)">
+          <button mat-icon-button class="node-add" *ngIf="!disabled && node.multiSelect" (click)="copyItem(node)">
             <mat-icon>add_circle_outline</mat-icon>
           </button>
-          <button mat-icon-button class="node-remove" *ngIf="!disabled"
+          <button mat-icon-button class="node-remove" *ngIf="!disabled && node.multiSelect"
             (click)="removeItem(node)">
             <mat-icon>remove_circle_outline</mat-icon>
           </button></span>

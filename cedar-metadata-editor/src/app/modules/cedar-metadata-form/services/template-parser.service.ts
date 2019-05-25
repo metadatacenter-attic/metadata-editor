@@ -263,18 +263,14 @@ export class TemplateParserService {
           model['@context'][key] = schema['@id'];
 
           if (TemplateService.isElement(schema)) {
-            model[key] = TemplateService.initValue(schema, InputType.element, minItems, maxItems);
+            model[key] = TemplateService.initValue(schema,key, InputType.element, minItems, maxItems);
 
           } else if (TemplateService.isField(schema)){
-            model[key] = TemplateService.initValue(schema, type, minItems, maxItems);
+            model[key] = TemplateService.initValue(schema, key, type, minItems, maxItems);
 
           }
         }
         const modelValue = model[key];
-        console.log('modelValue', key, modelValue);
-
-
-
 
         if (TemplateService.isElement(schema)) {
 

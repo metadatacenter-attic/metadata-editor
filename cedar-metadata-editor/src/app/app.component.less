@@ -1,4 +1,12 @@
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "../styles.less";
+
+
+
+@cedar-primary: #61A0C5;
+@cedar-secondary: #899cb7;
+@cedar-accent: #ffd740;
+@cedar-warn: #f44336;
+
 
 button:focus {
   outline: 0 !important;
@@ -95,7 +103,7 @@ button:focus {
 }
 
 .menu-header {
-  background: linear-gradient(to right, #00FF9B, #5f84fb);
+  background: white;
   display: grid;
   grid-template-rows: 1fr 4fr;
   grid-template-columns: 1fr 4fr;
@@ -104,7 +112,8 @@ button:focus {
   width: 100%;
   align-content: center;
   color: white;
-  box-shadow: 0 0.5rem 2rem rgba(0, 0, 255, 0.2);
+  box-shadow: 0 0 2rem rgba(95, 160, 179, 0.2);
+  height: 4rem;
 }
 
 .greeting__text {
@@ -172,9 +181,11 @@ button:focus {
 .main__header {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 0.25fr;
+  grid-template-columns: 5em 200px 1fr 120px;
+  grid-column-gap: 10px;
   grid-template-rows: 1fr;
-  box-shadow: 0 0 2rem rgba(0, 0, 255, 0.1);
+
+  box-shadow: 0 0 2rem rgba(95, 160, 179, 0.2);
   height: 4rem;
   margin: 0;
   align-items: center;
@@ -236,10 +247,18 @@ button:focus {
 
 /*Content*/
 .left__section {
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 1fr 1fr;
-  max-width: 5rem;
+  //display: grid;
+  //grid-template-rows: 1fr;
+  //grid-template-columns: 1fr 1fr;
+  //max-width: 5rem;
+}
+
+.title__section {
+  text-transform: uppercase;
+  //display: grid;
+  //grid-template-rows: 1fr;
+  //grid-template-columns: 1fr 1fr;
+  //max-width: 5rem;
 }
 
 .date__text {
@@ -253,20 +272,12 @@ button:focus {
 .hamburger__icon {
   position: relative;
   z-index: 35;
-  height: 1rem;
-  padding: 0.5rem 1.5rem;
-  margin-right: 1rem;
+  font-size:1.5em;
+  padding: 0.5em 2em;
+  margin-right: 1em;
   cursor: pointer;
 }
 
-.logo__icon {
-  height: 2rem;
-  margin-left: 1rem;
-}
-
-.logo__text {
-  fill: #2B244D;
-}
 
 .logo__text-dark {
   fill: #ffff;
@@ -331,5 +342,52 @@ button:focus {
     width: 100%;
   }
 }
+
+.logo__icon {
+  position: relative;
+  z-index: 35;
+  height: 3.0em;
+  font-size:2em;
+  margin: 0 0.2em;
+  cursor:pointer;
+}
+
+.logo__text {
+  position: relative;
+  z-index: 35;
+  font-size: 2.0em;
+  line-height: 2.0em;
+  padding-top:0;
+  margin-top:0;
+  font-family: 'crimson text','HelveticaNeue','Helvetica Neue','Helvetica-Neue',Helvetica,Arial,sans-serif;
+  cursor:pointer;
+}
+
+.fa-stack {
+  position: relative;
+  display: inline-block;
+  width: 1.0em;
+  height: 1.0em;
+  line-height: 1.0em;
+  vertical-align: text-top;
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.fa-stack-1x {
+  font-size: 0.5em;
+  color: white;
+}
+.fa-stack-2x {
+  font-size: 1.0em;
+  color:@cedar-primary;
+}
+
+
 
 

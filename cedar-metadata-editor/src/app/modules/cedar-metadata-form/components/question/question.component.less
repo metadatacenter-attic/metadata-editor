@@ -1,4 +1,9 @@
 
+@cedar-primary: #61A0C5;
+@cedar-secondary: #6F76CE;
+@cedar-accent: #E9AE0B;
+@cedar-warn: #EA8509;
+
 label.question-label {
   margin: 10px 0 0 0;
   font-weight: bolder;
@@ -159,11 +164,7 @@ mat-hint {
 
 
 
-.required {
-  color: red;
-  font-size: .8em;
-  padding: 0 .8em;
-}
+
 
 .question-icon {
   //color: #673ab7;
@@ -195,9 +196,35 @@ button.mat-icon-button.node-add, button.mat-icon-button.node-remove {
 }
 
 
+.fa-stack {
+  position: relative;
+  display: inline-block;
+  width: 3em;
+  height: 3em;
+  line-height: 3em;
+  vertical-align: middle;
+}
 
+.fa-stack-1x,
+.fa-stack-2x {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
 
+.fa-stack-1x {
+  font-size: .8em;
+  color: white;
+}
+.fa-stack-2x {
+  font-size: 1.2em;
+}
 
+.required {
+  color: @cedar-warn;
+  font-size: .8em;
+  padding: 0 .8em;
+}
 
 
 

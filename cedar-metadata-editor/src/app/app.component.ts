@@ -6,6 +6,11 @@ import {environment} from '../environments/environment';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
 import {LocalSettingsService} from './services/local-settings.service';
+import {
+  faSquare,
+  faTag,
+  faBars
+} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -26,7 +31,9 @@ export class AppComponent implements OnInit {
   _ls: LocalSettingsService;
   private _subscription: Subscription;
 
-
+  faTag = faTag;
+  faSquare = faSquare;
+  faBars = faBars;
 
   constructor(public ui: UiService, ls: LocalSettingsService,
               tr: TranslateService,
