@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, SchemaMetadata} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {forkJoin, Subscription} from 'rxjs';
@@ -16,6 +16,7 @@ import {InstanceService} from "../../../cedar-metadata-form/services/instance.se
 import {AutocompleteService} from "../../services/autocomplete.service";
 import {environment} from "../../../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+
 
 
 @Component({
@@ -51,6 +52,8 @@ export class InstanceComponent implements OnInit {
   private _darkModeSub: Subscription;
 
   allPosts;
+
+   CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
 
 
   constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService,  dataHandler: DataHandlerService,

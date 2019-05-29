@@ -1,5 +1,5 @@
 import {ReactiveFormsModule} from '@angular/forms';
-import {NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharedModule} from "../shared";
@@ -14,7 +14,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
   declarations: [
     InstanceComponent],
 
-
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   imports: [
     ReactiveFormsModule,
     CommonModule,
