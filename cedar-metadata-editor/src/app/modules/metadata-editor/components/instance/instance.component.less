@@ -1,3 +1,7 @@
+@cedar-primary: #61A0C5;
+@cedar-secondary: #6F76CE;
+@cedar-accent: #E9AE0B;
+@cedar-warn: #EA8509;
 
 .instance__container {
   margin: 50px auto;
@@ -7,7 +11,6 @@
   @media only screen and (max-width: 300px) {
     max-width: 100%;
     padding: 0 10px;
-    background: yellow;
   }
 
   @media only screen and (min-width: 301px) and (max-width: 600px) {
@@ -54,7 +57,10 @@
   height: 1rem;
   width: 2rem;
   border-radius: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: @cedar-warn;
+  @cedar-secondary: #6F76CE;
+  @cedar-accent: #E9AE0B;
+  @cedar-warn: #EA8509;;
   display: inline-block;
   transition: background-color 300ms linear;
 }
@@ -62,7 +68,7 @@
 .mode-toggle__circle {
   height: 1.30rem;
   width: 1.30rem;
-  background-color: #2B244D;
+  background-color: @cedar-primary;
   position: absolute;
   top: -0.2rem;
   border-radius: 50%;
@@ -72,12 +78,12 @@
 }
 
 .mode-toggle__circle-checked {
-  background-color: #2B244D;
+  background-color: @cedar-secondary;
   left: 1.75rem;
 }
 
 .mode-toggle__bg-checked {
-  background-color: #FF0070;
+  background-color: @cedar-accent;
 }
 
 .mode-toggle__text {

@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AttributeValueComponent } from './checkbox.component';
+import { AttributeValueComponent } from './attribute-value.component';
 
-describe('CheckboxComponent', () => {
+describe('AttributeValueComponent', () => {
   let component: AttributeValueComponent;
   let fixture: ComponentFixture<AttributeValueComponent>;
 
@@ -10,7 +10,7 @@ describe('CheckboxComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ AttributeValueComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
