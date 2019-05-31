@@ -1,10 +1,7 @@
 <div  class="instance__container ">
 
+  <mat-tab-group (selectedTabChange)="selectedTabChange($event)">
 
-  <cedar-form></cedar-form>
-
-
-  <mat-tab-group>
     <mat-tab label="{{'App.Form' | translate}}">
 
       <div class="tab-header">
@@ -19,8 +16,11 @@
         </div>
       </div>
 
-     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
-     [autocompleteResults]="allPosts"></cedar-metadata-form>
+      <cedar-form *ngIf="showForm"   [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
+        [autocompleteResults]="allPosts"></cedar-form>
+
+<!--     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--      [autocompleteResults]="allPosts"></cedar-metadata-form>-->
 
       <div>
         <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}
@@ -30,15 +30,16 @@
     </mat-tab>
 
     <mat-tab label="{{'App.JSONLD' | translate}}">
-      <div *ngIf="jsonLD">
+      <div *ngIf="instance">
         <div class="tab-header" >
           <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
-        <pre><span id="jsonLD">{{ jsonLD | json}}</span></pre>
+        <pre><span id="jsonLD">{{ instance | json}}</span></pre>
       </div>
     </mat-tab>
+
     <mat-tab label="{{'App.RDF' | translate}}">
       <div >
         <div class="tab-header" >
@@ -51,13 +52,13 @@
     </mat-tab>
 
     <mat-tab label="{{'App.Value' | translate}}">
-      <div *ngIf="payload">
+      <div *ngIf="form">
         <div class="tab-header" >
           <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
-        <pre><span id="payload">{{ payload | json}}</span></pre>
+        <pre><span id="payload">{{ form.value | json}}</span></pre>
       </div>
     </mat-tab>
   </mat-tab-group>

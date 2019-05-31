@@ -16,6 +16,7 @@ import {InstanceService} from "../../../cedar-metadata-form/services/instance.se
 import {AutocompleteService} from "../../services/autocomplete.service";
 import {environment} from "../../../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import * as jsonld from 'jsonld';
 
 
 
@@ -33,11 +34,13 @@ export class InstanceComponent implements OnInit {
 
   template: any;
   instance: any;
+  rdf: any;
 
   route: ActivatedRoute;
   payload: any;
   jsonLD: any;
-  rdf: any;
+
+
   formValid: boolean;
   viewOnly: boolean = false;
   ui: UiService;
@@ -51,9 +54,12 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
+  showForm:boolean;
+
   allPosts;
 
    CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
+
 
 
   constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService,  dataHandler: DataHandlerService,
@@ -65,6 +71,7 @@ export class InstanceComponent implements OnInit {
 
     this.dh = dataHandler;
     this.ds = dataStore;
+    this.showForm = true;
 
   }
 
@@ -86,9 +93,18 @@ export class InstanceComponent implements OnInit {
       this.initialize(val.instanceId, val.templateId);
     });
 
-    this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
-      this.darkMode = value;
+    // watch for changes
+    this.form.valueChanges.subscribe(value => {
+      console.log('watch for changes', value);
+
+      setTimeout(() => {
+        const that = this;
+        jsonld.toRDF(this.instance, {format: 'application/nquads'}, function (err, nquads) {
+          that.rdf = err ? err : nquads;
+        });
+      }, 0);
     });
+
   }
 
   protected initDataHandler(): DataHandlerService {
@@ -146,6 +162,15 @@ export class InstanceComponent implements OnInit {
   private dataErrorCallback(error: any, dataStatus: DataHandlerDataStatus) {
     this.artifactStatus = error.status;
     console.log('dataErrorCallback', error)
+  }
+
+  // form changed, update tab contents and submit button status
+  public onFormChanged(event) {
+    console.log('onFormChanged',event.detail);
+    this.payload = event.detail.payload;
+    this.jsonLD = event.detail.jsonLD;
+    this.rdf = event.detail.rdf;
+    this.formValid = event.detail.formValid;
   }
 
 
@@ -232,5 +257,17 @@ export class InstanceComponent implements OnInit {
     });
   }
 
+  selectedTabChange(event) {
+
+    if (event.index === 0) {
+      setTimeout(() => {
+        console.log('redraw form');
+        this.showForm = true;
+      }, 0);
+
+    } else {
+      this.showForm = false;
+    }
+  }
 
 }
