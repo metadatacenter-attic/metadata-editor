@@ -19,7 +19,6 @@ import {HttpClient} from "@angular/common/http";
 import * as jsonld from 'jsonld';
 
 
-
 @Component({
   selector: 'app-instance',
   templateUrl: './instance.component.html',
@@ -54,15 +53,14 @@ export class InstanceComponent implements OnInit {
   darkMode: boolean;
   private _darkModeSub: Subscription;
 
-  showForm:boolean;
+  showForm: boolean;
 
   allPosts;
 
-   CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
+  CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
 
 
-
-  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService,  dataHandler: DataHandlerService,
+  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, tr: TranslateService, dataHandler: DataHandlerService,
               dataStore: DataStoreService, private http: HttpClient, private autocompleteService: AutocompleteService) {
     this.route = route;
     this.ui = ui;
@@ -95,7 +93,7 @@ export class InstanceComponent implements OnInit {
 
     // watch for changes
     this.form.valueChanges.subscribe(value => {
-      console.log('watch for changes', value);
+      console.log('watch for changes', this.instance, value);
 
       setTimeout(() => {
         const that = this;
@@ -166,7 +164,7 @@ export class InstanceComponent implements OnInit {
 
   // form changed, update tab contents and submit button status
   public onFormChanged(event) {
-    console.log('onFormChanged',event.detail);
+    console.log('onFormChanged', event.detail);
     this.payload = event.detail.payload;
     this.jsonLD = event.detail.jsonLD;
     this.rdf = event.detail.rdf;

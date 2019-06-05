@@ -16,11 +16,11 @@
         </div>
       </div>
 
-      <cedar-form *ngIf="showForm"   [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
-        [autocompleteResults]="allPosts"></cedar-form>
+<!--      <cedar-form *ngIf="showForm"   [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"-->
+<!--        [autocompleteResults]="allPosts"></cedar-form>-->
 
-<!--     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
-<!--      [autocompleteResults]="allPosts"></cedar-metadata-form>-->
+     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+      [autocompleteResults]="allPosts"></cedar-metadata-form>
 
       <div>
         <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}
@@ -51,16 +51,16 @@
       </div>
     </mat-tab>
 
-    <mat-tab label="{{'App.Value' | translate}}">
-      <div *ngIf="form">
-        <div class="tab-header" >
-          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
-            {{'App.Copy' | translate}}
-          </button>
-        </div>
-        <pre><span id="payload">{{ form.value | json}}</span></pre>
-      </div>
-    </mat-tab>
+<!--    <mat-tab label="{{'App.Value' | translate}}">-->
+<!--      <div *ngIf="form">-->
+<!--        <div class="tab-header" >-->
+<!--          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">-->
+<!--            {{'App.Copy' | translate}}-->
+<!--          </button>-->
+<!--        </div>-->
+<!--        <pre><span id="payload">{{ form.value | json}}</span></pre>-->
+<!--      </div>-->
+<!--    </mat-tab>-->
   </mat-tab-group>
 
 </div>
