@@ -13,6 +13,13 @@ import {TemplateService} from "../../services/template.service";
 import {TreeNode} from "../../models/tree-node.model";
 import {InputTypeService} from "../../services/input-type.service";
 import {InstanceService} from "../../services/instance.service";
+import {
+  faSquare,
+  faTag,
+  faBars,
+  faSquareFull
+} from '@fortawesome/free-solid-svg-icons';
+
 
 
 @Component({
@@ -45,6 +52,9 @@ export class FormComponent implements OnChanges {
   copy: string = "Copy";
   remove: string = "Remove";
   private formChanges: Subscription;
+
+  faTag = faTag;
+  faSquare = faSquare;
 
   constructor(private ui: UiService, database: TemplateParserService, route: ActivatedRoute) {
     this.pageEvent = {"previousPageIndex": 0, "pageIndex": 0, "pageSize": 1, "length": 0};

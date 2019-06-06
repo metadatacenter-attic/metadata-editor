@@ -9,7 +9,8 @@ import {LocalSettingsService} from './services/local-settings.service';
 import {
   faSquare,
   faTag,
-  faBars
+  faBars,
+  faSquareFull
 } from '@fortawesome/free-solid-svg-icons';
 
 
@@ -34,6 +35,7 @@ export class AppComponent implements OnInit {
   faTag = faTag;
   faSquare = faSquare;
   faBars = faBars;
+  faSquareFull = faSquareFull;
 
   constructor(public ui: UiService, ls: LocalSettingsService,
               tr: TranslateService,
