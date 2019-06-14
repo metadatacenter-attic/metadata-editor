@@ -1,7 +1,7 @@
-import {Injectable} from "@angular/core";
-import {InputTypeService} from "./input-type.service";
-import {TemplateSchema} from "../models/template-schema.model";
-import {InputType} from "../models/input-type";
+import {Injectable} from '@angular/core';
+import {InputTypeService} from './input-type.service';
+import {TemplateSchema} from '../models/template-schema.model';
+import {InputType} from '../models/input-type';
 
 @Injectable()
 export class TemplateService {
@@ -15,6 +15,23 @@ export class TemplateService {
   /* parsing Template object */
   static isUndefined(value) {
     return value === null || value === undefined;
+  }
+
+
+  static isElement(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateElement');
+  }
+
+  static isTemplate(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/Template');
+  }
+
+  static isField(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateField');
+  }
+
+  static isStaticField(schema: TemplateSchema) {
+    return (schema['@type'] === 'https://schema.metadatacenter.org/core/StaticTemplateField');
   }
 
   static schemaOf(node): TemplateSchema {
@@ -114,15 +131,7 @@ export class TemplateService {
     return schema['schema:description'];
   }
 
-  static isElement(schema: TemplateSchema) {
-    return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateElement');
-  }
-
-  static isTemplate(schema: TemplateSchema) {
-    return (schema['@type'] === 'https://schema.metadatacenter.org/core/Template');
-  }
-
-  static getNodeType( inputType: InputType): InputType {
+  static getNodeType(inputType: InputType): InputType {
     let result: InputType;
     switch (inputType) {
       case InputType.numeric:
@@ -182,51 +191,50 @@ export class TemplateService {
     return result;
   }
 
-  static initValue(schema: TemplateSchema, key:string, type:InputType, minItems:number, maxItems:number) {
+  static initValue(schema: TemplateSchema, key: string, type: InputType, minItems: number, maxItems: number) {
     let result;
-    if (type == InputType.element) {
-      console.log('initValue element',key, minItems);
+    if (type === InputType.element) {
       if (!this.isUndefined(minItems)) {
-        result = [{'@context':{},'@id':schema['@id']}];
+        result = [{'@context': {}, '@id': schema['@id']}];
       } else {
-        result = {'@context':{},'@id':schema['@id']};
+        result = {'@context': {}, '@id': schema['@id']};
       }
     } else {
-    let location = this.getValueLocation(schema, this.getNodeType(type), this.getNodeSubtype(type));
+      const location = this.getValueLocation(schema, this.getNodeType(type), this.getNodeSubtype(type));
 
-    if (location == '@value') {
-      if (!this.isUndefined(minItems)) {
-        result = [];
-        for (let i=0; i<minItems; i++) {
-          let item = {'@value': null};
-          if (type == InputType.date) {
-            item['@type'] = 'xsd:date';
-          }
-          result.push(item)
-        }
-      } else {
-        result = {'@value': null};
-        if (type == InputType.date) {
-          result['@type'] = 'xsd:date';
-        }
-      }
-    } else {
-      if (type == InputType.controlled) {
+      if (location === '@value') {
         if (!this.isUndefined(minItems)) {
           result = [];
+          for (let i = 0; i < minItems; i++) {
+            const item = {'@value': null};
+            if (type === InputType.date) {
+              item['@type'] = 'xsd:date';
+            }
+            result.push(item);
+          }
+        } else {
+          result = {'@value': null};
+          if (type === InputType.date) {
+            result['@type'] = 'xsd:date';
+          }
+        }
+      } else {
+        if (type === InputType.controlled) {
+          if (!this.isUndefined(minItems)) {
+            result = [];
+          } else {
+            result = {};
+          }
+        } else if (!this.isUndefined(minItems)) {
+          result = [];
+          for (let i = 0; i < minItems; i++) {
+            const item = {};
+            result.push(item);
+          }
         } else {
           result = {};
         }
-      } else if (!this.isUndefined(minItems)) {
-        result = [];
-        for (let i=0; i<minItems; i++) {
-          let item = {};
-          result.push(item)
-        }
-      } else {
-        result = {};
       }
-    }
     }
     return result;
   }
@@ -263,40 +271,53 @@ export class TemplateService {
     return (ct || ctv || link) ? '@id' : '@value';
   }
 
-  static isField(schema: TemplateSchema) {
-    return (schema['@type'] === 'https://schema.metadatacenter.org/core/TemplateField');
-  }
-
-  static isStaticField(schema: TemplateSchema) {
-    return (schema['@type'] === 'https://schema.metadatacenter.org/core/StaticTemplateField');
-  }
-
   static getOrder(schema: TemplateSchema) {
-    return schema['_ui']['order'];
+    if (this.isField(schema)) {
+      return [schema['schema:name']];
+    } else {
+      return schema['_ui']['order'];
+    }
   }
 
   static getProperties(schema: TemplateSchema) {
-    return schema['properties'];
+    if (this.isField(schema)) {
+      const prop = {};
+      prop[schema['schema:name']] = schema;
+      return prop;
+      return schema;
+    } else {
+      return schema['properties'];
+    }
   }
 
   static getLabels(schema: TemplateSchema) {
-    return schema['_ui']['propertyLabels'];
+    if (this.isField(schema)) {
+      return [schema['schema:name']];
+    } else {
+      return schema['_ui']['propertyLabels'];
+    }
   }
 
   static getDescriptions(schema: TemplateSchema) {
-    return schema['_ui']['propertyDescriptions'];
+    if (this.isField(schema)) {
+      return [schema['schema:description']];
+    } else {
+      return schema['_ui']['propertyDescriptions'];
+    }
   }
 
   static getPageCount(schema: TemplateSchema) {
     const properties = this.getProperties(schema);
     let currentPage = 0;
-    this.getOrder(schema).forEach(function (key) {
-      let prop: TemplateSchema = properties[key];
-      let type: InputType = TemplateService.getInputType(prop);
-      if (InputTypeService.isPageBreak(type)) {
-        currentPage++;
-      }
-    });
+    if (this.getOrder(schema)) {
+      this.getOrder(schema).forEach(function (key) {
+        const prop: TemplateSchema = properties[key];
+        const type: InputType = TemplateService.getInputType(prop);
+        if (InputTypeService.isPageBreak(type)) {
+          currentPage++;
+        }
+      });
+    }
     return currentPage + 1;
   }
 
@@ -306,22 +327,24 @@ export class TemplateService {
     const properties = this.getProperties(schema);
     const order = this.getOrder(schema);
     let currentPage = 0;
-    let pageOrder = [];
-    let that = this;
-    order.forEach(function (key) {
+    const pageOrder = [];
+    const that = this;
+    if (order) {
+      order.forEach(function (key) {
 
-      let prop: TemplateSchema = properties[key];
+        const prop: TemplateSchema = properties[key];
 
-      let type: InputType = that.getInputType(prop);
-      if (InputTypeService.isPageBreak(type)) {
-        currentPage++;
-      } else {
-        if (currentPage === p) {
-          pageOrder.push(key);
+        const type: InputType = that.getInputType(prop);
+        if (InputTypeService.isPageBreak(type)) {
+          currentPage++;
+        } else {
+          if (currentPage === p) {
+            pageOrder.push(key);
+          }
         }
-      }
 
-    });
+      });
+    }
     return pageOrder;
   }
 
@@ -350,7 +373,6 @@ export class TemplateService {
   }
 
 
-
   static generateInstanceTypeForNumericField(schema: TemplateSchema) {
     if (schema._valueConstraints.hasOwnProperty('numberType')) {
       return schema._valueConstraints.numberType;
@@ -358,11 +380,10 @@ export class TemplateService {
   }
 
 
-
   static generateGUID = function () {
     let d = Date.now();
     const guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
+      const r = (d + Math.random() * 16) % 16 | 0;
       d = Math.floor(d / 16);
       return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });

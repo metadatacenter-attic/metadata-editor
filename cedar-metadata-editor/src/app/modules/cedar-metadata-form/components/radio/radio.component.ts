@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
+import {FormControl, FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
 
 @Component({
   selector: 'cedar-radio',
@@ -32,11 +32,11 @@ export class RadioComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
   getLiteralMap(literals) {
-    let map = literals
+    const map = literals
       .map(function (element) {
         return element.label;
       });
@@ -54,7 +54,7 @@ export class RadioComponent implements OnInit {
 
   // get the form value into the model
   setValue(value, literals, model, valueLocation) {
-    let result = {};
+    const result = {};
     result[valueLocation] = this.getLiteralMap(literals)[value];
     return result;
   }

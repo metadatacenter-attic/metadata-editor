@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
-import {NgxYoutubePlayerModule} from "ngx-youtube-player";
+import {FormControl, FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
+import {NgxYoutubePlayerModule} from 'ngx-youtube-player';
 
 @Component({
   selector: 'cedar-youtube',

@@ -35,14 +35,14 @@ export interface Metadata {
       '@type': string
     }
   };
-  'schema:isBasedOn'?: string,
-  'schema:name'?: string,
-  'schema:description'?: string,
-  'pav:createdOn'?: string,
-  'pav:createdBy'?: string,
-  'pav:lastUpdatedOn'?: string,
-  'oslc:modifiedBy'?: string,
-  '@id'?: string
+  'schema:isBasedOn'?: string;
+  'schema:name'?: string;
+  'schema:description'?: string;
+  'pav:createdOn'?: string;
+  'pav:createdBy'?: string;
+  'pav:lastUpdatedOn'?: string;
+  'oslc:modifiedBy'?: string;
+  '@id'?: string;
 }
 
 

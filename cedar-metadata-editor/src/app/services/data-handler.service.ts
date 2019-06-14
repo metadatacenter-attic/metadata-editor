@@ -54,7 +54,6 @@ export class DataHandlerService {
 
   require(dataId: DataHandlerDataId): DataHandlerService {
     const status: DataHandlerDataStatus = DataHandlerDataStatus.forDataId(dataId);
-    console.log('DataHandler.require:' + status.getKey());
     this.dataIdMap.set(status.getKey(), status);
     return this;
   }
@@ -179,7 +178,6 @@ export class DataHandlerService {
         this.successCallback();
       }
       this.dataAvailable = true;
-      console.log('All data was loaded.');
     }
   }
 

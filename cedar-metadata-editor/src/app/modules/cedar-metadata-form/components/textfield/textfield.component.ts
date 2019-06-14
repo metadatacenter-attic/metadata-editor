@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl, FormGroup} from '@angular/forms';
 
-import {TreeNode} from "../../models/tree-node.model";
-import {ValidatorService} from "../../services/validator.service";
+import {TreeNode} from '../../models/tree-node.model';
+import {ValidatorService} from '../../services/validator.service';
 
 
 @Component({
@@ -41,21 +41,21 @@ export class TextfieldComponent implements OnInit {
           'location': this.node.valueLocation,
           'value': value
         });
-      })
+      });
   }
 
-  setValidators(formGroup:FormGroup) {
+  setValidators(formGroup: FormGroup) {
     const validators = ValidatorService.getValidators(this.node);
     this.formGroup.get('values')['controls'].forEach(function(control) {
       control.setValidators(validators);
       control.updateValueAndValidity();
-    })
+    });
   }
 
 
   // get the value out of the model and into something the form can edit
   getValue(model, valueLocation) {
-    let result = [];
+    const result = [];
     if (model) {
       if (Array.isArray(model)) {
         for (let i = 0; i < model.length; i++) {
@@ -74,20 +74,20 @@ export class TextfieldComponent implements OnInit {
 
   // create the metadata model date object
   setVal(value, valueLocation) {
-    let obj = {};
+    const obj = {};
     obj[valueLocation] = value ? value : null;
     return obj;
   }
 
   // get the form value into the model
   setValue(value, model, valueLocation) {
-    let result = [];
+    const result = [];
     if (value.length > 1) {
       value.forEach((val) => {
-        result.push(this.setVal(val,valueLocation));
+        result.push(this.setVal(val, valueLocation));
       });
     } else if (value.length == 1) {
-      result.push(this.setVal(value[0],valueLocation));
+      result.push(this.setVal(value[0], valueLocation));
     }
     return result;
   }

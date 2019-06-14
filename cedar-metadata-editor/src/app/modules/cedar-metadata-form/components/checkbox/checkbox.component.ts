@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
+import {FormControl, FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
 
 @Component({
   selector: 'cedar-checkbox',
@@ -19,7 +19,8 @@ export class CheckboxComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
-    this.formGroup.get('values').setValue(this.getValue(this.node.options, this.node.model[this.node.key], this.node.valueLocation));
+    const val = this.getValue(this.node.options, this.node.model[this.node.key], this.node.valueLocation);
+    this.formGroup.get('values').setValue(val);
 
     // watch for changes
     this.formGroup.get('values').valueChanges.subscribe(value => {
@@ -36,11 +37,11 @@ export class CheckboxComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
   getLiteralMap(literals) {
-    let map = literals
+    const map = literals
       .map(function (element) {
         return element.label;
       });
@@ -49,26 +50,19 @@ export class CheckboxComponent implements OnInit {
 
   // get the value out of the model and into something the form can edit
   getValue(literals, model, valueLocation) {
-    let result = [];
-    let map = this.getLiteralMap(literals);
-    if (model) {
-      for (let i = 0; i < model.length; i++) {
-        result.push(map.indexOf(model[i][valueLocation]) > -1);
-      }
-    } else {
-      map.forEach(function () {
-        result.push(false);
-      });
-    }
+    const result = [];
+    const map = this.getLiteralMap(literals);
+    map.forEach(() => result.push(false));
+    model.forEach((item) => result[map.indexOf(item[valueLocation])] = (map.indexOf(item[valueLocation]) > -1));
     return result;
   }
 
   // get the form value into the model
   setValue(value, literals, model, valueLocation) {
-    let result = [];
+    const result = [];
     value.forEach(function (val, i) {
       if (val) {
-        let obj = {};
+        const obj = {};
         obj[valueLocation] = literals[i]['label'];
         result.push(obj);
       }

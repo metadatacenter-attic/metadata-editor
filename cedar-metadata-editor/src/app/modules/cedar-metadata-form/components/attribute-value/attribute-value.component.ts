@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
-import {TemplateService} from "../../services/template.service";
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
+import {TemplateService} from '../../services/template.service';
 
 @Component({
   selector: 'cedar-attribute-value',
@@ -40,12 +40,12 @@ export class AttributeValueComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
 
   setAttributeValue(model, key, index, location, val) {
-    let itemKey = model[key][index];
+    const itemKey = model[key][index];
     if (itemKey) {
 
       if (location === 'value') {
@@ -60,7 +60,7 @@ export class AttributeValueComponent implements OnInit {
         model['@context'][val] = model['@context'][itemKey];
         delete model['@context'][itemKey];
         model[key][index] = val;
-        model[val] = {'@value': itemValue}
+        model[val] = {'@value': itemValue};
       }
     } else {
       // initialize attribute value field with this itemKey
@@ -68,7 +68,7 @@ export class AttributeValueComponent implements OnInit {
       while (model.hasOwnProperty(newKey)) {
         newKey = newKey + '1';
       }
-      model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateService.generateGUID();
+      model['@context'][newKey] = 'https://schema.metadatacenter.org/properties/' + TemplateService.generateGUID();
       model[key] = [newKey];
       model[newKey] = {'@value': val};
     }
@@ -84,22 +84,22 @@ export class AttributeValueComponent implements OnInit {
 
 // get the form value from the metadata model
   private getValue(node): any[] {
-    let val = [];
+    const val = [];
     if (node.model[node.key]) {
       const itemCount = node.model[node.key].length;
       const modelValue = (node.model && node.model[node.key]) ? node.model[node.key] : [];
 
       if (itemCount == 0) {
-        val.push({'values':[null,null]})
+        val.push({'values': [null, null]});
       } else {
         for (let i = 0; i < itemCount; i++) {
           const itemKey = modelValue[i];
           const itemValue = node.model[itemKey]['@value'];
-          val.push({'values':[itemKey, itemValue]})
+          val.push({'values': [itemKey, itemValue]});
         }
       }
     } else {
-      val.push({'values':[null,null]})
+      val.push({'values': [null, null]});
     }
     return val;
   }
@@ -125,10 +125,10 @@ export class AttributeValueComponent implements OnInit {
     while (model.hasOwnProperty(newKey)) {
       newKey = newKey + '1';
     }
-    model['@context'][newKey] = "https://schema.metadatacenter.org/properties/" + TemplateService.generateGUID();
+    model['@context'][newKey] = 'https://schema.metadatacenter.org/properties/' + TemplateService.generateGUID();
     model[key].splice(index + 1, 0, newKey);
     model[newKey] = {'@value': oldValue};
-  };
+  }
 
 
   copy(node: TreeNode, index: number) {
@@ -145,8 +145,8 @@ export class AttributeValueComponent implements OnInit {
     const oldKey = model[key][index];
     delete model['@context'][oldKey];
     model[key].splice(index, 1);
-    delete model[oldKey]
-  };
+    delete model[oldKey];
+  }
 
   removeable(node: TreeNode) {
     return node.model[node.key].length > 1;
@@ -158,7 +158,7 @@ export class AttributeValueComponent implements OnInit {
       this.formGroup.setControl('values', this.fb.array(this.buildAV(this.node, this.disabled)));
 
 
-      //this.buildAV(node, this.disabled);
+      // this.buildAV(node, this.disabled);
       this.formGroup.get('values').setValue(this.getValue(this.node));
       this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
     }

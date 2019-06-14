@@ -26,7 +26,6 @@ if (environment.production) {
 
 
 function bootstrapModule() {
-  console.log('bootstrapModule')
   platformBrowserDynamic().bootstrapModule(AppModule)
     .catch(err => console.log(err));
 }

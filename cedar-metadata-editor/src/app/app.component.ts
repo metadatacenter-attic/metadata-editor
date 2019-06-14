@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {UiService} from './services/ui/ui.service';
+import {UiService} from './services/ui.service';
 import {Subscription} from 'rxjs';
 
 import {environment} from '../environments/environment';
@@ -21,7 +21,6 @@ import {
 })
 export class AppComponent implements OnInit {
   showMenu = false;
-  darkMode: boolean;
   title: string;
   disabled: boolean = false;
   languages = {
@@ -30,12 +29,10 @@ export class AppComponent implements OnInit {
   };
   _tr: TranslateService;
   _ls: LocalSettingsService;
-  private _subscription: Subscription;
 
   faTag = faTag;
   faSquare = faSquare;
   faBars = faBars;
-  faSquareFull = faSquareFull;
 
   constructor(public ui: UiService, ls: LocalSettingsService,
               tr: TranslateService,
@@ -60,9 +57,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._subscription = this.ui.darkModeState$.subscribe(res => {
-      this.darkMode = res;
-    })
   }
 
   toggleMenu() {
@@ -74,8 +68,6 @@ export class AppComponent implements OnInit {
   }
 
   modeToggleSwitch() {
-    this.ui.update(!this.darkMode);
-    // this.ui.darkModeState.next(!this.darkModeActive);
   }
 
   getCurrentLanguageCode() {

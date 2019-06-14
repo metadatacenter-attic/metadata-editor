@@ -1,5 +1,5 @@
-import {InputType} from "./input-type";
-import {TemplateSchemaProperties} from "./template-schema-properties.model";
+import {InputType} from './input-type';
+import {TemplateSchemaProperties} from './template-schema-properties.model';
 
 export interface TemplateSchema {
   '@id': string;
@@ -14,7 +14,7 @@ export interface TemplateSchema {
     'propertyLabels': string[];
     'propertyDescriptions': string[];
     'inputType': InputType
-  },
+  };
   'properties': TemplateSchemaProperties;
   'pav:version': string;
   'bibo:status': string;

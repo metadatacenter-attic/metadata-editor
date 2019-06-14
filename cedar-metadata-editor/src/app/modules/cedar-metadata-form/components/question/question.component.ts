@@ -1,12 +1,12 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChange} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
-import {InputTypeService} from "../../services/input-type.service";
-import {InputType} from "../../models/input-type";
-import {TreeNode} from "../../models/tree-node.model";
-import {TemplateParserService} from "../../services/template-parser.service";
-import {InstanceService} from "../../services/instance.service";
-import {ValidatorService} from "../../services/validator.service";
+import {InputTypeService} from '../../services/input-type.service';
+import {InputType} from '../../models/input-type';
+import {TreeNode} from '../../models/tree-node.model';
+import {TemplateParserService} from '../../services/template-parser.service';
+import {InstanceService} from '../../services/instance.service';
+import {ValidatorService} from '../../services/validator.service';
 import {
   faSquare,
   faAsterisk,
@@ -101,7 +101,7 @@ export class QuestionComponent implements OnInit {
 
       case InputType.date:
         this.formGroup = this.fb.group({values: this.fb.array(this.allowMultipleControls(this.node, this.disabled, validators))});
-        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
+        // this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         this.parentGroup.setControl(this.node.key, this.formGroup);
         this.setDisable(this.formGroup, this.disabled);
         break;
@@ -147,9 +147,9 @@ export class QuestionComponent implements OnInit {
 
   setDisable(formGroup: FormGroup, disabled) {
     if (disabled) {
-      formGroup.disable()
+      formGroup.disable();
     }
-  };
+  }
 
   // controlled term was selected
   onSelectedControlled(event) {
@@ -189,7 +189,7 @@ export class QuestionComponent implements OnInit {
 
     switch (this.node.type) {
       case InputType.controlled:
-        let clonedModel = Object.assign({}, node.model[node.key][index]);
+        const clonedModel = Object.assign({}, node.model[node.key][index]);
         this.node.model[node.key].splice(index, 0, node.model[node.key][index]);
         this.formGroup.setControl('values', this.fb.array(this.buildControlled(node, this.disabled)));
         break;
@@ -200,17 +200,17 @@ export class QuestionComponent implements OnInit {
 
         if (node.model) {
           if (Array.isArray(node.model[node.key])) {
-            let clonedModel = Object.assign({}, node.model[node.key][index]);
+            const clonedModel = Object.assign({}, node.model[node.key][index]);
             this.node.model[node.key].splice(index, 0, clonedModel);
           } else {
-            let clonedModel = Object.assign({}, node.model[node.key]);
+            const clonedModel = Object.assign({}, node.model[node.key]);
             this.node.model[node.key] = [clonedModel, clonedModel];
           }
         } else {
           this.node.model[node.key] = [null, null];
         }
         this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
-        //this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
+        // this.formGroup.updateValueAndValidity({onlySelf: true, emitEvent: true});
         break;
     }
   }
@@ -228,7 +228,7 @@ export class QuestionComponent implements OnInit {
       case InputType.textarea:
       case InputType.date:
         node.model[this.node.key].splice(index, 1);
-        //this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
+        // this.formGroup.updateValueAndValidity({onlySelf: false, emitEvent: true});
         this.formGroup.setControl('values', this.fb.array(this.allowMultipleControls(node, this.disabled, validators)));
         break;
     }
@@ -264,8 +264,8 @@ export class QuestionComponent implements OnInit {
 
   private buildControlled(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
-    let chips = [];
-    let ids = [];
+    const chips = [];
+    const ids = [];
     if (node.model[node.key]) {
       if (Array.isArray(node.model[node.key])) {
 
@@ -274,7 +274,7 @@ export class QuestionComponent implements OnInit {
           ids.push(value['@id']);
         });
 
-        let group = this.fb.group({
+        const group = this.fb.group({
           chips: this.fb.array(chips),
           ids: this.fb.array(ids),
           search: new FormControl({disabled: disabled})
@@ -288,7 +288,7 @@ export class QuestionComponent implements OnInit {
           ids.push(node.model[node.key]['@id']);
         }
 
-        let group = this.fb.group({
+        const group = this.fb.group({
           chips: this.fb.array(chips),
           ids: this.fb.array(ids),
           search: new FormControl({disabled: disabled})
@@ -297,7 +297,7 @@ export class QuestionComponent implements OnInit {
         arr.push(group);
       }
     } else {
-      let group = this.fb.group({
+      const group = this.fb.group({
         chips: this.fb.array(chips),
         ids: this.fb.array(ids),
         search: new FormControl({disabled: disabled})
@@ -306,13 +306,13 @@ export class QuestionComponent implements OnInit {
     }
 
     return arr;
-  };
+  }
 
   private buildControlledSingle(node: TreeNode, disabled: boolean): any[] {
     const arr = [];
     if (Array.isArray(node.model[node.key])) {
       node.model[node.key].forEach((value) => {
-        let group = this.fb.group({
+        const group = this.fb.group({
           chips: this.fb.array([value['rdfs:label']]),
           ids: this.fb.array([value['@id']]),
           search: new FormControl({disabled: disabled})
@@ -320,7 +320,7 @@ export class QuestionComponent implements OnInit {
         arr.push(group);
       });
     } else {
-      let group = this.fb.group({
+      const group = this.fb.group({
         chips: this.fb.array([node.model[node.key]['rdfs:label']]),
         ids: this.fb.array([node.model[node.key]['@id']]),
         search: new FormControl({disabled: disabled})
@@ -329,7 +329,7 @@ export class QuestionComponent implements OnInit {
     }
 
     return arr;
-  };
+  }
 
   // build the attribute value form controls
   private buildAV(node: TreeNode, disabled: boolean): any[] {

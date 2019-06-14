@@ -222,6 +222,6 @@ export const constants = {
       'allowsRequired': false
     }
   },
-  labels: {'copy': 'Copy', "remove":"Remove"}
+  labels: {'copy': 'Copy', 'remove': 'Remove'}
 
 };

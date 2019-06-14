@@ -1,7 +1,7 @@
-import {Injectable} from "@angular/core";
-import {TreeNode} from "../models/tree-node.model";
-import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from "@angular/forms";
-import {InputType} from "../models/input-type";
+import {Injectable} from '@angular/core';
+import {TreeNode} from '../models/tree-node.model';
+import {AbstractControl, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
+import {InputType} from '../models/input-type';
 
 
 @Injectable()
@@ -71,7 +71,7 @@ export class ValidatorService {
     return (control: AbstractControl): { [key: string]: { actual: number, required: number } } | null => {
       let result = null;
       if (control.value && (!isNaN(Number(control.value)))) {
-        const actual = control.value.split(".")[1].length;
+        const actual = control.value.split('.')[1].length;
         if (precision !== actual) {
           result = {
             decimal: {

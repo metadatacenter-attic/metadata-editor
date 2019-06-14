@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup, FormGroupDirective, NgForm} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
+import {FormControl, FormGroup, FormGroupDirective, NgForm} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
 
 
 
@@ -21,7 +21,7 @@ export class TextareaComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
-    this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation))
+    this.formGroup.get('values').setValue(this.getValue(this.node.model[this.node.key], this.node.valueLocation));
 
     // watch for changes
     this.formGroup.get( 'values').valueChanges.subscribe(value => {
@@ -38,12 +38,12 @@ export class TextareaComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
   // get the value out of the model and into something the form can edit
   getValue(model, valueLocation) {
-    let result = [];
+    const result = [];
     if (model) {
       if (Array.isArray(model)) {
         model.forEach((value, i) => {
@@ -65,9 +65,9 @@ export class TextareaComponent implements OnInit {
     if (value.length > 1) {
       result = [];
       value.forEach((val, i) => {
-        let obj = {};
+        const obj = {};
         obj[valueLocation] = val;
-        result.push(obj)
+        result.push(obj);
       });
     } else if (value.length == 1) {
       result = {};

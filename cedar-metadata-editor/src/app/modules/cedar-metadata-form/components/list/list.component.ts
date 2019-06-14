@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
+import {FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
 
 @Component({
   selector: 'cedar-list',
@@ -17,7 +17,7 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
     // initialize the value
-    this.formGroup.get(this.node.key + 'list').setValue(this.getListValue(this.node.options, this.node.model[this.node.key], this.node.valueLocation, this.node.multipleChoice))
+    this.formGroup.get(this.node.key + 'list').setValue(this.getListValue(this.node.options, this.node.model[this.node.key], this.node.valueLocation, this.node.multipleChoice));
 
     // watch for changes
     this.formGroup.get(this.node.key + 'list').valueChanges.subscribe(value => {
@@ -33,11 +33,11 @@ export class ListComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
   getLiteralMap(literals) {
-    let map = literals
+    const map = literals
       .map(function (element) {
         return element.label;
       });
@@ -47,7 +47,7 @@ export class ListComponent implements OnInit {
   // get the value out of the model and into something the form can edit
   getListValue(literals, model, valueLocation, multiple) {
     let result = [];
-    let map = this.getLiteralMap(literals);
+    const map = this.getLiteralMap(literals);
     if (model) {
       if (multiple) {
 
@@ -64,11 +64,11 @@ export class ListComponent implements OnInit {
   // get the form value into the model
   setListValue(value, literals, model, valueLocation, multiple) {
     let result;
-    let map = this.getLiteralMap(literals);
+    const map = this.getLiteralMap(literals);
     if (multiple) {
       result = [];
       for (let i = 0; i < value.length; i++) {
-        let obj = {};
+        const obj = {};
         obj[valueLocation] = map[value[i]];
         result.push(obj);
       }

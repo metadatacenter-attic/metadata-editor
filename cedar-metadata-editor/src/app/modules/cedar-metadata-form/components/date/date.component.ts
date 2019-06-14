@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup} from "@angular/forms";
-import {TreeNode} from "../../models/tree-node.model";
+import {FormControl, FormGroup} from '@angular/forms';
+import {TreeNode} from '../../models/tree-node.model';
 
 @Component({
   selector: 'cedar-date',
@@ -38,23 +38,23 @@ export class DateComponent implements OnInit {
         'location': this.node.valueLocation,
         'value': value
       });
-    })
+    });
   }
 
   // correct the minutes and timezone
   parseDate(val) {
     if (val) {
       // 'add' a timezone offset so we end up on the original date again
-      let dt = new Date(val);
+      const dt = new Date(val);
       dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
       return dt;
     }
     return null;
-  };
+  }
 
   // get the form value from the metadata model
   getValue(model, valueLocation): Date[] {
-    let result = [];
+    const result = [];
     if (model) {
       if (Array.isArray(model)) {
         for (let i = 0; i < model.length; i++) {
@@ -71,14 +71,14 @@ export class DateComponent implements OnInit {
 
   // create the metadata model date object
   setDate(value, valueLocation) {
-    let obj = {'@type': 'xsd:date'};
+    const obj = {'@type': 'xsd:date'};
     obj[valueLocation] = value ? this.parseDate(value).toISOString().substring(0, 10) : null;
     return obj;
   }
 
   // set the metadata model from the form value
   setValue(value, model, valueLocation): Date[] {
-    let result = [];
+    const result = [];
     if (Array.isArray(value)) {
       for (let i = 0; i < value.length; i++) {
         result.push(this.setDate(value[i], valueLocation));

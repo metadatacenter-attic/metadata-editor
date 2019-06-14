@@ -16,11 +16,24 @@
         </div>
       </div>
 
-<!--      <cedar-form *ngIf="showForm"   [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"-->
-<!--        [autocompleteResults]="allPosts"></cedar-form>-->
+      <cedar-form *ngIf="template"  type="template"  [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
+        [autocompleteResults]="allPosts"></cedar-form>
 
-     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
-      [autocompleteResults]="allPosts"></cedar-metadata-form>
+<!--     <cedar-metadata-form *ngIf="template"  type="template" [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--      [autocompleteResults]="allPosts"></cedar-metadata-form>-->
+
+      <cedar-form *ngIf="templateElement"  type="element" [form]="form" [instance]="instance" [template]="templateElement"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+        [autocompleteResults]="allPosts"></cedar-form>
+
+<!--      <cedar-metadata-form *ngIf="templateElement"  type="element" [form]="form" [instance]="instance" [template]="templateElement"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--        [autocompleteResults]="allPosts"></cedar-metadata-form>-->
+
+      <cedar-form *ngIf="templateField"  type="field" [form]="form" [instance]="instance" [template]="templateField"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+        [autocompleteResults]="allPosts"></cedar-form>
+
+<!--      <cedar-metadata-form *ngIf="templateField"  type="field" [form]="form" [instance]="instance" [template]="templateField"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--        [autocompleteResults]="allPosts"></cedar-metadata-form>-->
+
 
       <div>
         <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}

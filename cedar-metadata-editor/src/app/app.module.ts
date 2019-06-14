@@ -13,11 +13,12 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {UiService} from './services/ui/ui.service';
+import {UiService} from './services/ui.service';
 import {DemoMaterialModule} from '../material-module';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {OverlayModule} from "@angular/cdk/overlay";
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -42,6 +43,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     HttpClientModule,
     FlexLayoutModule,
     FontAwesomeModule,
+    OverlayModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

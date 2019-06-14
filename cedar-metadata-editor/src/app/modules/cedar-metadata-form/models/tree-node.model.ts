@@ -1,7 +1,7 @@
 import {FormGroup} from '@angular/forms';
 
 import {Metadata} from './metadata.model';
-import {InputType} from "../models/input-type";
+import {InputType} from '../models/input-type';
 
 export interface TreeNode {
   key: string;

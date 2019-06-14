@@ -1,5 +1,5 @@
-import {InputType} from "../models/input-type";
-import {constants} from "../models/constants";
+import {InputType} from '../models/input-type';
+import {constants} from '../models/constants';
 
 export class InputTypeService {
 

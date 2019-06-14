@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core'
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 import {FormGroup} from '@angular/forms';
-import {Subscription} from "rxjs";
-import {TreeNode} from "../../models/tree-node.model";
-import {UiService} from "../../../../services/ui/ui.service";
+import {Subscription} from 'rxjs';
+import {TreeNode} from '../../models/tree-node.model';
 
 
 @Component({
@@ -12,7 +11,7 @@ import {UiService} from "../../../../services/ui/ui.service";
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ElementComponent {
+export class ElementComponent  implements OnInit {
 
 
   @Input() node: TreeNode;
@@ -20,11 +19,7 @@ export class ElementComponent {
   @Input() formGroup: FormGroup;
   @Input() index: number;
 
-
-  darkMode: boolean;
-  private _darkModeSub: Subscription;
-
-  constructor(private ui: UiService) {
+  constructor() {
   }
 
   ngOnInit() {
@@ -32,9 +27,6 @@ export class ElementComponent {
       this.parentGroup.addControl(this.node.key, this.formGroup);
     }
 
-    this._darkModeSub = this.ui.darkModeState$.subscribe(value => {
-      this.darkMode = value;
-    });
   }
 
 }
