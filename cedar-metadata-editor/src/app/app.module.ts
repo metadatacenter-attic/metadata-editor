@@ -20,6 +20,7 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {OverlayModule} from "@angular/cdk/overlay";
 
+
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);

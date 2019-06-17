@@ -1,4 +1,4 @@
-<div  class="instance__container ">
+<div class="instance__container ">
 
   <mat-tab-group (selectedTabChange)="selectedTabChange($event)">
 
@@ -16,22 +16,27 @@
         </div>
       </div>
 
-      <cedar-form *ngIf="template"  type="template"  [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
-        [autocompleteResults]="allPosts"></cedar-form>
+            <cedar-form *ngIf="template"  type="template"  [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
+              [autocompleteResults]="allPosts"></cedar-form>
 
-<!--     <cedar-metadata-form *ngIf="template"  type="template" [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
-<!--      [autocompleteResults]="allPosts"></cedar-metadata-form>-->
+            <cedar-form *ngIf="templateElement"  type="element" [form]="form" [instance]="instance" [template]="templateElement"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+              [autocompleteResults]="allPosts"></cedar-form>
 
-      <cedar-form *ngIf="templateElement"  type="element" [form]="form" [instance]="instance" [template]="templateElement"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
-        [autocompleteResults]="allPosts"></cedar-form>
+            <cedar-form *ngIf="templateField"  type="field" [form]="form" [instance]="instance" [template]="templateField"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
+              [autocompleteResults]="allPosts"></cedar-form>
 
-<!--      <cedar-metadata-form *ngIf="templateElement"  type="element" [form]="form" [instance]="instance" [template]="templateElement"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--      <cedar-metadata-form *ngIf="template" type="template" [form]="form" [instance]="instance" [template]="template"-->
+<!--        [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
 <!--        [autocompleteResults]="allPosts"></cedar-metadata-form>-->
 
-      <cedar-form *ngIf="templateField"  type="field" [form]="form" [instance]="instance" [template]="templateField"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"
-        [autocompleteResults]="allPosts"></cedar-form>
+<!--      <cedar-metadata-form *ngIf="templateElement" type="element" [form]="form" [instance]="instance"-->
+<!--        [template]="templateElement" [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"-->
+<!--        (changed)="onChanged($event)"-->
+<!--        [autocompleteResults]="allPosts"></cedar-metadata-form>-->
 
-<!--      <cedar-metadata-form *ngIf="templateField"  type="field" [form]="form" [instance]="instance" [template]="templateField"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
+<!--      <cedar-metadata-form *ngIf="templateField" type="field" [form]="form" [instance]="instance"-->
+<!--        [template]="templateField" [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"-->
+<!--        (changed)="onChanged($event)"-->
 <!--        [autocompleteResults]="allPosts"></cedar-metadata-form>-->
 
 
@@ -44,7 +49,7 @@
 
     <mat-tab label="{{'App.JSONLD' | translate}}">
       <div *ngIf="instance">
-        <div class="tab-header" >
+        <div class="tab-header">
           <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
             {{'App.Copy' | translate}}
           </button>
@@ -54,8 +59,8 @@
     </mat-tab>
 
     <mat-tab label="{{'App.RDF' | translate}}">
-      <div >
-        <div class="tab-header" >
+      <div>
+        <div class="tab-header">
           <button id="rdfCopy" mat-raised-button color="accent" (click)="copyToClipboard('rdf', 'rdfCopy')">
             {{'App.Copy' | translate}}
           </button>
@@ -64,16 +69,16 @@
       </div>
     </mat-tab>
 
-<!--    <mat-tab label="{{'App.Value' | translate}}">-->
-<!--      <div *ngIf="form">-->
-<!--        <div class="tab-header" >-->
-<!--          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">-->
-<!--            {{'App.Copy' | translate}}-->
-<!--          </button>-->
-<!--        </div>-->
-<!--        <pre><span id="payload">{{ form.value | json}}</span></pre>-->
-<!--      </div>-->
-<!--    </mat-tab>-->
+    <!--    <mat-tab label="{{'App.Value' | translate}}">-->
+    <!--      <div *ngIf="form">-->
+    <!--        <div class="tab-header" >-->
+    <!--          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">-->
+    <!--            {{'App.Copy' | translate}}-->
+    <!--          </button>-->
+    <!--        </div>-->
+    <!--        <pre><span id="payload">{{ form.value | json}}</span></pre>-->
+    <!--      </div>-->
+    <!--    </mat-tab>-->
   </mat-tab-group>
 
 </div>

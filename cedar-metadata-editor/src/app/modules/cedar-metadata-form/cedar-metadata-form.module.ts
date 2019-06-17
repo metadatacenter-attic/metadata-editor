@@ -23,14 +23,16 @@ import {ImageComponent} from './components/image/image.component';
 import {RichtextComponent} from './components/richtext/richtext.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {DemoMaterialModule} from "../../../material-module";
-
+import { TooltipDirective } from './components/tooltip/tooltip.directive';
+import { TooltipComponent } from './components/tooltip/tooltip.component';
+import {OverlayModule} from "@angular/cdk/overlay";
 
 @NgModule({
   declarations: [FormComponent, QuestionComponent, ElementComponent, ControlledComponent,
     DateComponent, TextfieldComponent, TextareaComponent, ListComponent, RadioComponent,
     CheckboxComponent, AttributeValueComponent, YoutubeComponent, SectionComponent, ImageComponent,
-    RichtextComponent],
-
+    RichtextComponent,TooltipDirective,
+    TooltipComponent,],
   imports: [
     ReactiveFormsModule,
     CommonModule,
@@ -38,10 +40,14 @@ import {DemoMaterialModule} from "../../../material-module";
     DemoMaterialModule,
     SharedModule,
     NgxYoutubePlayerModule.forRoot(),
-    FontAwesomeModule
+    FontAwesomeModule,
+    OverlayModule,
   ],
   exports: [
     FormComponent
+  ],
+  entryComponents: [
+    TooltipComponent
   ],
   providers: [],
 })
