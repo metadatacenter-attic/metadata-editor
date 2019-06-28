@@ -22,7 +22,7 @@ import * as jsonld from 'jsonld';
 @Component({
   selector: 'app-instance',
   templateUrl: './instance.component.html',
-  styleUrls: ['./instance.component.less'],
+  styleUrls: ['./instance.component.scss'],
   providers: []
 })
 
@@ -35,17 +35,14 @@ export class InstanceComponent implements OnInit {
 
   template: any;
   instance: any;
-  templateElement: any;
-  templateField: any;
   rdf: any;
+  mode: string;
 
   route: ActivatedRoute;
   payload: any;
   jsonLD: any;
 
-
   formValid: boolean;
-  viewOnly: boolean = false;
   ui: UiService;
   _tr: TranslateService;
   _ls: LocalSettingsService;
@@ -71,6 +68,7 @@ export class InstanceComponent implements OnInit {
     this.dh = dataHandler;
     this.ds = dataStore;
     this.showForm = true;
+    this.mode = 'edit';
 
   }
 
@@ -185,11 +183,11 @@ export class InstanceComponent implements OnInit {
   }
 
   private templateElementLoadedCallback(templateElementId) {
-    this.templateElement = this.ds.getTemplateElement(templateElementId);
+    this.template = this.ds.getTemplateElement(templateElementId);
 
     // if this is a default instance, save the template info
     if (!TemplateService.isBasedOn(this.instance)) {
-      const schema = TemplateService.schemaOf(this.templateElement) as TemplateSchema;
+      const schema = TemplateService.schemaOf(this.template) as TemplateSchema;
       InstanceService.setBasedOn(this.instance, TemplateService.getId(schema));
       InstanceService.setName(this.instance, TemplateService.getName(schema));
       InstanceService.setHelp(this.instance, TemplateService.getHelp(schema));
@@ -197,11 +195,11 @@ export class InstanceComponent implements OnInit {
   }
 
   private templateFieldLoadedCallback(templateFieldId) {
-    this.templateField = this.ds.getTemplateField(templateFieldId);
+    this.template = this.ds.getTemplateField(templateFieldId);
 
     // if this is a default instance, save the template info
     if (!TemplateService.isBasedOn(this.instance)) {
-      const schema = TemplateService.schemaOf(this.templateField) as TemplateSchema;
+      const schema = TemplateService.schemaOf(this.template) as TemplateSchema;
       InstanceService.setBasedOn(this.instance, TemplateService.getId(schema));
       InstanceService.setName(this.instance, TemplateService.getName(schema));
       InstanceService.setHelp(this.instance, TemplateService.getHelp(schema));
@@ -233,8 +231,8 @@ export class InstanceComponent implements OnInit {
   }
 
   // toggle edit/view button
-  toggleDisabled() {
-    this.viewOnly = !this.viewOnly;
+  toggleMode() {
+    this.mode = this.mode === 'edit' ? 'view' : 'edit';
   }
 
   // copy stuff in tabs to browser's clipboard

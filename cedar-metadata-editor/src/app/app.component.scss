@@ -1,5 +1,4 @@
-@import "../styles.less";
-
+@import '~src/theme.scss';
 
 button:focus {
   outline: 0 !important;
@@ -146,6 +145,7 @@ button:focus {
   margin-right: 0.2rem;
   overflow: hidden;
   margin-left: 0.2rem;
+
   .mat-toolbar-row {
     height: 40px;
   }
@@ -265,7 +265,7 @@ button:focus {
 .hamburger__icon {
   position: relative;
   z-index: 35;
-  font-size:1.5em;
+  font-size: 1.5em;
   padding: 0.5em 2em;
   margin-right: 1em;
   cursor: pointer;
@@ -340,9 +340,9 @@ button:focus {
   position: relative;
   z-index: 35;
   height: 3.0em;
-  font-size:2em;
+  font-size: 2em;
   margin: 0 0.2em;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .logo__text {
@@ -350,10 +350,10 @@ button:focus {
   z-index: 35;
   font-size: 2.0em;
   line-height: 2.0em;
-  padding-top:0;
-  margin-top:0;
-  font-family: 'crimson text','HelveticaNeue','Helvetica Neue','Helvetica-Neue',Helvetica,Arial,sans-serif;
-  cursor:pointer;
+  padding-top: 0;
+  margin-top: 0;
+  font-family: 'crimson text', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  cursor: pointer;
 }
 
 .fa-stack {
@@ -376,9 +376,10 @@ button:focus {
   font-size: 0.5em;
   color: white;
 }
+
 .fa-stack-2x {
   font-size: 1.0em;
-  color:@cedar-primary;
+  color: mat-color($my-app-primary);
 }
 
 

@@ -9,8 +9,6 @@
     "Edit": "Edit",
     "Form": "Form",
     "Copy": "Copy",
-    "JSONLD": "JSON-LD",
-    "RDF": "RDF",
     "Save": "Save",
     "Value": "Value"
   },
@@ -37,7 +35,8 @@
   },
   "Generic": {
     "jsonSchema": "JSON Schema",
-    "jsonLD": "JSON-LD"
+    "jsonLD": "JSON-LD",
+    "rdf": "RDF"
   },
   "loadError": {
     "401": "We are sorry, but this artifact has not been made public by its owner.<br/><a href='{{link}}'>Try to view artifact in CEDAR</a> (Login required)",

@@ -51,5 +51,5 @@ import {OverlayModule} from "@angular/cdk/overlay";
   ],
   providers: [],
 })
-export class CedarMetadataFormModule {
+export class CedarMetadataFormModuleOld {
 }

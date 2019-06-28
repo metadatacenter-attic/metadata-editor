@@ -9,8 +9,6 @@
     "Edit": "Edit",
     "Form": "Form",
     "Copy": "Copy",
-    "JSONLD": "JSON-LD",
-    "RDF": "RDF",
     "Save": "Save",
     "Value": "Value"
   },
@@ -37,7 +35,8 @@
   },
   "Generic" : {
     "jsonSchema": "JSON Schema",
-    "jsonLD": "JSON-LD"
+    "jsonLD": "JSON-LD",
+    "rdf": "RDF"
   },
   "loadError": {
     "401": "Sajnáljuk, de az adott adatot a tulajdonosa nem tette nyitottá!<br/><a href='{{link}}'>Nyisd meg CEDAR-ban</a> (Bejelentkezés szükséges)",

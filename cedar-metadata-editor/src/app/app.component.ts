@@ -1,23 +1,17 @@
 import {Component, OnInit} from '@angular/core';
 import {UiService} from './services/ui.service';
-import {Subscription} from 'rxjs';
 
 import {environment} from '../environments/environment';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
 import {LocalSettingsService} from './services/local-settings.service';
-import {
-  faSquare,
-  faTag,
-  faBars,
-  faSquareFull
-} from '@fortawesome/free-solid-svg-icons';
+import {faBars, faSquare, faTag} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   showMenu = false;
