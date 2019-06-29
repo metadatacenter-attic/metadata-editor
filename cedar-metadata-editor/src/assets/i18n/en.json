@@ -1,21 +1,27 @@
 {
   "App": {
-    "NavTitle": "CEDAR",
-    "WindowTitle": "CEDAR Metadata Editor",
+    "Title": "CEDAR",
+    "NavTitle": "CEDAR Metadata Editor",
+    "WindowTitle": "CEDAR",
     "SelectPage": "Select Page",
     "Home": "Home",
     "Language": "Language",
     "View": "View",
     "Edit": "Edit",
     "Form": "Form",
-    "Copy": "Copy",
+    "Copy": "Copy to Clipboard",
+    "Copied": "Copied",
     "Save": "Save",
-    "Value": "Value"
+    "Value": "Value",
+    "Validate": "Validate"
   },
   "Generic": {
     "Loading": "Loading...",
     "Light": "Light",
-    "Dark": "Dark"
+    "Dark": "Dark",
+    "jsonSchema": "Template JSON Schema",
+    "jsonLD": "Instance JSON-LD",
+    "rdf": "Instance RDF"
   },
   "error": {
     "resourceNotPublic": "The requested resource is not publicly available"
@@ -32,11 +38,6 @@
     "https://schema.metadatacenter.org/core/TemplateElement": "Metadata element",
     "https://schema.metadatacenter.org/core/Template": "Metadata template",
     "TemplateInstance": "Metadata instance"
-  },
-  "Generic": {
-    "jsonSchema": "JSON Schema",
-    "jsonLD": "JSON-LD",
-    "rdf": "RDF"
   },
   "loadError": {
     "401": "We are sorry, but this artifact has not been made public by its owner.<br/><a href='{{link}}'>Try to view artifact in CEDAR</a> (Login required)",

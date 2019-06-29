@@ -6,11 +6,11 @@
     </section>
     <section class="menu-body">
       <div class="menu__container">
-<!--        <mat-toolbar>-->
-<!--          <mat-toolbar-row>-->
-<!--            <button style="text-align:left;width:100%" mat-button routerLink="">{{'App.Home' | translate}}</button>-->
-<!--          </mat-toolbar-row>-->
-<!--        </mat-toolbar>-->
+        <!--        <mat-toolbar>-->
+        <!--          <mat-toolbar-row>-->
+        <!--            <button style="text-align:left;width:100%" mat-button routerLink="">{{'App.Home' | translate}}</button>-->
+        <!--          </mat-toolbar-row>-->
+        <!--        </mat-toolbar>-->
       </div>
     </section>
     <section class="menu-footer">
@@ -21,41 +21,19 @@
 <div class="root__container">
   <header class="main__header">
     <div class="left__section">
-      <div  id="Menu_Burger_Icon"  class="hamburger__icon" (click)="toggleMenu()"><fa-icon  [icon]="faBars" ></fa-icon></div>
+      <div id="Menu_Burger_Icon" class="hamburger__icon" (click)="toggleMenu()">
+        <fa-icon [icon]="faBars"></fa-icon>
+      </div>
     </div>
 
-    <div>
-    <span class="logo__icon"><span class="fa-stack"><fa-icon class="fa-stack-2x" [icon]="faSquare"></fa-icon><fa-icon
-      class="fa-stack-1x" [icon]="faTag"></fa-icon></span></span>
-      <span class="logo__text">{{'App.NavTitle' | translate}}</span>
-    </div>
-
-    <div></div>
-
-    <mat-form-field class="language-selector" >
-      <mat-label>{{'App.Language' | translate}}</mat-label>
-      <mat-select matNativeControl required [(value)]="languages.selected"
-        (valueChange)="switchLanguage(languages.selected)">
-        <mat-option *ngFor="let language of languages.options" [value]="language.value">
-          {{language.viewValue}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <!--    <div class="mode-toggle__container">-->
-    <!--      <span class="mode-toggle__text">{{'Generic.Light' | translate}}</span>-->
-    <!--      <label class="toggle-button__container">-->
-    <!--        <input (click)="modeToggleSwitch()" type="checkbox" class="mode-toggle__input"/>-->
-    <!--        <span [ngClass]="{'mode-toggle__bg-checked': darkMode}" class="mode-toggle__bg"></span>-->
-    <!--        <span [ngClass]="{'mode-toggle__circle-checked': darkMode}" class="mode-toggle__circle"></span>-->
-    <!--      </label>-->
-    <!--      <span class="mode-toggle__text">{{'Generic.Dark' | translate}}</span>-->
-    <!--    </div>-->
+    <img class="cedar__logo" src="assets/img/CEDAR_logo_tree.png">
+    <h2 class="app-title">{{ 'App.NavTitle' | translate }}</h2>
 
   </header>
 
+
   <main class="main__container">
-    <div class="main-container__bg" [ngClass]="{'main-container__bg-dark': darkMode}"></div>
+    <div class="main-container__bg" ></div>
 
     <router-outlet></router-outlet>
   </main>

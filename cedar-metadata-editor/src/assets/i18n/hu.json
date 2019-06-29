@@ -8,14 +8,18 @@
     "View": "View",
     "Edit": "Edit",
     "Form": "Form",
-    "Copy": "Copy",
+    "Copy": "Copy to Clipboard",
+    "Copied": "Copied",
     "Save": "Save",
     "Value": "Value"
   },
   "Generic": {
     "Loading": "Adatbetöltés...",
     "Light": "Light",
-    "Dark": "Dark"
+    "Dark": "Dark",
+    "jsonSchema": "Template JSON Schema",
+    "jsonLD": "Instance JSON-LD",
+    "rdf": "Instance RDF"
   },
   "error": {
     "resourceNotPublic": "A hivatkozott erőforrás nem érhető el publikusan"
@@ -32,11 +36,6 @@
     "https://schema.metadatacenter.org/core/TemplateElement": "Metaadat elem",
     "https://schema.metadatacenter.org/core/Template": "Metaadat sablon",
     "TemplateInstance": "Metaadat példány"
-  },
-  "Generic" : {
-    "jsonSchema": "JSON Schema",
-    "jsonLD": "JSON-LD",
-    "rdf": "RDF"
   },
   "loadError": {
     "401": "Sajnáljuk, de az adott adatot a tulajdonosa nem tette nyitottá!<br/><a href='{{link}}'>Nyisd meg CEDAR-ban</a> (Bejelentkezés szükséges)",

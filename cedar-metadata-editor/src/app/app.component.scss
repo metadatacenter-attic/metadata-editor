@@ -27,6 +27,37 @@ button:focus {
 ================
 */
 
+.app-title {
+  color: mat-color($my-app-primary);
+  font-weight: lighter;
+}
+
+.cedar__logo {
+  width: 30px;
+  padding: 0 20px;
+}
+
+
+.logo__icon {
+  position: relative;
+  z-index: 35;
+  height: 3.0em;
+  font-size: 2em;
+  margin: 0 0.2em;
+  cursor: pointer;
+}
+
+.logo__text {
+  position: relative;
+  z-index: 35;
+  font-size: 2.0em;
+  line-height: 2.0em;
+  padding-top: 0;
+  margin-top: 0;
+  font-family: 'crimson text', 'HelveticaNeue', 'Helvetica Neue', 'Helvetica-Neue', Helvetica, Arial, sans-serif;
+  cursor: pointer;
+}
+
 .language-selector {
   padding: 0 10px;
   width: 6em;
@@ -174,12 +205,11 @@ button:focus {
 .main__header {
   width: 100%;
   display: grid;
-  grid-template-columns: 5em 20em 1fr 120px;
+  grid-template-columns: 5em 5em 1fr 120px;
   grid-column-gap: 10px;
   grid-template-rows: 1fr;
 
   box-shadow: 0 0 2rem rgba(95, 160, 179, 0.2);
-  height: 4rem;
   margin: 0;
   align-items: center;
   transition: background-color 500ms linear;
@@ -383,5 +413,24 @@ button:focus {
 }
 
 
+button.mat-icon-button.help-text-button {
+  padding: 0;
+  min-width: 0;
+  width: 2em;
+  height: 2em;
+  flex-shrink: 0;
+  width: 2em;
+  vertical-align: middle;
+  border-radius: 50%;
 
+  mat-icon {
+    height: 1em;
+    width: 1em;
+    font-size: 1em;
+    line-height: 1em;
+    padding-top: .5em;
+    vertical-align: top;
+    color: rgba(0, 0, 0, .54)
+  }
+}
 

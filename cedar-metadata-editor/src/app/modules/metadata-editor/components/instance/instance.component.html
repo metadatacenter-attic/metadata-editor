@@ -1,4 +1,4 @@
-<div class="instance__container ">
+<div class="instance__container " [ngClass]="{'alternate-theme': mode === 'view'}" >
 
   <div class="mode-toggle__container" >
     <span *ngIf="mode === 'view'" class="mode-toggle__text">{{'App.View' | translate}}</span>
@@ -12,6 +12,7 @@
 
   <cedar-form *ngIf="template" [mode]="mode" [instance]="instance" [template]="template"
     (autocomplete)="onAutocomplete($event)"
+    (formChange)="onFormChange($event)"
     [autocompleteResults]="allPosts"></cedar-form>
 
   <div *ngIf="mode ==='edit'" class="save-container">
@@ -30,27 +31,11 @@
         </mat-expansion-panel-header>
 
         <div style="text-align:right">
-          <button id="jsonLDCopy" mat-raised-button color="primary" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
+          <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
         <pre><span id="jsonLD">{{ instance | json}}</span></pre>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel class="expansion-container">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{'Generic.jsonSchema' | translate}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div style="text-align:right">
-          <button id="jsonSchemaCopy" mat-raised-button color="primary"
-            (click)="copyToClipboard('jsonSchema', 'jsonSchemaCopy')">
-            {{'App.Copy' | translate}}
-          </button>
-        </div>
-        <pre><span id="jsonSchema">{{ template | json}}</span></pre>
       </mat-expansion-panel>
 
       <mat-expansion-panel class="expansion-container">
@@ -61,12 +46,29 @@
         </mat-expansion-panel-header>
 
         <div style="text-align:right">
-          <button id="RDFCopy" mat-raised-button color="primary" (click)="copyToClipboard('RDF', 'RDFCopy')">
+          <button id="RDFCopy" mat-raised-button color="accent" (click)="copyToClipboard('RDF', 'RDFCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
         <pre><span id="RDF">{{rdf}}</span></pre>
       </mat-expansion-panel>
+
+      <mat-expansion-panel class="expansion-container">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{'Generic.jsonSchema' | translate}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div style="text-align:right">
+          <button id="jsonSchemaCopy" mat-raised-button color="accent"
+            (click)="copyToClipboard('jsonSchema', 'jsonSchemaCopy')">
+            {{'App.Copy' | translate}}
+          </button>
+        </div>
+        <pre><span id="jsonSchema">{{ template | json}}</span></pre>
+      </mat-expansion-panel>
+
     </mat-accordion>
   </div>
 
