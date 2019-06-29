@@ -1,7 +1,4 @@
-@cedar-primary: #61A0C5;
-@cedar-secondary: #6F76CE;
-@cedar-accent: #E9AE0B;
-@cedar-warn: #EA8509;
+@import '~src/theme.scss';
 
 .instance__container {
   margin: 50px auto;
@@ -25,11 +22,19 @@
     max-width: calc(80% - 4em);
   }
 
-  @media only screen and (min-width: 1001px)  {
+  @media only screen and (min-width: 1001px) {
     max-width: calc(1000px - 4em);
   }
 }
 
+.save-container {
+  text-align: right;
+  margin: 30px 20px;
+}
+
+.accordion-container {
+  margin-top: 50px
+}
 
 .tab-header {
   padding: 10px 10px 0 10px;
@@ -48,6 +53,16 @@
   margin: 0 0.5rem;
 }
 
+.expansion-container {
+  border: 1px solid #eee;
+  overflow:hidden;
+}
+
+.mode-toggle__container {
+  text-align: right;
+  margin: 20px;
+}
+
 .mode-toggle__input {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -57,10 +72,7 @@
   height: 1rem;
   width: 2rem;
   border-radius: 0.5rem;
-  background-color: @cedar-warn;
-  @cedar-secondary: #6F76CE;
-  @cedar-accent: #E9AE0B;
-  @cedar-warn: #EA8509;;
+  background-color: #b0b0b0;
   display: inline-block;
   transition: background-color 300ms linear;
 }
@@ -68,7 +80,7 @@
 .mode-toggle__circle {
   height: 1.30rem;
   width: 1.30rem;
-  background-color: @cedar-primary;
+  background-color: mat-color($my-app-primary);
   position: absolute;
   top: -0.2rem;
   border-radius: 50%;
@@ -78,12 +90,12 @@
 }
 
 .mode-toggle__circle-checked {
-  background-color: @cedar-secondary;
-  left: 1.75rem;
+  background-color: mat-color($my-app-secondary);
+  left: 1.3rem;
 }
 
 .mode-toggle__bg-checked {
-  background-color: @cedar-accent;
+  background-color: #b0b0b0;
 }
 
 .mode-toggle__text {
@@ -116,3 +128,4 @@ pre {
   white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
+

@@ -1,26 +1,20 @@
 import {Component, OnInit} from '@angular/core';
-import {UiService} from './services/ui/ui.service';
-import {Subscription} from 'rxjs';
+import {UiService} from './services/ui.service';
 
 import {environment} from '../environments/environment';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {Title} from '@angular/platform-browser';
 import {LocalSettingsService} from './services/local-settings.service';
-import {
-  faSquare,
-  faTag,
-  faBars
-} from '@fortawesome/free-solid-svg-icons';
+import {faBars, faSquare, faTag} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   showMenu = false;
-  darkMode: boolean;
   title: string;
   disabled: boolean = false;
   languages = {
@@ -29,7 +23,6 @@ export class AppComponent implements OnInit {
   };
   _tr: TranslateService;
   _ls: LocalSettingsService;
-  private _subscription: Subscription;
 
   faTag = faTag;
   faSquare = faSquare;
@@ -58,9 +51,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._subscription = this.ui.darkModeState$.subscribe(res => {
-      this.darkMode = res;
-    })
   }
 
   toggleMenu() {
@@ -72,8 +62,6 @@ export class AppComponent implements OnInit {
   }
 
   modeToggleSwitch() {
-    this.ui.update(!this.darkMode);
-    // this.ui.darkModeState.next(!this.darkModeActive);
   }
 
   getCurrentLanguageCode() {
@@ -83,6 +71,16 @@ export class AppComponent implements OnInit {
   switchLanguage(language: string) {
     this._tr.use(language);
     this._ls.setLanguage(language);
+  }
+
+  openInCedar() {
+    let destination = window.location.href;
+    destination = window.location.href.replace('open-metadata', 'cedar');
+    destination =  destination.replace('/instances/', '/instances/edit/');
+    destination =  destination.replace('/template-elements/', '/elements/edit/');
+    destination =  destination.replace('/template-fields/', '/fields/edit/');
+    destination =  destination.replace('/templates/', '/instances/create/');
+    window.open(destination, '_blank');
   }
 
 

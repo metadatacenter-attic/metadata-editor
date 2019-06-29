@@ -1,67 +1,81 @@
-<div  class="instance__container ">
+<div class="instance__container " [ngClass]="{'alternate-theme': mode === 'view'}" >
 
-  <mat-tab-group (selectedTabChange)="selectedTabChange($event)">
+  <div class="mode-toggle__container" >
+    <span *ngIf="mode === 'view'" class="mode-toggle__text">{{'App.View' | translate}}</span>
+    <span *ngIf="mode === 'edit'" class="mode-toggle__text">{{'App.Edit' | translate}}</span>
+    <label class="toggle-button__container">
+      <input (click)="toggleMode()" type="checkbox" class="mode-toggle__input"/>
+      <span [ngClass]="{'mode-toggle__bg-checked': mode === 'view'}" class="mode-toggle__bg"></span>
+      <span [ngClass]="{'mode-toggle__circle-checked': mode === 'edit'}" class="mode-toggle__circle"></span>
+    </label>
+  </div>
 
-    <mat-tab label="{{'App.Form' | translate}}">
+  <cedar-form *ngIf="template" [mode]="mode" [instance]="instance" [template]="template"
+    (autocomplete)="onAutocomplete($event)"
+    (formChange)="onFormChange($event)"
+    [autocompleteResults]="allPosts"></cedar-form>
 
-      <div class="tab-header">
-        <div class="mode-toggle__container">
-          <span *ngIf="viewOnly" class="mode-toggle__text">{{'App.View' | translate}}</span>
-          <span *ngIf="!viewOnly" class="mode-toggle__text">{{'App.Edit' | translate}}</span>
-          <label class="toggle-button__container">
-            <input (click)="toggleDisabled()" type="checkbox" class="mode-toggle__input"/>
-            <span [ngClass]="{'mode-toggle__bg-checked': viewOnly}" class="mode-toggle__bg"></span>
-            <span [ngClass]="{'mode-toggle__circle-checked': viewOnly}" class="mode-toggle__circle"></span>
-          </label>
-        </div>
-      </div>
+  <div *ngIf="mode ==='edit'" class="save-container">
+    <button mat-raised-button color="primary" [disabled]="mode === 'view'"
+      (click)="onSubmit()">{{'App.Save' | translate}}
+    </button>
+  </div>
 
-      <cedar-form *ngIf="showForm"   [form]="form"  [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)"
-        [autocompleteResults]="allPosts"></cedar-form>
+  <div *ngIf="instance" class="accordion-container">
+    <mat-accordion>
+      <mat-expansion-panel class="expansion-container">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{'Generic.jsonLD' | translate}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-<!--     <cedar-metadata-form  [form]="form" [instance]="instance" [template]="template"  [disabled]="viewOnly" (autocomplete)="onAutocomplete($event)" (changed)="onChanged($event)"-->
-<!--      [autocompleteResults]="allPosts"></cedar-metadata-form>-->
-
-      <div>
-        <button mat-raised-button color="primary" [disabled]="viewOnly" (click)="onSubmit()">{{'App.Save' | translate}}
-        </button>
-      </div>
-
-    </mat-tab>
-
-    <mat-tab label="{{'App.JSONLD' | translate}}">
-      <div *ngIf="instance">
-        <div class="tab-header" >
+        <div style="text-align:right">
           <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
         <pre><span id="jsonLD">{{ instance | json}}</span></pre>
-      </div>
-    </mat-tab>
+      </mat-expansion-panel>
 
-    <mat-tab label="{{'App.RDF' | translate}}">
-      <div >
-        <div class="tab-header" >
-          <button id="rdfCopy" mat-raised-button color="accent" (click)="copyToClipboard('rdf', 'rdfCopy')">
+      <mat-expansion-panel class="expansion-container">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{'Generic.rdf' | translate}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div style="text-align:right">
+          <button id="RDFCopy" mat-raised-button color="accent" (click)="copyToClipboard('RDF', 'RDFCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
-        <pre><div id="rdf">{{rdf}}</div></pre>
-      </div>
-    </mat-tab>
+        <pre><span id="RDF">{{rdf}}</span></pre>
+      </mat-expansion-panel>
 
-    <mat-tab label="{{'App.Value' | translate}}">
-      <div *ngIf="form">
-        <div class="tab-header" >
-          <button id="payloadCopy" mat-raised-button color="accent" (click)="copyToClipboard('payload','payloadCopy')">
+      <mat-expansion-panel class="expansion-container">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{'Generic.jsonSchema' | translate}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div style="text-align:right">
+          <button id="jsonSchemaCopy" mat-raised-button color="accent"
+            (click)="copyToClipboard('jsonSchema', 'jsonSchemaCopy')">
             {{'App.Copy' | translate}}
           </button>
         </div>
-        <pre><span id="payload">{{ form.value | json}}</span></pre>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+        <pre><span id="jsonSchema">{{ template | json}}</span></pre>
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </div>
+
+
+  <div *ngIf="artifactStatus">
+    <app-artifact-error [status]="artifactStatus" [cedarLink]="cedarLink"></app-artifact-error>
+  </div>
 
 </div>
 

@@ -6,7 +6,6 @@ import {SharedModule} from "../shared";
 import {DemoMaterialModule} from "../../../material-module";
 import {InstanceComponent} from "./components/instance/instance.component";
 import {MetadataEditorRoutingModule} from "./metadata-editor-routing.module";
-import {CedarMetadataFormModule} from "../cedar-metadata-form/cedar-metadata-form.module";
 import {NgxYoutubePlayerModule} from "ngx-youtube-player";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 
@@ -22,7 +21,6 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
     MetadataEditorRoutingModule,
     DemoMaterialModule,
     SharedModule,
-    CedarMetadataFormModule,
     FontAwesomeModule
   ],
   exports: [
