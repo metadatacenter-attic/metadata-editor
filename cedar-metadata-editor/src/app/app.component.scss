@@ -17,7 +17,6 @@ button:focus {
   height: 100vh;
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: 50px auto;
   position: relative;
 }
 
@@ -30,6 +29,8 @@ button:focus {
 .app-title {
   color: mat-color($my-app-primary);
   font-weight: lighter;
+  font-family: CrimsonText,  serif;
+  font-size: 2em;
 }
 
 .cedar__logo {
@@ -135,7 +136,8 @@ button:focus {
   width: 100%;
   align-content: center;
   color: white;
-  box-shadow: 0 0 2rem rgba(95, 160, 179, 0.2);
+  //box-shadow: 0 0 2rem rgba(11,62,79, 0.2);
+  box-shadow: 0 0 2rem rgba(99,153,165, 0.2);
   height: 4rem;
 }
 
@@ -208,8 +210,9 @@ button:focus {
   grid-template-columns: 5em 5em 1fr 120px;
   grid-column-gap: 10px;
   grid-template-rows: 1fr;
-
-  box-shadow: 0 0 2rem rgba(95, 160, 179, 0.2);
+  height:4rem;
+  //box-shadow: 0 0 2rem rgba(11,62,79, 0.2);
+  box-shadow: 0 0 2rem rgba(99,153,165, 0.2);
   margin: 0;
   align-items: center;
   transition: background-color 500ms linear;
@@ -299,6 +302,7 @@ button:focus {
   padding: 0.5em 2em;
   margin-right: 1em;
   cursor: pointer;
+  color: rgba(0, 0, 0, .54)
 }
 
 
