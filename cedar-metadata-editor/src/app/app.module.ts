@@ -9,16 +9,13 @@ import {SharedModule} from './modules/shared';
 import {ResourcesModule} from './modules/resources/resources.module';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-
-
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {UiService} from './services/ui.service';
-import {DemoMaterialModule} from '../material-module';
-
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {OverlayModule} from "@angular/cdk/overlay";
+import {MaterialModule} from "./shared/material-module";
 
 
 // AoT requires an exported function for factories
@@ -40,7 +37,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ResourcesModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    DemoMaterialModule,
+    MaterialModule,
     HttpClientModule,
     FlexLayoutModule,
     FontAwesomeModule,

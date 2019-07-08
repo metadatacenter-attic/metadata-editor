@@ -15,6 +15,22 @@ import {environment} from "../../../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import * as jsonld from 'jsonld';
 import {TemplateService} from "../../services/template.service";
+import {
+  faAsterisk,
+  faCalendar,
+  faCheckSquare,
+  faDotCircle,
+  faEnvelope,
+  faExternalLinkAlt,
+  faFont,
+  faHashtag,
+  faLink,
+  faList,
+  faParagraph,
+  faPhoneSquare,
+  faPlusSquare
+} from '@fortawesome/free-solid-svg-icons';
+
 
 
 @Component({
@@ -53,6 +69,19 @@ export class InstanceComponent implements OnInit {
   allPosts;
 
   CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
+  faAsterisk = faAsterisk;
+  faEnvelope = faEnvelope;
+  faHashtag = faHashtag;
+  faLink = faLink;
+  faFont = faFont;
+  faCalendar = faCalendar;
+  faPhoneSquare = faPhoneSquare;
+  faParagraph = faParagraph;
+  faCheckSquare = faCheckSquare;
+  faList = faList;
+  faDotCircle = faDotCircle;
+  faPlusSquare = faPlusSquare;
+  faExternalLinkAlt = faExternalLinkAlt;
 
 
   constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, private translateService: TranslateService, dataHandler: DataHandlerService,

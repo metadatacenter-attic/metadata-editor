@@ -129,3 +129,28 @@ pre {
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
+.legend {
+  margin:100px 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.38);
+  -moz-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.38);
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.38);
+  padding: 5px;
+  box-sizing: content-box;
+  display: block;
+  border-radius: 4px;
+
+  div {
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.38);
+    padding: 5px;
+    line-height: 2em;
+    font-size: 1em;
+    fa-icon {
+      padding:5px;
+    }
+    .asterisk {
+      color: mat-color($my-app-warn);
+    }
+  }
+}

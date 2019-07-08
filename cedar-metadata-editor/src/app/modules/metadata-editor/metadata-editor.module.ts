@@ -3,15 +3,16 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {SharedModule} from "../shared";
-import {DemoMaterialModule} from "../../../material-module";
+import {MaterialModule} from "../../shared/material-module";
 import {InstanceComponent} from "./components/instance/instance.component";
 import {MetadataEditorRoutingModule} from "./metadata-editor-routing.module";
-import {NgxYoutubePlayerModule} from "ngx-youtube-player";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {LegendComponent} from './components/legend/legend.component';
 
 @NgModule({
   declarations: [
-    InstanceComponent],
+    InstanceComponent,
+    LegendComponent],
 
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   imports: [
@@ -19,7 +20,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
     CommonModule,
     NgbModule,
     MetadataEditorRoutingModule,
-    DemoMaterialModule,
+    MaterialModule,
     SharedModule,
     FontAwesomeModule
   ],
