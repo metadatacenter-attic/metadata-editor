@@ -8,11 +8,14 @@ import {InstanceComponent} from "./components/instance/instance.component";
 import {MetadataEditorRoutingModule} from "./metadata-editor-routing.module";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {LegendComponent} from './components/legend/legend.component';
+import {FormResultsComponent} from './components/form-results/form-results.component';
+
 
 @NgModule({
   declarations: [
     InstanceComponent,
-    LegendComponent],
+    LegendComponent,
+    FormResultsComponent],
 
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   imports: [

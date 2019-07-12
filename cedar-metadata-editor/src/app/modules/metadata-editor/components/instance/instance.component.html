@@ -20,79 +20,11 @@
       (click)="onSubmit()">{{'App.Save' | translate}}
     </button>
   </div>
-
-  <div *ngIf="instance" class="accordion-container">
-    <mat-accordion>
-      <mat-expansion-panel class="expansion-container">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{'Generic.jsonLD' | translate}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div style="text-align:right">
-          <button id="jsonLDCopy" mat-raised-button color="accent" (click)="copyToClipboard('jsonLD', 'jsonLDCopy')">
-            {{'App.Copy' | translate}}
-          </button>
-        </div>
-        <pre><span id="jsonLD">{{ instance | json}}</span></pre>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel class="expansion-container">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{'Generic.rdf' | translate}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div style="text-align:right">
-          <button id="RDFCopy" mat-raised-button color="accent" (click)="copyToClipboard('RDF', 'RDFCopy')">
-            {{'App.Copy' | translate}}
-          </button>
-        </div>
-        <pre><span id="RDF">{{rdf}}</span></pre>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel class="expansion-container">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{'Generic.jsonSchema' | translate}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <div style="text-align:right">
-          <button id="jsonSchemaCopy" mat-raised-button color="accent"
-            (click)="copyToClipboard('jsonSchema', 'jsonSchemaCopy')">
-            {{'App.Copy' | translate}}
-          </button>
-        </div>
-        <pre><span id="jsonSchema">{{ template | json}}</span></pre>
-      </mat-expansion-panel>
-
-    </mat-accordion>
-  </div>
-
-  <div class="legend" style="display:flex;flex-wrap: wrap">
-    <div><fa-icon class="asterisk" [icon]="faAsterisk"></fa-icon>Required</div>
-    <div><fa-icon [icon]="faEnvelope"></fa-icon>Email</div>
-    <div><fa-icon [icon]="faHashtag"></fa-icon>Number</div>
-    <div><fa-icon [icon]="faLink"></fa-icon>Link</div>
-    <div><fa-icon [icon]="faFont"></fa-icon>Text</div>
-    <div><fa-icon [icon]="faPhoneSquare"></fa-icon>Telephone</div>
-    <div><fa-icon [icon]="faCalendar"></fa-icon>Date</div>
-    <div><fa-icon [icon]="faParagraph"></fa-icon>Paragraph</div>
-    <div><fa-icon [icon]="faCheckSquare"></fa-icon>Checkbox</div>
-    <div><fa-icon [icon]="faList"></fa-icon>List</div>
-    <div><fa-icon [icon]="faDotCircle"></fa-icon>Radio</div>
-    <div><fa-icon [icon]="faExternalLinkAlt"></fa-icon>Controlled</div>
-    <div><fa-icon [icon]="faPlusSquare"></fa-icon>Attribute</div>
-  </div>
-
-
-  <div *ngIf="artifactStatus">
-    <app-artifact-error [status]="artifactStatus" [cedarLink]="cedarLink"></app-artifact-error>
-  </div>
-
 </div>
 
+<app-form-results *ngIf="template && !artifactStatus" [instance]="instance" [template]="template" [rdf]="rdf"></app-form-results>
+<app-legend *ngIf="template && !artifactStatus"></app-legend>
 
+<div *ngIf="artifactStatus">
+  <app-artifact-error [status]="artifactStatus" [cedarLink]="cedarLink"></app-artifact-error>
+</div>
