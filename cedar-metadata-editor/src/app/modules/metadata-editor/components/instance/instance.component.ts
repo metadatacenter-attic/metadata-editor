@@ -1,11 +1,8 @@
 import {Component, OnInit, SchemaMetadata} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
-
 import {forkJoin} from 'rxjs';
 import {FormArray, FormControl, FormGroup} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
-import {LocalSettingsService} from "../../../../services/local-settings.service";
-import {UiService} from "../../../../services/ui.service";
 import {DataHandlerService} from "../../../../services/data-handler.service";
 import {DataStoreService} from "../../../../services/data-store.service";
 import {DataHandlerDataId} from "../../../shared/model/data-handler-data-id.model";
@@ -15,22 +12,6 @@ import {environment} from "../../../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import * as jsonld from 'jsonld';
 import {TemplateService} from "../../services/template.service";
-import {
-  faAsterisk,
-  faCalendar,
-  faCheckSquare,
-  faDotCircle,
-  faEnvelope,
-  faExternalLinkAlt,
-  faFont,
-  faHashtag,
-  faLink,
-  faList,
-  faParagraph,
-  faPhoneSquare,
-  faPlusSquare
-} from '@fortawesome/free-solid-svg-icons';
-
 
 
 @Component({
@@ -50,51 +31,21 @@ export class InstanceComponent implements OnInit {
   template: any;
   instance: any;
   rdf: any;
-  mode: string;
+  mode = 'edit';
 
-  route: ActivatedRoute;
   payload: any;
   jsonLD: any;
 
   formValid: boolean;
-  ui: UiService;
-  _ls: LocalSettingsService;
-  dh: DataHandlerService;
-  ds: DataStoreService;
   artifactStatus: number = null;
   cedarLink: string = null;
-
-  showForm: boolean;
-
   allPosts;
 
   CUSTOM_ELEMENTS_SCHEMA: SchemaMetadata;
-  faAsterisk = faAsterisk;
-  faEnvelope = faEnvelope;
-  faHashtag = faHashtag;
-  faLink = faLink;
-  faFont = faFont;
-  faCalendar = faCalendar;
-  faPhoneSquare = faPhoneSquare;
-  faParagraph = faParagraph;
-  faCheckSquare = faCheckSquare;
-  faList = faList;
-  faDotCircle = faDotCircle;
-  faPlusSquare = faPlusSquare;
-  faExternalLinkAlt = faExternalLinkAlt;
 
 
-  constructor(ui: UiService, route: ActivatedRoute, ls: LocalSettingsService, private translateService: TranslateService, dataHandler: DataHandlerService,
-              dataStore: DataStoreService, private http: HttpClient, private autocompleteService: AutocompleteService) {
-    this.route = route;
-    this.ui = ui;
-    this._ls = ls;
-
-    this.dh = dataHandler;
-    this.ds = dataStore;
-    this.showForm = true;
-    this.mode = 'edit';
-
+  constructor(private route: ActivatedRoute, private translateService: TranslateService, private dataHandler: DataHandlerService,
+              private dataStore: DataStoreService, private http: HttpClient, private autocompleteService: AutocompleteService) {
   }
 
   protected onAutocomplete(event) {
@@ -138,9 +89,9 @@ export class InstanceComponent implements OnInit {
   }
 
   protected initDataHandler(): DataHandlerService {
-    this.dh.reset();
-    this.dh.setPreCallback(() => this.preDataIsLoaded());
-    return this.dh;
+    this.dataHandler.reset();
+    this.dataHandler.setPreCallback(() => this.preDataIsLoaded());
+    return this.dataHandler;
   }
 
   private preDataIsLoaded() {
@@ -155,49 +106,49 @@ export class InstanceComponent implements OnInit {
     if (instanceId) {
       this.initDataHandler();
       this.cedarLink = environment.cedarUrl + 'instances/edit/' + instanceId;
-      this.dh
+      this.dataHandler
         .requireId(DataHandlerDataId.TEMPLATE_INSTANCE, instanceId)
         .load(() => this.instanceLoadedCallback(instanceId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
     } else if (templateId) {
       // load the template it is based on
-      this.dh
+      this.dataHandler
         .requireId(DataHandlerDataId.TEMPLATE, this.templateId)
         .load(() => this.templateLoadedCallback(this.templateId,), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
     } else if (templateElementId) {
       // load the template it is based on
-      this.dh
+      this.dataHandler
         .requireId(DataHandlerDataId.TEMPLATE_ELEMENT, this.templateElementId)
         .load(() => this.templateElementLoadedCallback(this.templateElementId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
     } else if (templateFieldId) {
       // load the template it is based on
-      this.dh
+      this.dataHandler
         .requireId(DataHandlerDataId.TEMPLATE_FIELD, this.templateFieldId)
         .load(() => this.templateFieldLoadedCallback(this.templateFieldId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
     }
   }
 
   private instanceLoadedCallback(instanceId) {
-    this.instance = this.ds.getTemplateInstance(instanceId);
+    this.instance = this.dataStore.getTemplateInstance(instanceId);
     this.templateId = TemplateService.isBasedOn(this.instance);
 
     // load the template it is based on
-    this.dh
+    this.dataHandler
       .requireId(DataHandlerDataId.TEMPLATE, this.templateId)
       .load(() => this.templateLoadedCallback(this.templateId), (error, dataStatus) => this.dataErrorCallback(error, dataStatus));
   }
 
   private templateLoadedCallback(templateId) {
-    this.template = this.ds.getTemplate(templateId);
+    this.template = this.dataStore.getTemplate(templateId);
     this.instance = TemplateService.initInstance(this.template);
   }
 
   private templateElementLoadedCallback(templateElementId) {
-    this.template = this.ds.getTemplateElement(templateElementId);
+    this.template = this.dataStore.getTemplateElement(templateElementId);
     this.instance = TemplateService.initInstance(this.template);
   }
 
   private templateFieldLoadedCallback(templateFieldId) {
-    this.template = this.ds.getTemplateField(templateFieldId);
+    this.template = this.dataStore.getTemplateField(templateFieldId);
     this.instance = TemplateService.initInstance(this.template);
   }
 
@@ -298,18 +249,6 @@ export class InstanceComponent implements OnInit {
 
   getType() {
     return 'element';
-  }
-
-  selectedTabChange(event) {
-
-    if (event.index === 0) {
-      setTimeout(() => {
-        this.showForm = true;
-      }, 0);
-
-    } else {
-      this.showForm = false;
-    }
   }
 
   // form changed, update tab contents and submit button status
