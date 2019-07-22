@@ -1,16 +1,79 @@
+<!--&lt;!&ndash; Slide Menu&ndash;&gt;-->
+<!--<aside class="side-menu__container" [ngClass]="{'side-menu__container-active': showMenu}" (click)="toggleMenu()">-->
+<!--  <nav class="slide-menu" [ngClass]="{'slide-menu-active': showMenu}" (click)="$event.stopImmediatePropagation();">-->
+<!--    <section class="menu-header">-->
+<!--      <span></span>-->
+<!--    </section>-->
+<!--    <section class="menu-body">-->
+<!--      <div class="menu__container">-->
+<!--                <mat-toolbar>-->
+<!--                  <mat-toolbar-row>-->
+<!--                    <button style="text-align:left;width:100%" mat-button routerLink="">{{'App.Home' | translate}}</button>-->
+<!--                  </mat-toolbar-row>-->
+<!--                </mat-toolbar>-->
+<!--      </div>-->
+<!--    </section>-->
+<!--    <section class="menu-footer">-->
+<!--    </section>-->
+<!--  </nav>-->
+<!--</aside>-->
+
+<!--<div class="root__container">-->
+<!--  <header class="main__header">-->
+<!--    <div class="left__section">-->
+<!--      <div id="Menu_Burger_Icon" class="hamburger__icon" (click)="toggleMenu()">-->
+<!--        <fa-icon [icon]="faBars"></fa-icon>-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <img class="cedar__logo" src="assets/img/small-tree.png">-->
+<!--    <h1 class="app-title">{{ 'App.NavTitle' | translate }}</h1>-->
+
+<!--  </header>-->
+
+<!--  <main class="main__container">-->
+<!--    <div class="main-container__bg"></div>-->
+<!--    <router-outlet></router-outlet>-->
+<!--  </main>-->
+
+<!--  <footer class="main__footer">-->
+<!--    <div class="flex">-->
+
+
+<!--          <div class="paragraph__section">-->
+<!--            <div style="margin:auto">-->
+<!--            <h2>Stay up to date.</h2>-->
+<!--            Get free support for all of your CEDAR questions via our mailing list. The list is actively monitored by-->
+<!--            Stanford’s CEDAR team, as well as many experienced CEDAR users from the community at large.-->
+<!--            </div>-->
+<!--          </div>-->
+
+<!--          <div class="form__section" >-->
+<!--            <form >-->
+<!--              <div class="subscribe" >-->
+<!--                <input type="text" placeholder="email address" >-->
+<!--                <button mat-raised-button  color="primary">Subscribe</button>-->
+<!--              </div>-->
+<!--              <div class="disclaimer">By subscribing, you agree to receive updates about CEDAR.</div>-->
+<!--            </form>-->
+<!--          </div>-->
+<!--    </div>-->
+<!--  </footer>-->
+<!--</div>-->
+
+
+
+<!--<ng-snotify></ng-snotify>-->
+<!--<app-spinner></app-spinner>-->
+
 <!-- Slide Menu-->
-<aside class="side-menu__container" [ngClass]="{'side-menu__container-active': showMenu}" (click)="toggleMenu()">
+<aside class="side-menu__container" [ngClass]="{'side-menu__container-active': showMenu}">
   <nav class="slide-menu" [ngClass]="{'slide-menu-active': showMenu}" (click)="$event.stopImmediatePropagation();">
     <section class="menu-header">
       <span></span>
     </section>
     <section class="menu-body">
       <div class="menu__container">
-                <mat-toolbar>
-                  <mat-toolbar-row>
-                    <button style="text-align:left;width:100%" mat-button routerLink="">{{'App.Home' | translate}}</button>
-                  </mat-toolbar-row>
-                </mat-toolbar>
       </div>
     </section>
     <section class="menu-footer">
@@ -20,48 +83,60 @@
 
 <div class="root__container">
   <header class="main__header">
-    <div class="left__section">
-      <div id="Menu_Burger_Icon" class="hamburger__icon" (click)="toggleMenu()">
-        <fa-icon [icon]="faBars"></fa-icon>
-      </div>
+    <img class="cedar__logo" src="assets/img/small-tree.png">
+    <h2 class="app-title">{{'App.NavTitle'|translate}}
+      <button (click)="openInCedar()" mat-icon-button class="help-text-button"
+        matTooltip="login to CEDAR">
+        <mat-icon>exit_to_app</mat-icon>
+      </button>
+    </h2>
+
+    <div class="button-container">
+      <button (click)="goto('https://cedar.metadatacenter.org')" mat-button>
+        Cedar
+      </button>
     </div>
 
-    <img class="cedar__logo" src="assets/img/CEDAR_logo_tree.png">
-    <h1 class="app-title">{{ 'App.NavTitle' | translate }}</h1>
+    <div class="button-container">
+      <button (click)="goto('http://metadatacenter.org')" mat-button>
+        MetadataCenter.org
+      </button>
+    </div>
 
   </header>
 
   <main class="main__container">
-    <div class="main-container__bg"></div>
     <router-outlet></router-outlet>
   </main>
 
   <footer class="main__footer">
     <div class="flex">
+      <div class="paragraph__section">
+        <div style="margin:auto">
+          <h1 class="footer-title" >Stay up to date.</h1>
+          <p>Get free support for all of your CEDAR questions via our mailing list. The list is actively monitored by
+            Stanford’s CEDAR team, as well as many experienced CEDAR users from the community at large.</p>
+          <p>CEDAR was originated by the National Institutes of Health through an NIH Big Data to Knowledge program
+            grant. (Grant Number 1U54AI117925)</p>
+        </div>
+      </div>
 
-
-          <div class="paragraph__section">
-            <div style="margin:auto">
-            <h2>Stay up to date.</h2>
-            Get free support for all of your CEDAR questions via our mailing list. The list is actively monitored by
-            Stanford’s CEDAR team, as well as many experienced CEDAR users from the community at large.
-            </div>
+      <div class="form__section">
+        <form>
+          <div class="subscribe">
+            <input type="text" placeholder="email address" [(ngModel)]="model.email" id="email" name="email"
+              #email="ngModel">
+            <button mat-raised-button color="primary" (click)="subscribe()">Subscribe</button>
           </div>
+          <p class="disclaimer">By subscribing, you agree to receive updates about CEDAR.</p>
+        </form>
+      </div>
+    </div>
 
-          <div class="form__section" >
-            <form >
-              <div class="subscribe" >
-                <input type="text" placeholder="email address" >
-                <button mat-raised-button  color="primary">Subscribe</button>
-              </div>
-              <div class="disclaimer">By subscribing, you agree to receive updates about CEDAR.</div>
-            </form>
-          </div>
+    <div class="flex">
+      <p>Copyright @ 2019 The Board of Trustees of Leland Stanford Junior University</p>
     </div>
   </footer>
 </div>
-
-
-
 
 

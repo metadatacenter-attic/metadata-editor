@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
   faTag = faTag;
   faSquare = faSquare;
   faBars = faBars;
+  model: any;
 
   constructor(public ui: UiService, ls: LocalSettingsService,
               tr: TranslateService,
@@ -48,6 +49,8 @@ export class AppComponent implements OnInit {
         titleService.setTitle(res);
       });
     });
+
+    this.model = {email: ''};
   }
 
   ngOnInit() {
@@ -83,5 +86,15 @@ export class AppComponent implements OnInit {
     window.open(destination, '_blank');
   }
 
+  subscribe() {
+    if (this.model.email.length) {
+      window.open('mailto:' + 'cedar-users-join@lists.stanford.edu' + '?email=' + this.model.email, '_self');
+      this.model.email = '';
+    }
+  }
+
+  goto(url: string) {
+    window.location.href = url;
+  }
 
 }
